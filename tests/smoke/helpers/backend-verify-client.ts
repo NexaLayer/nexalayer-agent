@@ -146,7 +146,7 @@ export class BackendVerifyClient {
         username: string;
         balance: number;
       };
-    }>(`/api/open/app/user/${userId}/balance`, {
+    }>(`/api/open/app/agent/sub-users/${userId}/balance`, {
       amount,
       remark: remark ?? 'smoke-test-topup',
     });
@@ -176,6 +176,7 @@ export class BackendVerifyClient {
     const qs = new URLSearchParams();
     if (params?.page)
       qs.set('page', String(params.page));
+    qs.set('pageSize', '20');
     const res = await this.get<{
       code: number;
       data: {
@@ -354,9 +355,11 @@ export class BackendVerifyClient {
       code: number;
       msg: string;
       data: Record<string, unknown>;
-    }>('/api/renew-order', {
-      instanceNo,
+    }>('/api/open/app/static/order/renew', {
+      order_no: instanceNo,
       duration,
+      unit: 3,
+      cycleTimes: 1,
     });
     return res.data;
   }
@@ -364,15 +367,21 @@ export class BackendVerifyClient {
   async setUserBalanceToZero(
     userId: number
   ): Promise<void> {
-    const userInfo = await this.get<{
+    const users = await this.get<{
       code: number;
-      data: { balance: number };
-    }>(`/api/open/app/user/${userId}/balance`);
+      data: {
+        items?: Array<{ id: number; balance: number }>;
+        list?: Array<{ id: number; balance: number }>;
+      };
+    }>('/api/open/app/agent/sub-users?page=1&pageSize=100');
 
-    const current = userInfo.data?.balance ?? 0;
+    const items =
+      users.data?.items ?? users.data?.list ?? [];
+    const current =
+      items.find((u) => u.id === userId)?.balance ?? 0;
     if (current > 0) {
       await this.post(
-        `/api/open/app/user/${userId}/balance`,
+        `/api/open/app/agent/sub-users/${userId}/balance`,
         {
           amount: -current,
           remark:

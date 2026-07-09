@@ -319,9 +319,9 @@ async function provisionSessionAsync(
   }
 }
 
-function dynamicValidTimeMinutes(
-  input: CreateSessionRequest
-): number {
+function dynamicValidTimeMinutes(input: {
+  rotation_interval_sec: number;
+}): number {
   if (input.rotation_interval_sec > 0) {
     return Math.min(
       89,
@@ -403,10 +403,19 @@ export async function rotateSession(
     );
   }
 
-  if (!session.backendOrderNo) {
+  if (
+    session.sessionType !== SESSION_TYPE.DYNAMIC
+  ) {
     throw new AppError(
       ERROR_CODES.BACKEND_ERROR,
-      'No backend order associated'
+      'Only dynamic sessions support rotate. Renew or recreate static sessions instead.'
+    );
+  }
+
+  if (!session.backendProductNo) {
+    throw new AppError(
+      ERROR_CODES.BACKEND_ERROR,
+      'No backend product associated'
     );
   }
 
@@ -419,26 +428,68 @@ export async function rotateSession(
   });
 
   try {
-    const result = await backend.refreshProxy(
-      session.backendOrderNo
+    const agent = await prisma.agentApp.findUnique({
+      where: { id: agentId },
+    });
+    if (
+      !agent?.backendUsername ||
+      !agent.backendPasswordEnc
+    ) {
+      throw new AppError(
+        ERROR_CODES.BACKEND_ERROR,
+        'Backend credentials missing'
+      );
+    }
+
+    const backendPassword = decrypt(
+      agent.backendPasswordEnc
+    );
+    const userToken = await backend.getUserToken(
+      agent.backendUsername,
+      backendPassword
+    );
+    const product = await lookupProductInfo(
+      userToken,
+      session.backendProductNo,
+      session.sessionType
+    );
+    const result = await backend.extractDynamicProxy(
+      userToken,
+      {
+        productNo: session.backendProductNo,
+        proxyType: product.proxyType,
+        username: agent.backendUsername,
+        protocol: session.proxyProtocol,
+        quantity: 1,
+        validTime: dynamicValidTimeMinutes({
+          rotation_interval_sec:
+            session.rotationIntervalSec,
+        }),
+        countryCode: session.countryCode ?? undefined,
+        cityCode: session.cityCode ?? undefined,
+      }
     );
 
     const proxyInfo = extractProxyInfo(result);
+    if (!proxyInfo) {
+      throw new Error(
+        'Dynamic proxy rotation returned no proxy endpoint'
+      );
+    }
 
     await prisma.agentSession.update({
       where: { id: session.id },
       data: {
         status: SESSION_STATUS.ACTIVE,
-        proxyHost: proxyInfo?.host ?? session.proxyHost,
-        proxyPort: proxyInfo?.port ?? session.proxyPort,
+        proxyHost: proxyInfo.host,
+        proxyPort: proxyInfo.port,
         proxyUsername:
-          proxyInfo?.username ??
+          proxyInfo.username ??
           session.proxyUsername,
-        proxyPasswordEnc: proxyInfo?.password
+        proxyPasswordEnc: proxyInfo.password
           ? encrypt(proxyInfo.password)
           : session.proxyPasswordEnc,
-        proxyProtocol:
-          proxyInfo?.protocol ?? session.proxyProtocol,
+        proxyProtocol: proxyInfo.protocol,
         lastRotatedAt: new Date(),
         lastRotateReason: reason,
       },

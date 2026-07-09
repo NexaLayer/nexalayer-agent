@@ -1,8 +1,9 @@
 import { z } from 'zod';
 
 export const BackendDynamicProductSchema = z.object({
-  id: z.number(),
-  type: z.string(),
+  id: z.number().optional(),
+  productId: z.string().optional(),
+  type: z.string().optional(),
   name: z.string(),
   proxyType: z.number(),
   price: z.number(),
@@ -13,6 +14,8 @@ export const BackendDynamicProductSchema = z.object({
   city: z.string().optional(),
   isGlobal: z.boolean().optional(),
   stock: z.number().optional(),
+}).refine((p) => p.productId || p.type, {
+  message: 'productId or type is required',
 });
 
 export const BackendStaticProductSchema = z.object({
@@ -23,12 +26,17 @@ export const BackendStaticProductSchema = z.object({
   stock: z.number(),
   area: z.string().optional().nullable(),
   country: z.string().optional().nullable(),
+  countryCode: z.string().optional().nullable(),
   city: z.string().optional().nullable(),
+  cityCode: z.string().optional().nullable(),
   flow: z.number().optional().nullable(),
   duration: z.number().optional().nullable(),
   unit: z.number().optional().nullable(),
+  product_type: z.union([z.string(), z.number()])
+    .optional()
+    .nullable(),
   supplierCode: z.string().optional().nullable(),
-  status: z.number(),
+  status: z.number().optional(),
   minAgentPrice: z.number().optional().nullable(),
 });
 

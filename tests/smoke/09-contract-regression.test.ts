@@ -118,15 +118,23 @@ describe(
           return;
         }
 
-        const raw = await backendGet<{
+        const raw = await backendPost<{
           code: number;
-          data: unknown[];
+          data:
+            | unknown[]
+            | {
+                items?: unknown[];
+                list?: unknown[];
+              };
         }>(
-          '/api/business/dynamic-proxy/products',
+          '/api/open/app/product/query-standard/v2',
+          { proxyType: 104, language: 'en' },
           token
         );
 
-        const items = raw.data ?? [];
+        const items = Array.isArray(raw.data)
+          ? raw.data
+          : (raw.data?.items ?? raw.data?.list ?? []);
         if (items.length === 0) {
           console.warn(
             '[TS-9] No dynamic products'
@@ -168,14 +176,21 @@ describe(
 
         const raw = await backendPost<{
           code: number;
-          data: unknown[];
+          data:
+            | unknown[]
+            | {
+                items?: unknown[];
+                list?: unknown[];
+              };
         }>(
-          '/api/open/app/product/query/v2',
-          { proxyType: [101, 102, 103] },
+          '/api/open/app/product/query-standard/v2',
+          { proxyType: 103, language: 'en' },
           token
         );
 
-        const items = raw.data ?? [];
+        const items = Array.isArray(raw.data)
+          ? raw.data
+          : (raw.data?.items ?? raw.data?.list ?? []);
         if (items.length === 0) {
           console.warn(
             '[TS-9] No static products'

@@ -328,9 +328,25 @@ export async function executeAssignBalance(
     };
   }
   const adminToken = await getAdminToken();
+  const found = await findUserAcrossRoles(
+    targetUser,
+    adminToken
+  );
+  if (!found) {
+    return {
+      message: t(
+        lang,
+        `未找到用户 ${targetUser}`,
+        `User ${targetUser} not found`
+      ),
+    };
+  }
   const res = (await backendPost(
-    '/api/open/app/user/adjust-balance',
-    { username: targetUser, amount },
+    `/api/open/app/agent/sub-users/${found.id}/balance`,
+    {
+      amount,
+      remark: `NL Agent balance adjustment for ${targetUser}`,
+    },
     adminToken
   )) as { code: number; msg?: string };
   if (res.code !== 0) {
@@ -378,14 +394,7 @@ export async function executeQueryBalance(
       };
     }
 
-    const balRes = (await backendGet(
-      `/api/open/app/user/${found.id}/balance`,
-      token
-    )) as {
-      code: number;
-      data?: { balance?: number };
-    };
-    const bal = balRes.data?.balance ?? 0;
+    const bal = found.balance ?? 0;
     const roleLabel = found.is_agent
       ? t(lang, '(代理商)', '(Agent)')
       : found.is_admin
@@ -2527,6 +2536,7 @@ export async function executeQueryStaticOrders(
 interface DynProduct {
   id: number;
   type: string;
+  productId?: string;
   proxyType: number;
   price: number;
   name?: string;
@@ -2591,17 +2601,36 @@ export async function executePurchaseDynamic(
     targetUsername = found.username ?? targetUserName;
   }
 
-  const prodRes = (await backendGet(
-    '/api/business/dynamic-proxy/products',
+  const prodRes = (await backendPost(
+    '/api/open/app/product/query-standard/v2',
+    {
+      proxyType: 104,
+      language: lang,
+    },
     user.backendToken
-  )) as { code: number; data?: DynProduct[] };
+  )) as {
+    code: number;
+    data?:
+      | DynProduct[]
+      | {
+          items?: DynProduct[];
+          list?: DynProduct[];
+        };
+  };
 
   let product: DynProduct | undefined;
-  if (prodRes.code === 0 && prodRes.data?.length) {
+  const products = Array.isArray(prodRes.data)
+    ? prodRes.data
+    : (prodRes.data?.items ??
+      prodRes.data?.list ??
+      []);
+  if (prodRes.code === 0 && products.length) {
     product =
-      prodRes.data.find(
-        (p) => p.type === 'dynamic_ipweb'
-      ) || prodRes.data[0];
+      products.find((p) =>
+        (p.type ?? p.productId ?? '').includes(
+          'dynamic'
+        )
+      ) || products[0];
   }
 
   if (!product) {
@@ -2666,31 +2695,30 @@ export async function executePurchaseDynamic(
     (unitPrice * trafficGb).toFixed(2)
   );
 
+  const productNo = product.productId ?? product.type;
   const body = {
-    productNo: product.type,
-    proxyType: product.proxyType || 104,
-    flow: trafficGb,
-    maxFlowLimit: trafficGb,
-    username: targetUsername,
+    orderType: 'dynamic_proxy',
+    poolId: productNo,
+    trafficAmount: trafficGb,
     userId: targetUserId,
+    ipCount: 1,
+    duration: 30,
+    unit: 1,
     unitPrice,
     totalAmount,
     remark,
   };
 
   const res = (await backendPost(
-    '/api/business/dynamic-proxy/open',
+    '/api/open/app/order/create/v2',
     body,
     user.backendToken
   )) as {
     code: number;
     data?: {
-      orderNo?: string;
       balance?: number;
-      proxy?: {
-        url?: string;
-        list?: string[];
-      };
+      orderNo?: string;
+      order_no?: string;
     };
     msg?: string;
   };
@@ -2710,33 +2738,82 @@ export async function executePurchaseDynamic(
     };
   }
 
+  const extractRes = (await backendPost(
+    '/api/business/dynamic-proxy/extract',
+    {
+      productNo,
+      proxyType: product.proxyType || 104,
+      username: targetUsername,
+      extractConfig: {
+        method: 'password',
+        protocol: 'socks5',
+        dataFormat: 'txt',
+        delimiter: 1,
+        quantity: 1,
+        validTime: 5,
+        timeMode: 'specified',
+      },
+    },
+    user.backendToken
+  )) as {
+    code: number;
+    data?: {
+      proxy?: { url?: string; list?: string[] };
+      list?: string[];
+      full_url?: string;
+      proxy_url?: string;
+    };
+    msg?: string;
+  };
+
   let proxyLine = '';
-  if (res.data?.proxy?.url) {
-    proxyLine = `\n• 代理地址: ${res.data.proxy.url}`;
-  } else if (res.data?.proxy?.list?.length) {
+  if (extractRes.code === 0 && extractRes.data) {
+    if (extractRes.data.proxy?.url) {
+      proxyLine =
+        `\n• 代理地址: ${extractRes.data.proxy.url}`;
+    } else if (
+      extractRes.data.proxy?.list?.length
+    ) {
+      proxyLine =
+        `\n• 代理地址: ${extractRes.data.proxy.list[0]}`;
+    } else if (extractRes.data.list?.length) {
+      proxyLine =
+        `\n• 代理地址: ${extractRes.data.list[0]}`;
+    } else if (extractRes.data.full_url) {
+      proxyLine =
+        `\n• 代理地址: ${extractRes.data.full_url}`;
+    } else if (extractRes.data.proxy_url) {
+      proxyLine =
+        `\n• 代理地址: ${extractRes.data.proxy_url}`;
+    }
+  }
+  if (!proxyLine && extractRes.code !== 0) {
     proxyLine =
-      `\n• 代理地址: ${res.data.proxy.list[0]}`;
+      `\n• 提取代理失败: ${extractRes.msg ?? 'unknown'}`;
   }
 
   return {
     message: t(
       lang,
-      `✅ 动态代理开通成功！\n\n` +
+        `✅ 动态代理开通成功！\n\n` +
         `• 流量: ${trafficGb} GB\n` +
-        `• 产品: ${product.type}\n` +
+        `• 产品: ${productNo}\n` +
         `• 用户: ${targetUsername}` +
         proxyLine +
         (remark ? `\n• 备注: ${remark}` : '') +
         `\n\n如需提取代理，请输入"提取动态代理"`,
       `✅ Dynamic proxy activated!\n\n` +
         `• Traffic: ${trafficGb} GB\n` +
-        `• Product: ${product.type}\n` +
+        `• Product: ${productNo}\n` +
         `• User: ${targetUsername}` +
         proxyLine +
         (remark ? `\n• Remark: ${remark}` : '') +
         `\n\nTo extract proxy, type "extract proxy"`
     ),
-    data: res.data as Record<string, unknown>,
+    data: {
+      ...(res.data as Record<string, unknown>),
+      proxy_extract: extractRes.data,
+    },
   };
 }
 
@@ -3006,8 +3083,8 @@ export async function executePurchaseStatic(
     body.assignedIp = ip;
   }
 
-  const res = (await backendPost(
-    '/api/open/app/static/order/create/v2',
+  let res = (await backendPost(
+    '/api/open/app/static/order/create-standard/v2',
     body,
     user.backendToken
   )) as {
@@ -3015,6 +3092,17 @@ export async function executePurchaseStatic(
     data?: unknown;
     msg?: string;
   };
+  if (res.code !== 0) {
+    res = (await backendPost(
+      '/api/open/app/static/order/create/v2',
+      body,
+      user.backendToken
+    )) as {
+      code: number;
+      data?: unknown;
+      msg?: string;
+    };
+  }
 
   if (res.code !== 0) {
     const errStr = res.msg || '未知错误';

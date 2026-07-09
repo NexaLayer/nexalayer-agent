@@ -21,6 +21,54 @@ const tokenCache = new NodeCache({
 const TOKEN_CACHE_KEY = 'backend_admin_token';
 const REQUEST_TIMEOUT = 15_000;
 
+type StandardProductItem = Record<string, unknown>;
+
+function asArrayData<T>(
+  data: T[] | { items?: T[]; list?: T[] } | null | undefined
+): T[] {
+  if (Array.isArray(data)) return data;
+  return data?.items ?? data?.list ?? [];
+}
+
+async function queryStandardProducts(
+  userToken: string,
+  params: {
+    proxyType: number;
+    countryCode?: string;
+    cityCode?: string;
+    language?: 'zh' | 'en';
+  }
+): Promise<StandardProductItem[]> {
+  const res = await fetchJson<
+    BackendResponse<
+      | StandardProductItem[]
+      | {
+          items?: StandardProductItem[];
+          list?: StandardProductItem[];
+        }
+    >
+  >('/api/open/app/product/query-standard/v2', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${userToken}`,
+    },
+    body: JSON.stringify({
+      proxyType: params.proxyType,
+      standardCountryCode: params.countryCode,
+      standardCityCode: params.cityCode,
+      countryCode: params.countryCode,
+      cityCode: params.cityCode,
+      language: params.language ?? 'en',
+    }),
+  });
+  return asArrayData(res.data);
+}
+
+function num(value: unknown, fallback = 0): number {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
 async function fetchJson<T>(
   path: string,
   options: RequestInit = {}
@@ -154,6 +202,11 @@ export async function createBackendUser(
   if (agentId !== undefined) {
     payload.agent_id = agentId;
   }
+  const request = {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(payload),
+  };
   const res = await fetchJson<
     BackendResponse<{
       id: number;
@@ -161,11 +214,16 @@ export async function createBackendUser(
       agent_id?: number;
       agent_name?: string;
     }>
-  >('/api/open/app/user/create/v2', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(payload),
-  });
+  >('/api/open/app/user/v2', request).catch(() =>
+    fetchJson<
+      BackendResponse<{
+        id: number;
+        username: string;
+        agent_id?: number;
+        agent_name?: string;
+      }>
+    >('/api/open/app/user/create/v2', request)
+  );
   return res.data;
 }
 
@@ -183,12 +241,30 @@ export async function getBalance(
 export async function getDynamicProducts(
   userToken: string
 ): Promise<BackendProductResponse[]> {
-  const res = await fetchJson<
-    BackendResponse<BackendProductResponse[]>
-  >('/api/business/dynamic-proxy/products', {
-    headers: { Authorization: `Bearer ${userToken}` },
+  const items = await queryStandardProducts(userToken, {
+    proxyType: 104,
   });
-  return res.data;
+  return items.map((p) => {
+    const productNo = String(
+      p.productId ?? p.product_no ?? p.type ?? ''
+    );
+    return {
+      id: num(p.id),
+      type: productNo,
+      name: String(p.name ?? productNo),
+      proxyType: num(p.proxyType, 104),
+      price: num(p.price),
+      unit: num(p.unit, 1),
+      flow: num(p.flow ?? p.trafficAmount, 1),
+      duration: num(p.duration, 30),
+      country: String(
+        p.countryCode ?? p.country ?? ''
+      ),
+      city: String(p.cityCode ?? p.city ?? ''),
+      isGlobal: Boolean(p.isGlobal ?? p.is_global),
+      stock: num(p.stock ?? p.inventory),
+    };
+  });
 }
 
 export interface PriceEntry {
@@ -221,20 +297,49 @@ export async function getStaticProducts(
     cityCode?: string;
   }
 ): Promise<BackendStaticProductResponse[]> {
-  const res = await fetchJson<
-    BackendResponse<BackendStaticProductResponse[]>
-  >('/api/open/app/product/query/v2', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${userToken}`,
-    },
-    body: JSON.stringify({
-      proxyType: params?.proxyType ?? [101, 102, 103],
-      countryCode: params?.countryCode,
-      cityCode: params?.cityCode,
-    }),
+  const proxyTypes = params?.proxyType?.length
+    ? params.proxyType
+    : [103];
+  const batches = await Promise.all(
+    proxyTypes.map((proxyType) =>
+      queryStandardProducts(userToken, {
+        proxyType,
+        countryCode: params?.countryCode,
+        cityCode: params?.cityCode,
+      })
+    )
+  );
+  return batches.flat().map((p) => {
+    const productId = String(
+      p.productId ?? p.product_no ?? p.type ?? ''
+    );
+    return {
+      productId,
+      name: String(p.name ?? productId),
+      proxyType: num(p.proxyType, 103),
+      price: num(p.price),
+      stock: num(p.stock ?? p.inventory),
+      area: String(p.area ?? p.areaCode ?? ''),
+      country: String(
+        p.countryCode ?? p.country ?? ''
+      ),
+      city: String(p.cityCode ?? p.city ?? ''),
+      flow:
+        p.flow === undefined
+          ? undefined
+          : num(p.flow),
+      duration: num(p.duration, 30),
+      unit: num(p.unit, 1),
+      supplierCode:
+        (p.supplierCode as string | undefined) ??
+        (p.supplier_code as string | undefined),
+      status: num(p.status, 1),
+      minAgentPrice:
+        p.minAgentPrice === undefined
+          ? undefined
+          : num(p.minAgentPrice),
+    };
   });
-  return res.data;
 }
 
 export async function adjustUserBalance(
@@ -245,7 +350,7 @@ export async function adjustUserBalance(
 ): Promise<BackendBalanceAdjustResponse> {
   const res = await fetchJson<
     BackendResponse<BackendBalanceAdjustResponse>
-  >(`/api/open/app/user/${userId}/balance`, {
+  >(`/api/open/app/agent/sub-users/${userId}/balance`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${userToken}`,
@@ -263,48 +368,6 @@ export async function getAreaHierarchy(
   >('/api/areas/hierarchy', {
     headers: { Authorization: `Bearer ${userToken}` },
   });
-  return res.data;
-}
-
-export interface OpenDynamicProxyParams {
-  productNo: string;
-  proxyType: number;
-  flow: number;
-  maxFlowLimit: number;
-  username: string;
-  userId: number;
-  unitPrice: number;
-  totalAmount: number;
-  remark?: string;
-}
-
-export interface OpenDynamicResult {
-  orderNo: string;
-  username?: string;
-  password?: string;
-  host?: string;
-  port?: string;
-  proxy?: { url: string };
-}
-
-export async function openDynamicProxy(
-  params: OpenDynamicProxyParams
-): Promise<OpenDynamicResult> {
-  const headers = await authHeaders();
-  const res = await fetchJson<
-    BackendResponse<OpenDynamicResult>
-  >('/api/business/dynamic-proxy/open', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(params),
-  });
-
-  if (!res.data?.orderNo) {
-    throw new Error(
-      `Dynamic proxy open failed: ` +
-        `${res.msg ?? JSON.stringify(res)}`
-    );
-  }
   return res.data;
 }
 
@@ -405,6 +468,7 @@ export interface CreateOrderParams {
   cycleTimes?: number;
   countryCode?: string;
   cityCode?: string;
+  projectId?: string;
   remark?: string;
 }
 
@@ -412,9 +476,7 @@ export async function createStaticOrderV2(
   userToken: string,
   params: CreateOrderParams
 ): Promise<{ order_no: string }> {
-  const res = await fetchJson<
-    BackendResponse<Record<string, unknown>>
-  >('/api/open/app/static/order/create/v2', {
+  const request = {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${userToken}`,
@@ -431,13 +493,25 @@ export async function createStaticOrderV2(
       cycleTimes: params.cycleTimes ?? 1,
       countryCode: params.countryCode,
       cityCode: params.cityCode,
+      projectId: params.projectId,
       remark: params.remark ?? 'Agent session',
       extBandWidth: 0,
       bandWidthPrice: 0,
       bridgePrice: 0,
       renew: false,
     }),
-  });
+  };
+  const res = await fetchJson<
+    BackendResponse<Record<string, unknown>>
+  >(
+    '/api/open/app/static/order/create-standard/v2',
+    request
+  ).catch(() =>
+    fetchJson<BackendResponse<Record<string, unknown>>>(
+      '/api/open/app/static/order/create/v2',
+      request
+    )
+  );
 
   if (!res.data) {
     throw new Error(
@@ -472,19 +546,6 @@ export async function createStaticOrder(
   };
 }
 
-export async function refreshProxy(
-  orderNo: string
-): Promise<Record<string, unknown>> {
-  const headers = await authHeaders();
-  const res = await fetchJson<
-    BackendResponse<Record<string, unknown>>
-  >(`/api/open/app/proxy/refresh/v2/${orderNo}`, {
-    method: 'POST',
-    headers,
-  });
-  return res.data;
-}
-
 export async function getStaticOrders(
   userToken: string,
   params: { page?: number; page_size?: number }
@@ -495,7 +556,7 @@ export async function getStaticOrders(
   const qs = new URLSearchParams();
   if (params.page) qs.set('page', String(params.page));
   if (params.page_size) {
-    qs.set('page_size', String(params.page_size));
+    qs.set('pageSize', String(params.page_size));
   }
 
   const res = await fetchJson<
@@ -518,7 +579,7 @@ export async function createUsdtRechargeOrder(
   >('/api/usdt/create-order', {
     method: 'POST',
     headers: { Authorization: `Bearer ${userToken}` },
-    body: JSON.stringify({ amount }),
+    body: JSON.stringify({ amount_cny: amount }),
   });
   return res.data;
 }
@@ -595,20 +656,14 @@ export async function renewStaticOrder(
   const headers = await authHeaders();
   const res = await fetchJson<
     BackendResponse<Record<string, unknown>>
-  >(`/api/open/app/user/${params.userId}/renew`, {
+  >('/api/open/app/static/order/renew', {
     method: 'POST',
     headers,
     body: JSON.stringify({
-      proxyType: 'static',
-      orderNo: params.orderNo,
-      product_no: params.productNo,
-      quantity: 1,
+      order_no: params.orderNo,
       duration: params.duration,
-      region: params.region ?? '',
-      country: params.country ?? '',
-      city: params.city ?? '',
-      staticType: params.staticType ?? 'isp',
-      remark: '续费 - Agent自动续费',
+      unit: 3,
+      cycleTimes: 1,
     }),
   });
   return res.data;
