@@ -5,7 +5,10 @@ import {
   SESSION_STATUS,
   SESSION_TYPE,
 } from '../../config/constants';
-import { generateSessionId } from '../../utils/id-generator';
+import {
+  generateIpwebProxyPassword,
+  generateSessionId,
+} from '../../utils/id-generator';
 import { encrypt, decrypt } from '../../utils/crypto';
 import * as backend from '../../gateway/backend-client';
 import {
@@ -229,7 +232,22 @@ async function provisionSessionAsync(
             `(agentId=${agent.id})`,
         });
       backendOrderNo = dynResult.orderNo;
-      const proxy = extractProxyInfo(dynResult);
+      let proxy = extractProxyInfo(dynResult);
+      if (
+        input.product_no === 'dynamic_ipweb' &&
+        proxy?.username
+      ) {
+        const proxyPassword =
+          generateIpwebProxyPassword();
+        await backend.updateIpwebProxyPassword(
+          proxy.username,
+          proxyPassword
+        );
+        proxy = {
+          ...proxy,
+          password: proxyPassword,
+        };
+      }
       await prisma.agentSession.update({
         where: { id: sessionDbId },
         data: proxy

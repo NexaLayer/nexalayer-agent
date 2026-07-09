@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 
 export function generateSessionId(): string {
   return `sess_${uuidv4()}`;
@@ -51,6 +52,18 @@ export function generateBackendPassword(): string {
   for (let i = 0; i < 16; i++) {
     const idx = Math.floor(Math.random() * chars.length);
     password += chars[idx];
+  }
+  return password;
+}
+
+export function generateIpwebProxyPassword(): string {
+  const chars =
+    'abcdefghijklmnopqrstuvwxyz' +
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const bytes = crypto.randomBytes(12);
+  let password = '';
+  for (let i = 0; i < 12; i++) {
+    password += chars[bytes[i] % chars.length];
   }
   return password;
 }

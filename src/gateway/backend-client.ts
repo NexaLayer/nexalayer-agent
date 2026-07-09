@@ -401,6 +401,27 @@ export async function refreshProxy(
   return res.data;
 }
 
+export async function updateIpwebProxyPassword(
+  username: string,
+  newPassword: string
+): Promise<{ username: string; ipweb_username: string }> {
+  const headers = await authHeaders();
+  const res = await fetchJson<
+    BackendResponse<{
+      username: string;
+      ipweb_username: string;
+    }>
+  >('/api/open/app/agent/ipweb/update-password', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      username,
+      newPassword,
+    }),
+  });
+  return res.data;
+}
+
 export async function getStaticOrders(
   userToken: string,
   params: { page?: number; page_size?: number }
