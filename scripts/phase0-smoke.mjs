@@ -37,6 +37,7 @@ let registeredAgentId = 0;
 let backendUsername = '';
 let backendUserId = 0;
 let backendToken = '';
+let backendLoginRole = '';
 
 function log(label, data) {
   console.log(JSON.stringify({ label, ...data }));
@@ -164,6 +165,7 @@ async function ensureBackendToken() {
         password: c.password,
       });
       backendToken = data.token;
+      backendLoginRole = c.role;
       log('backend.login', { role: c.role, ok: true });
       return backendToken;
     } catch (err) {
@@ -177,15 +179,23 @@ async function ensureBackendToken() {
 async function findBackendUser() {
   if (backendUserId) return backendUserId;
   await ensureBackendToken();
-  const qs = new URLSearchParams({
-    page: '1',
-    pageSize: '5',
-    search: backendUsername,
-  });
-  const data = await backendApi(
-    'GET',
-    `/api/open/app/agent/sub-users?${qs}`
-  );
+  const qs =
+    backendLoginRole === 'admin'
+      ? new URLSearchParams({
+          page: '1',
+          pageSize: '5',
+          search: backendUsername,
+        })
+      : new URLSearchParams({
+          page: '1',
+          pageSize: '5',
+          search: backendUsername,
+        });
+  const path =
+    backendLoginRole === 'admin'
+      ? `/api/open/app/users/list?${qs}`
+      : `/api/open/app/agent/sub-users?${qs}`;
+  const data = await backendApi('GET', path);
   const users = data?.items ?? data?.list ?? [];
   const match =
     users.find((u) => u.username === backendUsername) ?? users[0];
@@ -200,11 +210,11 @@ async function adjustBackendBalance(amount, remark) {
   if (!amount) return null;
   await ensureBackendToken();
   const id = await findBackendUser();
-  return backendApi(
-    'POST',
-    `/api/open/app/agent/sub-users/${id}/balance`,
-    { amount, remark }
-  );
+  const path =
+    backendLoginRole === 'admin'
+      ? `/api/open/app/user/${id}/balance`
+      : `/api/open/app/agent/sub-users/${id}/balance`;
+  return backendApi('POST', path, { amount, remark });
 }
 
 async function cleanupBackendBalance() {
@@ -214,10 +224,11 @@ async function cleanupBackendBalance() {
     pageSize: '5',
     search: backendUsername,
   });
-  const data = await backendApi(
-    'GET',
-    `/api/open/app/agent/sub-users?${qs}`
-  );
+  const path =
+    backendLoginRole === 'admin'
+      ? `/api/open/app/users/list?${qs}`
+      : `/api/open/app/agent/sub-users?${qs}`;
+  const data = await backendApi('GET', path);
   const users = data?.items ?? data?.list ?? [];
   const match =
     users.find((u) => u.id === backendUserId) ?? users[0];
