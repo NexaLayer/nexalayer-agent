@@ -28,14 +28,14 @@ function getCtx(request: FastifyRequest) {
 export async function handleCreate(
   request: FastifyRequest,
   reply: FastifyReply
-): Promise<void> {
+): Promise<FastifyReply> {
   const ctx = getCtx(request);
   const body = createSessionSchema.parse(request.body);
   const result = await sessionService.createSession(
     ctx.agentId,
     body
   );
-  sendSuccess(reply, result, 202, request.startTime);
+  return sendSuccess(reply, result, 202, request.startTime);
 }
 
 export async function handleGet(
@@ -79,7 +79,7 @@ export async function handleRotate(
     Params: { session_id: string };
   }>,
   reply: FastifyReply
-): Promise<void> {
+): Promise<FastifyReply> {
   const ctx = getCtx(request);
   const body = rotateSessionSchema.parse(
     request.body ?? {}
@@ -89,7 +89,7 @@ export async function handleRotate(
     request.params.session_id,
     body.reason ?? 'manual'
   );
-  sendSuccess(reply, result, 200, request.startTime);
+  return sendSuccess(reply, result, 200, request.startTime);
 }
 
 export async function handleTerminate(
@@ -111,7 +111,7 @@ export async function handleRenew(
     Params: { session_id: string };
   }>,
   reply: FastifyReply
-): Promise<void> {
+): Promise<FastifyReply> {
   const ctx = getCtx(request);
   const body = renewSessionSchema.parse(request.body);
   const result = await sessionService.renewSession(
@@ -119,7 +119,7 @@ export async function handleRenew(
     request.params.session_id,
     body.duration
   );
-  sendSuccess(reply, result, 200, request.startTime);
+  return sendSuccess(reply, result, 200, request.startTime);
 }
 
 export async function handleWhitelist(

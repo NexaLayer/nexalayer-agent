@@ -12,14 +12,14 @@ export function sendSuccess<T>(
   data: T,
   statusCode = 200,
   startTime?: number
-): void {
+): FastifyReply {
   const response: ApiResponse<T> = {
     success: true,
     data,
     error: null,
     meta: buildMeta(startTime),
   };
-  reply.status(statusCode).send(response);
+  return reply.status(statusCode).send(response);
 }
 
 export function sendError(
@@ -28,7 +28,7 @@ export function sendError(
   message: string,
   details?: Record<string, unknown>,
   startTime?: number
-): void {
+): FastifyReply {
   const httpStatus = HTTP_STATUS_FOR_ERROR[code] ?? 500;
   const response: ApiResponse<null> = {
     success: false,
@@ -36,7 +36,7 @@ export function sendError(
     error: { code, message, details },
     meta: buildMeta(startTime),
   };
-  reply.status(httpStatus).send(response);
+  return reply.status(httpStatus).send(response);
 }
 
 export function sendPaginated<T>(
@@ -46,7 +46,7 @@ export function sendPaginated<T>(
   page: number,
   pageSize: number,
   startTime?: number
-): void {
+): FastifyReply {
   const data: PaginatedData<T> = {
     items,
     pagination: {
@@ -56,7 +56,7 @@ export function sendPaginated<T>(
       total_pages: Math.ceil(total / pageSize),
     },
   };
-  sendSuccess(reply, data, 200, startTime);
+  return sendSuccess(reply, data, 200, startTime);
 }
 
 function buildMeta(startTime?: number) {
