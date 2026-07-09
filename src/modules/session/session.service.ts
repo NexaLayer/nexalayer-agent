@@ -381,26 +381,7 @@ export async function rotateSession(
   });
 
   try {
-    const agent = await prisma.agentApp.findUnique({
-      where: { id: agentId },
-    });
-    if (
-      !agent?.backendUsername ||
-      !agent.backendPasswordEnc
-    ) {
-      throw new Error('Backend credentials missing');
-    }
-
-    const backendPassword = decrypt(
-      agent.backendPasswordEnc
-    );
-    const userToken = await backend.getUserToken(
-      agent.backendUsername,
-      backendPassword
-    );
-
     const result = await backend.refreshProxy(
-      userToken,
       session.backendOrderNo
     );
 

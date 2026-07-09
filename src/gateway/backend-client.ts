@@ -389,14 +389,14 @@ export async function createStaticOrder(
 }
 
 export async function refreshProxy(
-  userToken: string,
   orderNo: string
 ): Promise<Record<string, unknown>> {
+  const headers = await authHeaders();
   const res = await fetchJson<
     BackendResponse<Record<string, unknown>>
   >(`/api/open/app/proxy/refresh/v2/${orderNo}`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${userToken}` },
+    headers,
   });
   return res.data;
 }

@@ -2,6 +2,7 @@ import {
   FastifyInstance,
   FastifyError,
 } from 'fastify';
+import { ZodError } from 'zod';
 import { AppError, sendError } from '../utils/response';
 import { ERROR_CODES } from '../config/constants';
 
@@ -21,6 +22,16 @@ export function registerErrorHandler(
           error.code,
           error.message,
           error.details,
+          request.startTime
+        );
+      }
+
+      if (error instanceof ZodError) {
+        return sendError(
+          reply,
+          ERROR_CODES.INVALID_REQUEST,
+          'Validation error',
+          { issues: error.issues },
           request.startTime
         );
       }
