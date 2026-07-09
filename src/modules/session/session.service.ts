@@ -123,7 +123,9 @@ async function lookupProductInfo(
       const prices =
         await backend.getDynamicPrices();
       const priceEntry = prices.find(
-        (p) => p.id === match.id
+        (p) =>
+          p.id === match.id ||
+          p.type === match.type
       );
       if (priceEntry && priceEntry.price > 0) {
         price = priceEntry.price;

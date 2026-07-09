@@ -44,13 +44,16 @@ function log(label, data) {
 }
 
 async function api(method, path, body, headers = {}) {
+  const requestHeaders = {
+    ...(apiKey ? { 'X-API-Key': apiKey } : {}),
+    ...headers,
+  };
+  if (body !== undefined) {
+    requestHeaders['Content-Type'] = 'application/json';
+  }
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(apiKey ? { 'X-API-Key': apiKey } : {}),
-      ...headers,
-    },
+    headers: requestHeaders,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const text = await res.text();
@@ -113,9 +116,12 @@ async function backendApi(method, path, body) {
   if (!BACKEND_BASE_URL) {
     throw new Error('BACKEND_BASE_URL is required for backend top-up');
   }
-  const headers = { 'Content-Type': 'application/json' };
+  const headers = {};
   if (backendToken) {
     headers.Authorization = `Bearer ${backendToken}`;
+  }
+  if (body !== undefined) {
+    headers['Content-Type'] = 'application/json';
   }
   const res = await fetch(`${BACKEND_BASE_URL}${path}`, {
     method,
