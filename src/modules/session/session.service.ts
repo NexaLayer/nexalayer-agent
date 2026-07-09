@@ -5,10 +5,7 @@ import {
   SESSION_STATUS,
   SESSION_TYPE,
 } from '../../config/constants';
-import {
-  generateIpwebProxyPassword,
-  generateSessionId,
-} from '../../utils/id-generator';
+import { generateSessionId } from '../../utils/id-generator';
 import { encrypt, decrypt } from '../../utils/crypto';
 import * as backend from '../../gateway/backend-client';
 import {
@@ -217,36 +214,44 @@ async function provisionSessionAsync(
     if (
       input.session_type === SESSION_TYPE.DYNAMIC
     ) {
-      const dynResult =
-        await backend.openDynamicProxy({
-          productNo: input.product_no,
-          proxyType: product.proxyType,
-          flow: qty,
-          maxFlowLimit: qty,
-          username:
-            agent.backendUsername ?? 'agent',
-          userId: agent.backendUserId,
-          unitPrice: product.price,
-          totalAmount,
-          remark: `Agent session ` +
-            `(agentId=${agent.id})`,
-        });
-      backendOrderNo = dynResult.orderNo;
-      let proxy = extractProxyInfo(dynResult);
-      if (
-        input.product_no === 'dynamic_ipweb' &&
-        proxy?.username
-      ) {
-        const proxyPassword =
-          generateIpwebProxyPassword();
-        await backend.updateIpwebProxyPassword(
-          proxy.username,
-          proxyPassword
+      const dynOrder =
+        await backend.createDynamicOrderV2(
+          userToken,
+          {
+            orderType: 'dynamic_proxy',
+            poolId: input.product_no,
+            userId: agent.backendUserId,
+            unitPrice: product.price,
+            totalAmount,
+            trafficAmount: qty,
+            ipCount: 1,
+            duration: 30,
+            unit: 1,
+            remark: `Agent session ` +
+              `(agentId=${agent.id})`,
+          }
         );
-        proxy = {
-          ...proxy,
-          password: proxyPassword,
-        };
+      backendOrderNo = dynOrder.order_no;
+      const dynExtract =
+        await backend.extractDynamicProxy(
+          userToken,
+          {
+            productNo: input.product_no,
+            proxyType: product.proxyType,
+            username:
+              agent.backendUsername ?? 'agent',
+            protocol: input.protocol,
+            quantity: 1,
+            validTime: dynamicValidTimeMinutes(input),
+            countryCode: input.country_code,
+            cityCode: input.city_code,
+          }
+        );
+      const proxy = extractProxyInfo(dynExtract);
+      if (!proxy) {
+        throw new Error(
+          'Dynamic proxy extraction returned no proxy endpoint'
+        );
       }
       await prisma.agentSession.update({
         where: { id: sessionDbId },
@@ -312,6 +317,21 @@ async function provisionSessionAsync(
       },
     });
   }
+}
+
+function dynamicValidTimeMinutes(
+  input: CreateSessionRequest
+): number {
+  if (input.rotation_interval_sec > 0) {
+    return Math.min(
+      89,
+      Math.max(
+        1,
+        Math.ceil(input.rotation_interval_sec / 60)
+      )
+    );
+  }
+  return 5;
 }
 
 export async function getSession(
@@ -721,12 +741,22 @@ function extractProxyInfo(
 
   const nestedProxy =
     value.proxy as Record<string, unknown> | undefined;
+  const proxyList =
+    (nestedProxy?.list as unknown[] | undefined) ??
+    (value.list as unknown[] | undefined);
   const proxyUrl =
     (nestedProxy?.url as string | undefined) ??
+    (nestedProxy?.proxyUrl as string | undefined) ??
+    (typeof proxyList?.[0] === 'string'
+      ? (proxyList[0] as string)
+      : undefined) ??
     (value.full_url as string | undefined) ??
     (value.proxy_url as string | undefined);
 
   if (!proxyUrl) return null;
+
+  const lineProxy = parseProxyLine(proxyUrl);
+  if (lineProxy) return lineProxy;
 
   try {
     const parsed = new URL(proxyUrl);
@@ -744,6 +774,57 @@ function extractProxyInfo(
   } catch {
     return null;
   }
+}
+
+function parseProxyLine(line: string):
+  | {
+      host: string;
+      port: number;
+      username: string | null;
+      password: string | null;
+      protocol: string;
+    }
+  | null {
+  const raw = line.trim();
+  if (!raw) return null;
+  if (raw.includes('://')) return null;
+
+  const atIdx = raw.lastIndexOf('@');
+  if (atIdx > 0) {
+    const userPass = raw.slice(0, atIdx);
+    const hostPort = raw.slice(atIdx + 1);
+    const [username, ...passwordParts] =
+      userPass.split(':');
+    const [host, portText] = hostPort.split(':');
+    const port = Number(portText);
+    if (host && Number.isFinite(port)) {
+      return {
+        host,
+        port,
+        username: username || null,
+        password: passwordParts.join(':') || null,
+        protocol: 'socks5',
+      };
+    }
+  }
+
+  const parts = raw.split(':');
+  if (parts.length >= 4) {
+    const [host, portText, username, ...passwordParts] =
+      parts;
+    const port = Number(portText);
+    if (host && Number.isFinite(port)) {
+      return {
+        host,
+        port,
+        username: username || null,
+        password: passwordParts.join(':') || null,
+        protocol: 'socks5',
+      };
+    }
+  }
+
+  return null;
 }
 
 function buildProxyUrl(session: {

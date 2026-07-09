@@ -308,6 +308,90 @@ export async function openDynamicProxy(
   return res.data;
 }
 
+export async function createDynamicOrderV2(
+  userToken: string,
+  params: CreateOrderParams
+): Promise<{ order_no: string }> {
+  const res = await fetchJson<
+    BackendResponse<Record<string, unknown>>
+  >('/api/open/app/order/create/v2', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${userToken}`,
+    },
+    body: JSON.stringify({
+      orderType: 'dynamic_proxy',
+      poolId: params.poolId,
+      trafficAmount: params.trafficAmount ?? 1,
+      unitPrice: params.unitPrice,
+      totalAmount: params.totalAmount,
+      remark: params.remark ?? 'Agent dynamic session',
+      userId: params.userId,
+      ipCount: params.ipCount ?? 1,
+      duration: params.duration || 30,
+      unit: params.unit || 1,
+    }),
+  });
+
+  if (!res.data) {
+    throw new Error(
+      `Dynamic order creation failed: ${res.msg}`
+    );
+  }
+
+  const d = res.data as Record<string, unknown>;
+  const orderNo =
+    (d.order_no as string) ??
+    (d.orderNo as string);
+  if (!orderNo) {
+    throw new Error(
+      `Backend returned no dynamic order_no. ` +
+        `Keys: ${Object.keys(d).join(',')}`
+    );
+  }
+  return { order_no: orderNo };
+}
+
+export async function extractDynamicProxy(
+  userToken: string,
+  params: {
+    productNo: string;
+    proxyType: number;
+    username: string;
+    protocol: string;
+    quantity: number;
+    validTime: number;
+    countryCode?: string;
+    cityCode?: string;
+  }
+): Promise<Record<string, unknown>> {
+  const res = await fetchJson<
+    BackendResponse<Record<string, unknown>>
+  >('/api/business/dynamic-proxy/extract', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${userToken}`,
+    },
+    body: JSON.stringify({
+      productNo: params.productNo,
+      proxyType: params.proxyType,
+      username: params.username,
+      extractConfig: {
+        method: 'password',
+        protocol: params.protocol,
+        dataFormat: 'txt',
+        delimiter: 1,
+        quantity: params.quantity,
+        validTime: params.validTime,
+        timeMode: 'specified',
+        ipwebCountry: params.countryCode || undefined,
+        ipwebCity: params.cityCode || undefined,
+      },
+    }),
+  });
+  return res.data;
+}
+
 export interface CreateOrderParams {
   orderType: 'dynamic_proxy' | 'static_proxy';
   poolId: string;
@@ -397,27 +481,6 @@ export async function refreshProxy(
   >(`/api/open/app/proxy/refresh/v2/${orderNo}`, {
     method: 'POST',
     headers,
-  });
-  return res.data;
-}
-
-export async function updateIpwebProxyPassword(
-  username: string,
-  newPassword: string
-): Promise<{ username: string; ipweb_username: string }> {
-  const headers = await authHeaders();
-  const res = await fetchJson<
-    BackendResponse<{
-      username: string;
-      ipweb_username: string;
-    }>
-  >('/api/open/app/agent/ipweb/update-password', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      username,
-      newPassword,
-    }),
   });
   return res.data;
 }
