@@ -51,13 +51,28 @@ export async function listProducts(
   if (type === 'all' || type === 'dynamic') {
     const dynamicProducts =
       await backend.getDynamicProducts(userToken);
+    const pricesByType = new Map<string, number>();
+    try {
+      const prices = await backend.getDynamicPrices();
+      for (const entry of prices) {
+        if (entry.type && entry.price > 0) {
+          pricesByType.set(entry.type, entry.price);
+        }
+      }
+    } catch {
+      // Product listing should still work if admin pricing lookup is temporarily unavailable.
+    }
     for (const p of dynamicProducts) {
+      const price =
+        p.price > 0
+          ? p.price
+          : pricesByType.get(p.type) ?? p.price;
       products.push({
         product_no: p.type,
         name: p.name || p.type,
         type: 'dynamic',
         proxy_type: p.proxyType,
-        price: p.price,
+        price,
         unit: p.flow > 0 ? 'MB' : 'request',
         country: p.country || undefined,
         city: p.city || undefined,

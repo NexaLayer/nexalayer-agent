@@ -13,7 +13,7 @@ const IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1000;
 export async function idempotencyGuard(
   request: FastifyRequest,
   reply: FastifyReply
-): Promise<void> {
+): Promise<FastifyReply | void> {
   const key = request.headers['idempotency-key'];
   if (!key) return;
 
@@ -59,7 +59,7 @@ export async function idempotencyGuard(
         .header('X-Idempotent-Replay', 'true')
         .status(existing.responseStatus)
         .send(existing.responseBody);
-      return;
+      return reply;
     }
 
     throw new AppError(

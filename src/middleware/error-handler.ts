@@ -36,6 +36,20 @@ export function registerErrorHandler(
         );
       }
 
+      if (
+        fastifyErr.statusCode &&
+        fastifyErr.statusCode >= 400 &&
+        fastifyErr.statusCode < 500
+      ) {
+        return sendError(
+          reply,
+          ERROR_CODES.INVALID_REQUEST,
+          fastifyErr.message || 'Invalid request',
+          { fastify_code: fastifyErr.code },
+          request.startTime
+        );
+      }
+
       return sendError(
         reply,
         ERROR_CODES.INTERNAL_ERROR,
