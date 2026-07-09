@@ -517,7 +517,7 @@ export async function extractDynamicProxy(
   params: {
     productNo: string;
     proxyType: number;
-    username: string;
+    username?: string;
     protocol: string;
     quantity: number;
     validTime: number;
@@ -535,7 +535,7 @@ export async function extractDynamicProxy(
     body: JSON.stringify({
       productNo: params.productNo,
       proxyType: params.proxyType,
-      username: params.username,
+      username: params.username || undefined,
       extractConfig: {
         method: 'password',
         protocol: params.protocol,

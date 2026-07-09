@@ -240,8 +240,7 @@ async function provisionSessionAsync(
           {
             productNo: input.product_no,
             proxyType: product.proxyType,
-            username:
-              agent.backendUsername ?? 'agent',
+            username: undefined,
             protocol: input.protocol,
             quantity: 1,
             validTime: dynamicValidTimeMinutes(input),
@@ -460,7 +459,7 @@ export async function rotateSession(
       {
         productNo: session.backendProductNo,
         proxyType: product.proxyType,
-        username: agent.backendUsername,
+        username: undefined,
         protocol: session.proxyProtocol,
         quantity: 1,
         validTime: dynamicValidTimeMinutes({
