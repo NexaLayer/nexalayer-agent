@@ -1,0 +1,77 @@
+import { z } from 'zod';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const logLevels = [
+  'fatal', 'error', 'warn', 'info', 'debug', 'trace',
+] as const;
+
+const envSchema = z.object({
+  PORT: z.coerce.number().default(3000),
+  NODE_ENV: z
+    .string()
+    .transform((v) => v.toLowerCase())
+    .pipe(
+      z.enum(['development', 'production', 'test'])
+    )
+    .default('development'),
+  LOG_LEVEL: z
+    .string()
+    .transform((v) => v.toLowerCase())
+    .pipe(z.enum(logLevels))
+    .default('info'),
+
+  DATABASE_URL: z.string().min(1),
+
+  JWT_SECRET: z.string().min(32),
+  JWT_EXPIRES_IN: z.coerce.number().default(3600),
+
+  BACKEND_BASE_URL: z.string().min(1),
+  BACKEND_ADMIN_USERNAME: z.string().min(1),
+  BACKEND_ADMIN_PASSWORD: z.string().min(1),
+
+  ENCRYPTION_KEY: z.string().min(32),
+
+  RATE_LIMIT_PER_MIN: z.coerce.number().default(60),
+  RATE_LIMIT_PER_DAY: z.coerce.number().default(10000),
+
+  TRIAL_BALANCE: z.coerce.number().default(5.0),
+  TRIAL_DURATION_DAYS: z.coerce.number().default(30),
+
+  OPENAI_API_KEY: z.preprocess(
+    (v) =>
+      typeof v === 'string'
+        ? v.trim().replace(/^=+/, '').trim() || undefined
+        : undefined,
+    z.string().optional()
+  ),
+  OPENAI_MODEL: z.string().default('gpt-4o-mini'),
+  OPENAI_BASE_URL: z
+    .string()
+    .default('https://api.openai.com/v1'),
+
+  DEEPSEEK_API_KEY: z.preprocess(
+    (v) =>
+      typeof v === 'string'
+        ? v.trim().replace(/^=+/, '').trim() || undefined
+        : undefined,
+    z.string().optional()
+  ),
+  DEEPSEEK_MODEL: z.string().default('deepseek-chat'),
+  DEEPSEEK_BASE_URL: z
+    .string()
+    .default('https://api.deepseek.com/v1'),
+});
+
+const parsed = envSchema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error(
+    'Invalid environment variables:',
+    parsed.error.flatten().fieldErrors
+  );
+  process.exit(1);
+}
+
+export const env = parsed.data;

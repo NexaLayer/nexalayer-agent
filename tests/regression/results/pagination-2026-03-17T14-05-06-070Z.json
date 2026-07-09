@@ -1,0 +1,1087 @@
+[
+  {
+    "name": "A1",
+    "suite": "A. Basic pagination",
+    "description": "Query all IPs returns paginated page 1",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A1.1 都有哪些IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "260170b4-e902-436a-b499-a1e04f3b3364",
+        "durationMs": 4683
+      }
+    ],
+    "totalMs": 4683
+  },
+  {
+    "name": "A2",
+    "suite": "A. Basic pagination",
+    "description": "Next page works",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A2.1 查所有IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "b29bddf9-d590-4996-81ce-e54fffae8a54",
+        "durationMs": 2861
+      },
+      {
+        "label": "A2.2 下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 2 页)：\n\n美国-科罗拉多-欧文 [纯净静态3]\n21. 157.238.220.0 库存：198；成本：¥12；售价：¥42\n22. 192.204.28.0 库存：209；成本：¥12；",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "b29bddf9-d590-4996-81ce-e54fffae8a54",
+        "durationMs": 1059
+      }
+    ],
+    "totalMs": 3920
+  },
+  {
+    "name": "A3",
+    "suite": "A. Basic pagination",
+    "description": "Prev page works",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A3.1 查所有IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "a2bfefcc-6f63-43d1-8ad5-7ab2e0aaa2a3",
+        "durationMs": 5249
+      },
+      {
+        "label": "A3.2 下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 2 页)：\n\n美国-科罗拉多-欧文 [纯净静态3]\n21. 157.238.220.0 库存：198；成本：¥12；售价：¥42\n22. 192.204.28.0 库存：209；成本：¥12；",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "a2bfefcc-6f63-43d1-8ad5-7ab2e0aaa2a3",
+        "durationMs": 1588
+      },
+      {
+        "label": "A3.3 上一页",
+        "passed": true,
+        "intent": "paginate_prev",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "a2bfefcc-6f63-43d1-8ad5-7ab2e0aaa2a3",
+        "durationMs": 803
+      }
+    ],
+    "totalMs": 7640
+  },
+  {
+    "name": "A4",
+    "suite": "A. Basic pagination",
+    "description": "Jump to page 3",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A4.1 查所有IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "b0fa77f1-6be1-43c2-9a4e-58c6c571093f",
+        "durationMs": 896
+      },
+      {
+        "label": "A4.2 第3页",
+        "passed": true,
+        "intent": "paginate_to_page",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 3 页)：\n\n中国-CHN071-台北 [纯净静态1]\n41. 202.160.92.0 库存：77；成本：¥20；售价：¥50\n\n中国-CHN071-台北 [纯净静态3]\n42. 160.1",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "b0fa77f1-6be1-43c2-9a4e-58c6c571093f",
+        "durationMs": 845
+      }
+    ],
+    "totalMs": 1741
+  },
+  {
+    "name": "A5",
+    "suite": "A. Basic pagination",
+    "description": "Change page size",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A5.1 查所有IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "0c601345-80ac-4457-b88f-46f87f1d414d",
+        "durationMs": 867
+      },
+      {
+        "label": "A5.2 每页20条",
+        "passed": true,
+        "intent": "paginate_change_page_size",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "0c601345-80ac-4457-b88f-46f87f1d414d",
+        "durationMs": 825
+      }
+    ],
+    "totalMs": 1692
+  },
+  {
+    "name": "A6",
+    "suite": "A. Basic pagination",
+    "description": "View detail item 5",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A6.1 查所有IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "aa13b45d-572b-48be-b5b7-08732c6406bb",
+        "durationMs": 812
+      },
+      {
+        "label": "A6.2 看第5个",
+        "passed": true,
+        "intent": "paginate_view_detail",
+        "messagePreview": "📋 正在查看第 5 条（当前页第 5 条）",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "aa13b45d-572b-48be-b5b7-08732c6406bb",
+        "durationMs": 426
+      }
+    ],
+    "totalMs": 1238
+  },
+  {
+    "name": "B1",
+    "suite": "B. Multi-turn continuation",
+    "description": "Query NYC -> next page -> purchase 3rd",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B1.1 查纽约IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段，第 1 页)：\n\n美国-纽约-皇后区 [纯净静态3]\n1. 149.119.140.0 库存：26；成本：¥10；售价：¥40\n2. 149.119.141.0 库存：20；成本：¥10；售价：¥4",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "aec988ed-b2d7-40e8-a57b-b1487d70f4d7",
+        "durationMs": 1036
+      },
+      {
+        "label": "B1.2 下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段，第 2 页)：\n\n美国-纽约-皇后区 [纯净静态1]\n21. 149.119.156.0 库存：19；成本：¥12；售价：¥42\n22. 149.119.158.0 库存：2；成本：¥12；售价：¥",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "aec988ed-b2d7-40e8-a57b-b1487d70f4d7",
+        "durationMs": 842
+      },
+      {
+        "label": "B1.3 开通第三个",
+        "passed": true,
+        "intent": "follow_up_action",
+        "messagePreview": "📦 已为您选中产品：\n• 位置: 美国-纽约\n• 价格: ¥48\n\n确认开通吗？(回复\"确认\"执行购买)",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "aec988ed-b2d7-40e8-a57b-b1487d70f4d7",
+        "durationMs": 410
+      }
+    ],
+    "totalMs": 2288
+  },
+  {
+    "name": "B2",
+    "suite": "B. Multi-turn continuation",
+    "description": "Query US -> cheapest -> next -> buy 2nd",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B2.1 查美国IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 1 页)：\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n1. 146.71.35.0 库存：47；成本：¥5.5；售价：¥35.5\n2. 107.178.159.0 库存：42；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "4256123a-dbd5-48ed-bafb-feee1f2d2f36",
+        "durationMs": 985
+      },
+      {
+        "label": "B2.2 最便宜的",
+        "passed": true,
+        "intent": "follow_up_refine",
+        "messagePreview": "📋 您选中的 10 个产品：\n\n1. 美国-加利福尼亚-洛杉矶  库存: 856  售价: ¥35.5\n2. 美国-加利福尼亚-洛杉矶  库存: 164  售价: ¥35.5\n3. 美国-德克萨斯-达拉斯  库存: 51  售价: ¥35",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "4256123a-dbd5-48ed-bafb-feee1f2d2f36",
+        "durationMs": 779
+      },
+      {
+        "label": "B2.3 下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 2 页)：\n\n美国-科罗拉多-欧文 [纯净静态3]\n21. 192.204.28.0 库存：209；成本：¥12；售价：¥42\n\n美国-纽约-皇后区 [纯净静态3]\n22. 149.119.1",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "4256123a-dbd5-48ed-bafb-feee1f2d2f36",
+        "durationMs": 1151
+      },
+      {
+        "label": "B2.4 开通第二个",
+        "passed": true,
+        "intent": "follow_up_action",
+        "messagePreview": "📦 已为您选中产品：\n• 位置: 美国-加利福尼亚-洛杉矶\n• 价格: ¥40\n\n确认开通吗？(回复\"确认\"执行购买)",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "4256123a-dbd5-48ed-bafb-feee1f2d2f36",
+        "durationMs": 418
+      }
+    ],
+    "totalMs": 3333
+  },
+  {
+    "name": "B3",
+    "suite": "B. Multi-turn continuation",
+    "description": "Query London -> page 2 -> view 1 -> switch to 3rd",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B3.1 查伦敦IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 伦敦静态代理产品 (40 个IP段，第 1 页)：\n\n英国-伦敦 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n英国-英格兰-伦敦 [纯净静态2] ⚠️停用\n2. 库存：1703；成本：¥12；售价：¥65\n\n英国-英",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "d9e01bf3-05bd-4242-84a6-166a76025e3e",
+        "durationMs": 846
+      },
+      {
+        "label": "B3.2 第2页",
+        "passed": true,
+        "intent": "paginate_to_page",
+        "messagePreview": "📦 伦敦静态代理产品 (40 个IP段，第 2 页)：\n\n英国-英格兰-伦敦 [纯净静态3] ⚠️停用\n21. 165.65.164.0 库存：253；成本：¥12；售价：¥64\n22. 165.65.146.0 库存：252；成本：¥1",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "d9e01bf3-05bd-4242-84a6-166a76025e3e",
+        "durationMs": 834
+      },
+      {
+        "label": "B3.3 看第1个",
+        "passed": true,
+        "intent": "paginate_view_detail",
+        "messagePreview": "📋 正在查看第 21 条（当前页第 1 条）",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "d9e01bf3-05bd-4242-84a6-166a76025e3e",
+        "durationMs": 435
+      }
+    ],
+    "totalMs": 2115
+  },
+  {
+    "name": "B4",
+    "suite": "B. Multi-turn continuation",
+    "description": "Query all -> 20 per page -> next -> buy 10th",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B4.1 查所有IP",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA20260118025255047x70\n149.119.142.230:6013:egkhnaq8p68a:nrvgvmsnmsmp\n美国-皇后区  纯净静态3 30天 运行中\npengya",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "19e4875a-3a37-4bf9-94c1-b950534f897e",
+        "durationMs": 5429
+      },
+      {
+        "label": "B4.2 每页20条",
+        "passed": true,
+        "intent": "paginate_change_page_size",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA20260118025255047x70\n149.119.142.230:6013:egkhnaq8p68a:nrvgvmsnmsmp\n美国-皇后区  纯净静态3 30天 运行中\npengya",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "19e4875a-3a37-4bf9-94c1-b950534f897e",
+        "durationMs": 3696
+      },
+      {
+        "label": "B4.3 下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 静态代理订单（第 2 页）\n\n21. STA20260215141206jfyjqs\n149.119.150.247:43624:1A2jFdA149119150247A43624:OLprfzEQjRIM\n149.119.150.1",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "19e4875a-3a37-4bf9-94c1-b950534f897e",
+        "durationMs": 4215
+      }
+    ],
+    "totalMs": 13340
+  },
+  {
+    "name": "C1",
+    "suite": "C. Fuzzy expression",
+    "description": "\"继续\" as next page",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C1.1 查美国IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 1 页)：\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n1. 146.71.35.0 库存：47；成本：¥5.5；售价：¥35.5\n2. 107.178.159.0 库存：42；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "3fa02c46-4ccd-409c-910d-90793622438d",
+        "durationMs": 1731
+      },
+      {
+        "label": "C1.2 继续",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 2 页)：\n\n美国-科罗拉多-欧文 [纯净静态3]\n21. 192.204.28.0 库存：209；成本：¥12；售价：¥42\n\n美国-纽约-皇后区 [纯净静态3]\n22. 149.119.1",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "3fa02c46-4ccd-409c-910d-90793622438d",
+        "durationMs": 1135
+      }
+    ],
+    "totalMs": 2866
+  },
+  {
+    "name": "C2",
+    "suite": "C. Fuzzy expression",
+    "description": "\"往后翻\" as next page",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C2.1 查美国IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 1 页)：\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n1. 146.71.35.0 库存：47；成本：¥5.5；售价：¥35.5\n2. 107.178.159.0 库存：42；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "a4484286-c827-4ae1-9f6b-057ca8578afc",
+        "durationMs": 1017
+      },
+      {
+        "label": "C2.2 往后翻",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 2 页)：\n\n美国-科罗拉多-欧文 [纯净静态3]\n21. 192.204.28.0 库存：209；成本：¥12；售价：¥42\n\n美国-纽约-皇后区 [纯净静态3]\n22. 149.119.1",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "a4484286-c827-4ae1-9f6b-057ca8578afc",
+        "durationMs": 963
+      }
+    ],
+    "totalMs": 1980
+  },
+  {
+    "name": "C3",
+    "suite": "C. Fuzzy expression",
+    "description": "\"后面还有吗\" as next page",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C3.1 查美国IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 1 页)：\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n1. 146.71.35.0 库存：47；成本：¥5.5；售价：¥35.5\n2. 107.178.159.0 库存：42；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "a4f7723e-c0c6-4e1f-8df5-bb9d66c34809",
+        "durationMs": 993
+      },
+      {
+        "label": "C3.2 后面还有吗",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 2 页)：\n\n美国-科罗拉多-欧文 [纯净静态3]\n21. 192.204.28.0 库存：209；成本：¥12；售价：¥42\n\n美国-纽约-皇后区 [纯净静态3]\n22. 149.119.1",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "a4f7723e-c0c6-4e1f-8df5-bb9d66c34809",
+        "durationMs": 1149
+      }
+    ],
+    "totalMs": 2142
+  },
+  {
+    "name": "C4",
+    "suite": "C. Fuzzy expression",
+    "description": "\"跳到第2页\" jump",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C4.1 查美国IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 1 页)：\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n1. 146.71.35.0 库存：47；成本：¥5.5；售价：¥35.5\n2. 107.178.159.0 库存：42；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "400b9f20-b0fd-42fe-b4e4-a659a27dbaeb",
+        "durationMs": 1293
+      },
+      {
+        "label": "C4.2 跳到第2页",
+        "passed": true,
+        "intent": "paginate_to_page",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 2 页)：\n\n美国-科罗拉多-欧文 [纯净静态3]\n21. 192.204.28.0 库存：209；成本：¥12；售价：¥42\n\n美国-纽约-皇后区 [纯净静态3]\n22. 149.119.1",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "400b9f20-b0fd-42fe-b4e4-a659a27dbaeb",
+        "durationMs": 1208
+      }
+    ],
+    "totalMs": 2501
+  },
+  {
+    "name": "C5",
+    "suite": "C. Fuzzy expression",
+    "description": "\"多显示一点\" doubles page size",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C5.1 查美国IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 1 页)：\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n1. 146.71.35.0 库存：47；成本：¥5.5；售价：¥35.5\n2. 107.178.159.0 库存：42；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "f4fbd200-9c89-4005-b172-f1a41e789038",
+        "durationMs": 1048
+      },
+      {
+        "label": "C5.2 多显示一点",
+        "passed": true,
+        "intent": "paginate_change_page_size",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 1 页)：\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n1. 146.71.35.0 库存：47；成本：¥5.5；售价：¥35.5\n2. 107.178.159.0 库存：42；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "f4fbd200-9c89-4005-b172-f1a41e789038",
+        "durationMs": 986
+      }
+    ],
+    "totalMs": 2034
+  },
+  {
+    "name": "C6",
+    "suite": "C. Fuzzy expression",
+    "description": "\"看第3个\" view detail",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C6.1 查美国IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 1 页)：\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n1. 146.71.35.0 库存：47；成本：¥5.5；售价：¥35.5\n2. 107.178.159.0 库存：42；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "6d8013ac-ab93-4809-b94a-85e5b35cd472",
+        "durationMs": 997
+      },
+      {
+        "label": "C6.2 看第3个",
+        "passed": true,
+        "intent": "paginate_view_detail",
+        "messagePreview": "📋 正在查看第 3 条（当前页第 3 条）",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "6d8013ac-ab93-4809-b94a-85e5b35cd472",
+        "durationMs": 394
+      }
+    ],
+    "totalMs": 1391
+  },
+  {
+    "name": "C7",
+    "suite": "C. Fuzzy expression",
+    "description": "\"往前翻\" as prev page",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C7.1 查所有IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "220517a7-83f6-49b9-9596-c6bec53e8977",
+        "durationMs": 825
+      },
+      {
+        "label": "C7.2 下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 2 页)：\n\n美国-科罗拉多-欧文 [纯净静态3]\n21. 157.238.220.0 库存：198；成本：¥12；售价：¥42\n22. 192.204.28.0 库存：209；成本：¥12；",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "220517a7-83f6-49b9-9596-c6bec53e8977",
+        "durationMs": 790
+      },
+      {
+        "label": "C7.3 往前翻",
+        "passed": true,
+        "intent": "paginate_prev",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "220517a7-83f6-49b9-9596-c6bec53e8977",
+        "durationMs": 810
+      }
+    ],
+    "totalMs": 2425
+  },
+  {
+    "name": "D1",
+    "suite": "D. Context reset",
+    "description": "NYC -> next -> check balance -> next should warn",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D1.1 查纽约IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段，第 1 页)：\n\n美国-纽约-皇后区 [纯净静态3]\n1. 149.119.140.0 库存：26；成本：¥10；售价：¥40\n2. 149.119.141.0 库存：20；成本：¥10；售价：¥4",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "308097b5-fc95-4370-85d1-2f4b2c6355ee",
+        "durationMs": 828
+      },
+      {
+        "label": "D1.2 下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段，第 2 页)：\n\n美国-纽约-皇后区 [纯净静态1]\n21. 149.119.156.0 库存：19；成本：¥12；售价：¥42\n22. 149.119.158.0 库存：2；成本：¥12；售价：¥",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "308097b5-fc95-4370-85d1-2f4b2c6355ee",
+        "durationMs": 766
+      },
+      {
+        "label": "D1.3 查余额",
+        "passed": true,
+        "intent": "query_balance",
+        "messagePreview": "💰 当前余额: ¥67,046.79",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "308097b5-fc95-4370-85d1-2f4b2c6355ee",
+        "durationMs": 525
+      },
+      {
+        "label": "D1.4 再下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "⚠️ 已经是最后一页了。当前共 2 页。",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "308097b5-fc95-4370-85d1-2f4b2c6355ee",
+        "durationMs": 509
+      }
+    ],
+    "totalMs": 2628
+  },
+  {
+    "name": "D2",
+    "suite": "D. Context reset",
+    "description": "NYC IP -> \"英国的呢\" new query resets",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D2.1 查纽约IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段，第 1 页)：\n\n美国-纽约-皇后区 [纯净静态3]\n1. 149.119.140.0 库存：26；成本：¥10；售价：¥40\n2. 149.119.141.0 库存：20；成本：¥10；售价：¥4",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "ac8b8f13-8b78-4d7c-be6c-0adedb7beac5",
+        "durationMs": 781
+      },
+      {
+        "label": "D2.2 英国的呢",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 英国静态代理产品 (40 个IP段，第 1 页)：\n\n英国-伦敦 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n英国-英格兰-伦敦 [纯净静态2] ⚠️停用\n2. 库存：1703；成本：¥12；售价：¥65\n\n英国-英",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "ac8b8f13-8b78-4d7c-be6c-0adedb7beac5",
+        "durationMs": 809
+      }
+    ],
+    "totalMs": 1590
+  },
+  {
+    "name": "D3",
+    "suite": "D. Context reset",
+    "description": "NYC -> next -> monthly cost -> buy 3rd should not work",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D3.1 查纽约IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段，第 1 页)：\n\n美国-纽约-皇后区 [纯净静态3]\n1. 149.119.140.0 库存：26；成本：¥10；售价：¥40\n2. 149.119.141.0 库存：20；成本：¥10；售价：¥4",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "7b29a2d1-1099-48ab-beb6-5c1a5fee2b58",
+        "durationMs": 768
+      },
+      {
+        "label": "D3.2 下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段，第 2 页)：\n\n美国-纽约-皇后区 [纯净静态1]\n21. 149.119.156.0 库存：19；成本：¥12；售价：¥42\n22. 149.119.158.0 库存：2；成本：¥12；售价：¥",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "7b29a2d1-1099-48ab-beb6-5c1a5fee2b58",
+        "durationMs": 872
+      },
+      {
+        "label": "D3.3 查本月消费",
+        "passed": true,
+        "intent": "query_stats",
+        "messagePreview": "💸 消费统计：\n\n• 累计消费: ¥1,436,088.84\n• 本月消费: ¥0\n• 上月消费: ¥110,857.06\n• 今日消费: ¥4,895.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "7b29a2d1-1099-48ab-beb6-5c1a5fee2b58",
+        "durationMs": 5163
+      }
+    ],
+    "totalMs": 6803
+  },
+  {
+    "name": "D4",
+    "suite": "D. Context reset",
+    "description": "NYC -> next -> help -> next should still work",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D4.1 查纽约IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段，第 1 页)：\n\n美国-纽约-皇后区 [纯净静态3]\n1. 149.119.140.0 库存：26；成本：¥10；售价：¥40\n2. 149.119.141.0 库存：20；成本：¥10；售价：¥4",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "e019ed31-5a47-4195-962f-425f28c2a1c0",
+        "durationMs": 1367
+      },
+      {
+        "label": "D4.2 下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段，第 2 页)：\n\n美国-纽约-皇后区 [纯净静态1]\n21. 149.119.156.0 库存：19；成本：¥12；售价：¥42\n22. 149.119.158.0 库存：2；成本：¥12；售价：¥",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "e019ed31-5a47-4195-962f-425f28c2a1c0",
+        "durationMs": 1026
+      },
+      {
+        "label": "D4.3 帮助",
+        "passed": true,
+        "intent": "show_help",
+        "messagePreview": "📖 帮助中心 (管理员)\n━━━━━━━━━━━━━━━━━━━━━━━━\n\n📄 翻页控制\n  • 下一页\n    例: \"下一页\"\n  • 上一页\n    例: \"上一页\"\n  • 跳转到指定页\n    例: \"第3页\"\n  • 修改",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "e019ed31-5a47-4195-962f-425f28c2a1c0",
+        "durationMs": 418
+      },
+      {
+        "label": "D4.4 下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "⚠️ 已经是最后一页了。当前共 2 页。",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "e019ed31-5a47-4195-962f-425f28c2a1c0",
+        "durationMs": 450
+      }
+    ],
+    "totalMs": 3261
+  },
+  {
+    "name": "E1",
+    "suite": "E. Boundary",
+    "description": "First page -> prev -> should warn",
+    "passed": true,
+    "steps": [
+      {
+        "label": "E1.1 查所有IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "7191360c-0bb5-435d-a2e5-211834fd4546",
+        "durationMs": 842
+      },
+      {
+        "label": "E1.2 上一页",
+        "passed": true,
+        "intent": "paginate_prev",
+        "messagePreview": "⚠️ 已经是第一页了。",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "7191360c-0bb5-435d-a2e5-211834fd4546",
+        "durationMs": 407
+      }
+    ],
+    "totalMs": 1249
+  },
+  {
+    "name": "E2",
+    "suite": "E. Boundary",
+    "description": "Page 999 out of range",
+    "passed": true,
+    "steps": [
+      {
+        "label": "E2.1 查所有IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "7cfb3c80-aaf7-4d45-a326-76cd1309121d",
+        "durationMs": 767
+      },
+      {
+        "label": "E2.2 第999页",
+        "passed": true,
+        "intent": "paginate_to_page",
+        "messagePreview": "⚠️ 已经是最后一页了。当前共 28 页。",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "7cfb3c80-aaf7-4d45-a326-76cd1309121d",
+        "durationMs": 390
+      }
+    ],
+    "totalMs": 1157
+  },
+  {
+    "name": "E3",
+    "suite": "E. Boundary",
+    "description": "View item 25 when page has 20",
+    "passed": true,
+    "steps": [
+      {
+        "label": "E3.1 查所有IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "237624ce-d795-4f7f-b030-84d9e3fffc33",
+        "durationMs": 781
+      },
+      {
+        "label": "E3.2 看第25个",
+        "passed": true,
+        "intent": "paginate_view_detail",
+        "messagePreview": "⚠️ 当前页只有 20 条，请输入 1-20 之间的序号。",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "237624ce-d795-4f7f-b030-84d9e3fffc33",
+        "durationMs": 417
+      }
+    ],
+    "totalMs": 1198
+  },
+  {
+    "name": "E4",
+    "suite": "E. Boundary",
+    "description": "Page size 1000 (capped)",
+    "passed": true,
+    "steps": [
+      {
+        "label": "E4.1 查所有IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "8ec71a6c-9f70-42fd-9241-f4ef46ff88f4",
+        "durationMs": 937
+      },
+      {
+        "label": "E4.2 每页1000条",
+        "passed": true,
+        "intent": "paginate_change_page_size",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "8ec71a6c-9f70-42fd-9241-f4ef46ff88f4",
+        "durationMs": 1179
+      }
+    ],
+    "totalMs": 2116
+  },
+  {
+    "name": "F1",
+    "suite": "F. Frontend consistency",
+    "description": "All IPs: has total > 0, has products",
+    "passed": true,
+    "steps": [
+      {
+        "label": "F1.1 都有哪些IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 全部静态代理产品 (548 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "fe0f0dc7-06b2-4e3b-84e3-30592aea78a8",
+        "durationMs": 814
+      }
+    ],
+    "totalMs": 814
+  },
+  {
+    "name": "F2",
+    "suite": "F. Frontend consistency",
+    "description": "NYC IPs return data",
+    "passed": true,
+    "steps": [
+      {
+        "label": "F2.1 纽约有哪些IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段，第 1 页)：\n\n美国-纽约-皇后区 [纯净静态3]\n1. 149.119.140.0 库存：26；成本：¥10；售价：¥40\n2. 149.119.141.0 库存：20；成本：¥10；售价：¥4",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "2009fe5f-6531-4ffc-988c-8919e3f3c218",
+        "durationMs": 749
+      }
+    ],
+    "totalMs": 749
+  },
+  {
+    "name": "F3",
+    "suite": "F. Frontend consistency",
+    "description": "US IPs return data",
+    "passed": true,
+    "steps": [
+      {
+        "label": "F3.1 美国有哪些IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 1 页)：\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n1. 146.71.35.0 库存：47；成本：¥5.5；售价：¥35.5\n2. 107.178.159.0 库存：42；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "c3c8fce8-c9d3-4668-b267-bd22c967decb",
+        "durationMs": 941
+      }
+    ],
+    "totalMs": 941
+  },
+  {
+    "name": "F4",
+    "suite": "F. Frontend consistency",
+    "description": "London IPs return data",
+    "passed": true,
+    "steps": [
+      {
+        "label": "F4.1 伦敦有哪些IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 伦敦静态代理产品 (40 个IP段，第 1 页)：\n\n英国-伦敦 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n英国-英格兰-伦敦 [纯净静态2] ⚠️停用\n2. 库存：1703；成本：¥12；售价：¥65\n\n英国-英",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "59495bdc-8f9b-4b63-8741-2bafad137e78",
+        "durationMs": 951
+      }
+    ],
+    "totalMs": 951
+  },
+  {
+    "name": "F5",
+    "suite": "F. Frontend consistency",
+    "description": "Jakarta IPs",
+    "passed": true,
+    "steps": [
+      {
+        "label": "F5.1 雅加达有哪些IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 雅加达静态代理产品 (12 个IP段，第 1 页)：\n\n印尼-IDN000-雅加达 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n印尼-IDN000-雅加达 [纯净静态2] ⚠️停用\n2. 库存：1097；成本：¥18",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "3b5d2507-4177-4d8a-b402-d399c3c8a371",
+        "durationMs": 634
+      }
+    ],
+    "totalMs": 634
+  },
+  {
+    "name": "F6",
+    "suite": "F. Frontend consistency",
+    "description": "Taipei IPs",
+    "passed": true,
+    "steps": [
+      {
+        "label": "F6.1 台北有哪些IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 台北静态代理产品 (12 个IP段，第 1 页)：\n\n中国-CHN071-台北 [纯净静态2]\n1. 库存：1227；成本：¥12；售价：¥42\n\n中国-CHN071-台北 [纯净静态1]\n2. 38.182.123.0 库存：65；",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "152f7cac-be7b-4f0b-b64e-39ddcfd50e8d",
+        "durationMs": 615
+      }
+    ],
+    "totalMs": 615
+  },
+  {
+    "name": "G1",
+    "suite": "G. Regression",
+    "description": "Static order pagination still works",
+    "passed": true,
+    "steps": [
+      {
+        "label": "G1.1 查静态订单",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA20260317140337t6oiff\n203.32.21.132:5206:vgkxfbentqqj:pfvd6xgy3vnp\n203.32.21.105:5206:cgkxfbentzg",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "1ea12429-0b7c-41e0-97b4-3b9685275c39",
+        "durationMs": 3519
+      },
+      {
+        "label": "G1.2 下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 静态代理订单（第 2 页）\n\n21. STA20260215141206jfyjqs\n149.119.150.99:38519:1A2jFeA14911915099A38519:NF0ncGTYOnga\n149.119.150.247",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "1ea12429-0b7c-41e0-97b4-3b9685275c39",
+        "durationMs": 3240
+      }
+    ],
+    "totalMs": 6759
+  },
+  {
+    "name": "G2",
+    "suite": "G. Regression",
+    "description": "Dynamic order pagination still works",
+    "passed": true,
+    "steps": [
+      {
+        "label": "G2.1 查动态订单",
+        "passed": true,
+        "intent": "query_dynamic_orders",
+        "messagePreview": "📋 动态代理订单（第 1 页）\n\n1. DYN32026031619352791aecc  |  active  |  3GB  |  zhengwen0221  |  2026-03-17 03:35\n2. DYN32026031607",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "7fb9b886-79d8-48c7-a57e-8ca8d113c266",
+        "durationMs": 1087
+      }
+    ],
+    "totalMs": 1087
+  },
+  {
+    "name": "G3",
+    "suite": "G. Regression",
+    "description": "Transaction pagination still works",
+    "passed": true,
+    "steps": [
+      {
+        "label": "G3.1 查交易记录",
+        "passed": true,
+        "intent": "query_nl_history",
+        "messagePreview": "📜 所有用户对话历史（第 1 页）\n\n1. [admin] 2026-03-17 14:04\n   意图: follow_up_action\n   用户: 帮我开通第一个\n   系统: 📦 已为您选中产品：\n• 位置: 英国-伦敦\n• ",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "9408113c-d6db-4a9d-9c33-01c591765389",
+        "durationMs": 780
+      }
+    ],
+    "totalMs": 780
+  },
+  {
+    "name": "G4",
+    "suite": "G. Regression",
+    "description": "Dynamic extract flow not broken",
+    "passed": true,
+    "steps": [
+      {
+        "label": "G4.1 提取动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 地区: US\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_US_s",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "64ec0750-e122-4a9a-87d9-8e42f718da8a",
+        "durationMs": 5357
+      }
+    ],
+    "totalMs": 5357
+  },
+  {
+    "name": "G5",
+    "suite": "G. Regression",
+    "description": "IP query with geo filter still works",
+    "passed": true,
+    "steps": [
+      {
+        "label": "G5.1 查东京IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 东京静态代理产品 (22 个IP段，第 1 页)：\n\n日本-JPN000-东京 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n2. 库存：229；成本：¥12；售价：",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "c6052118-da85-4b71-80d2-61acb12ece8b",
+        "durationMs": 13032
+      }
+    ],
+    "totalMs": 13032
+  },
+  {
+    "name": "G6",
+    "suite": "G. Regression",
+    "description": "Existing follow-up select works",
+    "passed": true,
+    "steps": [
+      {
+        "label": "G6.1 查美国IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 美国静态代理产品 (294 个IP段，第 1 页)：\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n1. 146.71.35.0 库存：47；成本：¥5.5；售价：¥35.5\n2. 107.178.159.0 库存：42；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [
+          "[PERF] 17171ms > 15000ms"
+        ],
+        "conversationId": "79cca523-daa5-4431-93c2-2952584cd3e3",
+        "durationMs": 17171
+      },
+      {
+        "label": "G6.2 找最便宜的",
+        "passed": true,
+        "intent": "follow_up_refine",
+        "messagePreview": "📋 您选中的 10 个产品：\n\n1. 美国-加利福尼亚-洛杉矶  库存: 856  售价: ¥35.5\n2. 美国-加利福尼亚-洛杉矶  库存: 164  售价: ¥35.5\n3. 美国-德克萨斯-达拉斯  库存: 51  售价: ¥35",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "79cca523-daa5-4431-93c2-2952584cd3e3",
+        "durationMs": 1256
+      }
+    ],
+    "totalMs": 18427
+  }
+]

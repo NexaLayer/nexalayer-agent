@@ -1,0 +1,1082 @@
+[
+  {
+    "name": "A1: 查询动态资源→提取一个",
+    "suite": "A",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A1.1 查询动态资源",
+        "passed": true,
+        "intent": "query_dynamic_resource",
+        "messagePreview": "⚡ 动态代理资源：\n\n• 动态IP池1  |  总量: 0 GB  |  已用: 0 GB  |  剩余: 0 GB\n• 动态IP池2  |  总量: 0 GB  |  已用: 0 GB  |  剩余: 0 GB\n• 动态IP池3  |  总量: 13,312 GB  |  已用: 1,098.87 GB  |  剩余: 12,213.13 GB\n\n📊 动态消耗详情（第 1 页）\n1. 10  ",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "8d527196-01fc-470f-8fdd-5a9ae3fb0e0a",
+        "hasConfirmation": false,
+        "durationMs": 5336
+      },
+      {
+        "label": "A1.2 提取一个",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_gUftBZOR_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "8d527196-01fc-470f-8fdd-5a9ae3fb0e0a",
+        "hasConfirmation": false,
+        "durationMs": 1415
+      }
+    ],
+    "totalMs": 6751
+  },
+  {
+    "name": "A2: 查动态资源→提取5个美国的",
+    "suite": "A",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A2.1 查动态资源",
+        "passed": true,
+        "intent": "query_dynamic_resource",
+        "messagePreview": "⚡ 动态代理资源：\n\n• 动态IP池1  |  总量: 0 GB  |  已用: 0 GB  |  剩余: 0 GB\n• 动态IP池2  |  总量: 0 GB  |  已用: 0 GB  |  剩余: 0 GB\n• 动态IP池3  |  总量: 13,312 GB  |  已用: 1,098.87 GB  |  剩余: 12,213.13 GB\n\n📊 动态消耗详情（第 1 页）\n1. 10  ",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "787f93bf-05b1-49ed-b825-49130f8a1028",
+        "hasConfirmation": false,
+        "durationMs": 4480
+      },
+      {
+        "label": "A2.2 提取5个美国的",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 5\n• 有效时长: 5分钟\n• 地区: US\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_US_st_city_sid_O2h7rNXB_time_5:defaultpwd\nhost1.ztproxy.net:6666:admin_custom_zone_U",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "787f93bf-05b1-49ed-b825-49130f8a1028",
+        "hasConfirmation": false,
+        "durationMs": 1395
+      }
+    ],
+    "totalMs": 5875
+  },
+  {
+    "name": "A3: 提取美国动态→再来3个",
+    "suite": "A",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A3.1 提取一个美国动态",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 地区: US\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_US_st_city_sid_2snUku5M_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "66a6bf07-72ef-4aae-9f1f-ef6ece3b1c9d",
+        "hasConfirmation": false,
+        "durationMs": 729
+      },
+      {
+        "label": "A3.2 再来3个",
+        "passed": true,
+        "intent": "refine_search_results",
+        "messagePreview": "没有正在进行的搜索。请先告诉我你想查找什么，例如：\n- 帮我找纽约的IP\n- 查一下美国住宅IP",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "66a6bf07-72ef-4aae-9f1f-ef6ece3b1c9d",
+        "hasConfirmation": false,
+        "durationMs": 261
+      }
+    ],
+    "totalMs": 990
+  },
+  {
+    "name": "A4: 查动态订单→再提取同类型",
+    "suite": "A",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A4.1 查动态订单",
+        "passed": true,
+        "intent": "query_dynamic_orders",
+        "messagePreview": "📋 动态代理订单（第 1 页）\n\n1. DYN32026031619352791aecc  |  active  |  3GB  |  zhengwen0221  |  2026-03-17 03:35\n2. DYN32026031607351917667f  |  active  |  10GB  |  zhengwen0124  |  2026-03-16 15:35\n3. DYN32026",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "8361c4fc-19de-430e-977c-94524534e60b",
+        "hasConfirmation": false,
+        "durationMs": 396
+      },
+      {
+        "label": "A4.2 提取一个动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_cOSkm45K_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "8361c4fc-19de-430e-977c-94524534e60b",
+        "hasConfirmation": false,
+        "durationMs": 824
+      }
+    ],
+    "totalMs": 1220
+  },
+  {
+    "name": "A5: 提取一个→换成日本",
+    "suite": "A",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A5.1 提取一个动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_11l2qbYl_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "67161414-d50f-4bae-b53c-ebe678477de7",
+        "hasConfirmation": false,
+        "durationMs": 794
+      },
+      {
+        "label": "A5.2 换成日本",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 日本静态代理产品 (21 个IP段)：\n\n日本-JPN000-东京 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：229；成本：¥12；售价：¥65\n\n日本-JPN000-横滨 [纯净静态3]\n160.22.229.0 库存：142；成本：¥35；售价：¥65\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：10",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "67161414-d50f-4bae-b53c-ebe678477de7",
+        "hasConfirmation": false,
+        "durationMs": 1396
+      }
+    ],
+    "totalMs": 2191
+  },
+  {
+    "name": "B1: 购买动态→管理员受限提示",
+    "suite": "B",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B1.1 购买10GB动态代理",
+        "passed": true,
+        "intent": "purchase_dynamic",
+        "messagePreview": "确认开通动态代理？\n• 流量: 10 GB\n• 用户: 10GB",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "38d7d72d-45f2-4a69-b051-d63dde5580d1",
+        "hasConfirmation": true,
+        "confirmationId": "ca4e9507-1836-4468-8636-2a2e91fafd50",
+        "durationMs": 231
+      },
+      {
+        "label": "B1.2 确认",
+        "passed": true,
+        "intent": "purchase_dynamic",
+        "messagePreview": "管理员不能直接开通动态代理，请以用户身份操作。",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "38d7d72d-45f2-4a69-b051-d63dde5580d1",
+        "hasConfirmation": false,
+        "durationMs": 236
+      }
+    ],
+    "totalMs": 467
+  },
+  {
+    "name": "B2: 购买动态→取消",
+    "suite": "B",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B2.1 购买5GB动态代理",
+        "passed": true,
+        "intent": "purchase_dynamic",
+        "messagePreview": "确认开通动态代理？\n• 流量: 5 GB\n• 用户: 5GB",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "874fe940-30ca-4327-8b89-b65714a1422d",
+        "hasConfirmation": true,
+        "confirmationId": "339023ad-db75-4158-a0c2-35e9e00ae472",
+        "durationMs": 250
+      },
+      {
+        "label": "B2.2 取消",
+        "passed": true,
+        "intent": "cancel_confirmed",
+        "messagePreview": "好的，已取消操作。",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "874fe940-30ca-4327-8b89-b65714a1422d",
+        "hasConfirmation": false,
+        "durationMs": 237
+      }
+    ],
+    "totalMs": 487
+  },
+  {
+    "name": "B3: 购买动态→取消→改成5GB",
+    "suite": "B",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B3.1 购买10GB动态代理",
+        "passed": true,
+        "intent": "purchase_dynamic",
+        "messagePreview": "确认开通动态代理？\n• 流量: 10 GB\n• 用户: 10GB",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "a09cf6eb-9bca-43d4-89cc-b3c5e1d85d12",
+        "hasConfirmation": true,
+        "confirmationId": "c0341ce4-767c-4fcc-adc4-73d56ded75dd",
+        "durationMs": 256
+      },
+      {
+        "label": "B3.2 取消",
+        "passed": true,
+        "intent": "cancel_confirmed",
+        "messagePreview": "好的，已取消操作。",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "a09cf6eb-9bca-43d4-89cc-b3c5e1d85d12",
+        "hasConfirmation": false,
+        "durationMs": 225
+      },
+      {
+        "label": "B3.3 改成5GB",
+        "passed": true,
+        "intent": "purchase_dynamic",
+        "messagePreview": "确认开通动态代理？\n• 流量: 5 GB",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "a09cf6eb-9bca-43d4-89cc-b3c5e1d85d12",
+        "hasConfirmation": true,
+        "confirmationId": "0511b196-54cc-4fea-ad83-a59acfa36848",
+        "durationMs": 242
+      }
+    ],
+    "totalMs": 723
+  },
+  {
+    "name": "B4: 购买动态→插话查余额→取消",
+    "suite": "B",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B4.1 购买10GB动态代理",
+        "passed": true,
+        "intent": "purchase_dynamic",
+        "messagePreview": "确认开通动态代理？\n• 流量: 10 GB\n• 用户: 10GB",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "60ed0e36-db81-420b-a594-656c9f3c1347",
+        "hasConfirmation": true,
+        "confirmationId": "35a63c52-d0f9-4488-a043-a8179ddc9cda",
+        "durationMs": 221
+      },
+      {
+        "label": "B4.2 查余额",
+        "passed": true,
+        "intent": "query_balance",
+        "messagePreview": "💰 当前余额: ¥70,947.29",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "60ed0e36-db81-420b-a594-656c9f3c1347",
+        "hasConfirmation": false,
+        "durationMs": 284
+      },
+      {
+        "label": "B4.3 取消",
+        "passed": true,
+        "intent": "cancel_confirmed",
+        "messagePreview": "好的，已取消操作。",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "60ed0e36-db81-420b-a594-656c9f3c1347",
+        "hasConfirmation": false,
+        "durationMs": 243
+      }
+    ],
+    "totalMs": 748
+  },
+  {
+    "name": "B5: 提取不需确认(直接执行)",
+    "suite": "B",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B5.1 提取一个动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_CCvOniGH_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "d6d21ecb-03f5-4d9b-8f09-e9a49ae017b2",
+        "hasConfirmation": false,
+        "durationMs": 750
+      }
+    ],
+    "totalMs": 750
+  },
+  {
+    "name": "B6: 购买与提取意图不混淆",
+    "suite": "B",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B6.1 购买动态代理",
+        "passed": true,
+        "intent": "purchase_dynamic",
+        "messagePreview": "确认开通动态代理？\n• 流量: 10 GB\n• 用户: 10GB",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "9d827165-5fbf-48c8-a26b-b868357ccc62",
+        "hasConfirmation": true,
+        "confirmationId": "e9542a5c-1240-429b-bc55-23dcbf4deb27",
+        "durationMs": 286
+      },
+      {
+        "label": "B6.2 取消购买",
+        "passed": true,
+        "intent": "cancel_confirmed",
+        "messagePreview": "好的，已取消操作。",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "9d827165-5fbf-48c8-a26b-b868357ccc62",
+        "hasConfirmation": false,
+        "durationMs": 299
+      },
+      {
+        "label": "B6.3 提取动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_58PIp82G_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "9d827165-5fbf-48c8-a26b-b868357ccc62",
+        "hasConfirmation": false,
+        "durationMs": 731
+      }
+    ],
+    "totalMs": 1316
+  },
+  {
+    "name": "B7: 确认态取消命中状态机",
+    "suite": "B",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B7.1 购买3GB动态代理",
+        "passed": true,
+        "intent": "purchase_dynamic",
+        "messagePreview": "确认开通动态代理？\n• 流量: 3 GB\n• 用户: 3GB",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "ff02657a-9f7a-4789-b238-25853b92f28f",
+        "hasConfirmation": true,
+        "confirmationId": "8fedb720-de4d-4c34-80a7-8b4405e95dbf",
+        "durationMs": 249
+      },
+      {
+        "label": "B7.2 取消(状态机)",
+        "passed": true,
+        "intent": "cancel_confirmed",
+        "messagePreview": "好的，已取消操作。",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "ff02657a-9f7a-4789-b238-25853b92f28f",
+        "hasConfirmation": false,
+        "durationMs": 245
+      }
+    ],
+    "totalMs": 494
+  },
+  {
+    "name": "C1: 提取1个→改成5个",
+    "suite": "C",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C1.1 提取一个动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_4NxIAHkW_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "3f966e68-ce55-4be8-b37d-71b7030b1d7b",
+        "hasConfirmation": false,
+        "durationMs": 760
+      },
+      {
+        "label": "C1.2 改成5个",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 5\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_IGYzmSt6_time_5:defaultpwd\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_vPw",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "3f966e68-ce55-4be8-b37d-71b7030b1d7b",
+        "hasConfirmation": false,
+        "durationMs": 4172
+      }
+    ],
+    "totalMs": 4932
+  },
+  {
+    "name": "C2: 提取5个美国→改成英国",
+    "suite": "C",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C2.1 提取5个美国动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 5\n• 有效时长: 5分钟\n• 地区: US\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_US_st_city_sid_ZwDUPZcm_time_5:defaultpwd\nhost1.ztproxy.net:6666:admin_custom_zone_U",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "f52ce3d2-ff4b-4fd7-9642-a6f1d4ce09f3",
+        "hasConfirmation": false,
+        "durationMs": 1470
+      },
+      {
+        "label": "C2.2 改成英国",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 英国静态代理产品 (40 个IP段)：\n\n英国-伦敦 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n英国-英格兰-伦敦 [纯净静态2] ⚠️停用\n库存：1703；成本：¥12；售价：¥65\n\n英国-英格兰-伦敦 [纯净静态1]\n154.62.172.0 库存：58；成本：¥12；售价：¥42\n154.62.180.0 库存：43；成本：¥12；售价：¥42\n154.64.136.0",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "f52ce3d2-ff4b-4fd7-9642-a6f1d4ce09f3",
+        "hasConfirmation": false,
+        "durationMs": 557
+      }
+    ],
+    "totalMs": 2027
+  },
+  {
+    "name": "C3: 提取socks5→改成http",
+    "suite": "C",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C3.1 提取一个socks5代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "未找到用户 socks5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "316f2b12-2841-4267-9ecd-ca2f422d7fbe",
+        "hasConfirmation": false,
+        "durationMs": 382
+      },
+      {
+        "label": "C3.2 改成http",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_zpxYXK7f_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "316f2b12-2841-4267-9ecd-ca2f422d7fbe",
+        "hasConfirmation": false,
+        "durationMs": 3335
+      }
+    ],
+    "totalMs": 3717
+  },
+  {
+    "name": "C4: 提取→改成10分钟有效",
+    "suite": "C",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C4.1 提取一个动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_wrddPoo9_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "1b95e651-8ae7-449a-a2e0-493963607515",
+        "hasConfirmation": false,
+        "durationMs": 800
+      },
+      {
+        "label": "C4.2 10分钟有效",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 10分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_jm1SRmUU_time_10:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "1b95e651-8ae7-449a-a2e0-493963607515",
+        "hasConfirmation": false,
+        "durationMs": 3573
+      }
+    ],
+    "totalMs": 4373
+  },
+  {
+    "name": "C5: 提取美国→改成洛杉矶",
+    "suite": "C",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C5.1 提取美国动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 地区: US\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_US_st_city_sid_iZjtiIT3_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "37072f2a-662d-4e9d-aa62-d28fdbd14ca1",
+        "hasConfirmation": false,
+        "durationMs": 781
+      },
+      {
+        "label": "C5.2 改成洛杉矶",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 洛杉矶静态代理产品 (88 个IP段)：\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n146.71.35.0 库存：67；成本：¥5.5；售价：¥35.5\n107.178.159.0 库存：62；成本：¥5.5；售价：¥35.5\n146.148.157.0 库存：40；成本：¥5.5；售价：¥35.5\n173.254.199.0 库存：2；成本：¥5.5；售价：¥35.5\n107.178.1",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "37072f2a-662d-4e9d-aa62-d28fdbd14ca1",
+        "hasConfirmation": false,
+        "durationMs": 660
+      }
+    ],
+    "totalMs": 1441
+  },
+  {
+    "name": "C6: 提取日本→改成全球随机",
+    "suite": "C",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C6.1 提取日本动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 地区: JP\n• 代理信息:\nhost2.ztproxy.net:6666:admin_custom_zone_JP_st_city_sid_VNVxCEUw_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "a179cea6-bd98-4193-8b6a-ed130cc09ded",
+        "hasConfirmation": false,
+        "durationMs": 871
+      },
+      {
+        "label": "C6.2 改成全球随机",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 地区: JP\n• 代理信息:\nhost2.ztproxy.net:6666:admin_custom_zone_JP_st_city_sid_hj7d5y3G_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "a179cea6-bd98-4193-8b6a-ed130cc09ded",
+        "hasConfirmation": false,
+        "durationMs": 3445
+      }
+    ],
+    "totalMs": 4316
+  },
+  {
+    "name": "C7: 提取→改成API提取",
+    "suite": "C",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C7.1 提取一个动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_OjuKUkyM_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "81b45774-b907-4dd5-ae16-39de64b1af08",
+        "hasConfirmation": false,
+        "durationMs": 758
+      },
+      {
+        "label": "C7.2 改成API提取",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: API提取\n• 数量: 1\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_kkEvEkS6_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "81b45774-b907-4dd5-ae16-39de64b1af08",
+        "hasConfirmation": false,
+        "durationMs": 3734
+      }
+    ],
+    "totalMs": 4492
+  },
+  {
+    "name": "D1: 提取0个→改成1个",
+    "suite": "D",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D1.1 提取0个动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_P48xypIZ_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "1abfc039-a429-43b3-885c-7138d8fa8031",
+        "hasConfirmation": false,
+        "durationMs": 892
+      },
+      {
+        "label": "D1.2 改成1个",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_3dBWub5V_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "1abfc039-a429-43b3-885c-7138d8fa8031",
+        "hasConfirmation": false,
+        "durationMs": 4187
+      }
+    ],
+    "totalMs": 5080
+  },
+  {
+    "name": "D2: 无上下文\"换成日本\"",
+    "suite": "D",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D2.1 无上下文换日本",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 日本静态代理产品 (21 个IP段)：\n\n日本-JPN000-东京 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：229；成本：¥12；售价：¥65\n\n日本-JPN000-横滨 [纯净静态3]\n160.22.229.0 库存：142；成本：¥35；售价：¥65\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：10",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "21083097-db22-4c00-882a-07b182f6e621",
+        "hasConfirmation": false,
+        "durationMs": 1233
+      }
+    ],
+    "totalMs": 1234
+  },
+  {
+    "name": "D3: 查询无资源→提示开通",
+    "suite": "D",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D3.1 查动态资源",
+        "passed": true,
+        "intent": "query_dynamic_resource",
+        "messagePreview": "⚡ 动态代理资源：\n\n• 动态IP池1  |  总量: 0 GB  |  已用: 0 GB  |  剩余: 0 GB\n• 动态IP池2  |  总量: 0 GB  |  已用: 0 GB  |  剩余: 0 GB\n• 动态IP池3  |  总量: 13,312 GB  |  已用: 1,098.91 GB  |  剩余: 12,213.09 GB\n\n📊 动态消耗详情（第 1 页）\n1. 10  ",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "9de49396-b620-4255-843e-2b71366804d0",
+        "hasConfirmation": false,
+        "durationMs": 5025
+      }
+    ],
+    "totalMs": 5025
+  },
+  {
+    "name": "D4: 提取→失败→换参数重试",
+    "suite": "D",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D4.1 提取一个动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_sRjkmXcu_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "5841900a-86bb-449c-94e3-ba63fc322382",
+        "hasConfirmation": false,
+        "durationMs": 1431
+      },
+      {
+        "label": "D4.2 换成美国",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 美国静态代理产品 (290 个IP段)：\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n146.71.35.0 库存：67；成本：¥5.5；售价：¥35.5\n107.178.159.0 库存：62；成本：¥5.5；售价：¥35.5\n146.148.157.0 库存：40；成本：¥5.5；售价：¥35.5\n173.254.199.0 库存：2；成本：¥5.5；售价：¥35.5\n107.178.1",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "5841900a-86bb-449c-94e3-ba63fc322382",
+        "hasConfirmation": false,
+        "durationMs": 596
+      }
+    ],
+    "totalMs": 2027
+  },
+  {
+    "name": "D5: \"再来一个\"无动态上下文不误继承",
+    "suite": "D",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D5.1 查纽约静态IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：29；成本：¥10；售价：¥40\n149.119.141.0 库存：21；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 [纯净静态3] ⚠️停用\n65.87.3.0 库存：60；成本：¥12；售价：¥64\n\n美国-纽约 ",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "73beb49d-83fb-4b02-9cbd-7ad1a74ca121",
+        "hasConfirmation": false,
+        "durationMs": 537
+      },
+      {
+        "label": "D5.2 提取动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 地区: US\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_US_st_city_USA0NY_sid_FeWjVTun_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "73beb49d-83fb-4b02-9cbd-7ad1a74ca121",
+        "hasConfirmation": false,
+        "durationMs": 758
+      }
+    ],
+    "totalMs": 1295
+  },
+  {
+    "name": "E1: 提取美国→意图含US",
+    "suite": "E",
+    "passed": true,
+    "steps": [
+      {
+        "label": "E1.1 提取美国动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 地区: US\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_US_st_city_sid_MlfvOX5n_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "b12a4a68-ff15-41c2-a479-25ff7ad0d711",
+        "hasConfirmation": false,
+        "durationMs": 750
+      }
+    ],
+    "totalMs": 750
+  },
+  {
+    "name": "E2: 提取英国→GB",
+    "suite": "E",
+    "passed": true,
+    "steps": [
+      {
+        "label": "E2.1 提取英国动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 地区: GB\n• 代理信息:\nhost3.ztproxy.net:6666:admin_custom_zone_GB_st_city_sid_qSN9RC8J_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "a0b698f9-ad6b-46d7-ab09-edb2fb40dd4f",
+        "hasConfirmation": false,
+        "durationMs": 758
+      }
+    ],
+    "totalMs": 759
+  },
+  {
+    "name": "E3: 提取日本→JP",
+    "suite": "E",
+    "passed": true,
+    "steps": [
+      {
+        "label": "E3.1 提取日本动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 地区: JP\n• 代理信息:\nhost2.ztproxy.net:6666:admin_custom_zone_JP_st_city_sid_HSHcoawZ_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "e87799f9-7449-4e32-b012-aaededa30465",
+        "hasConfirmation": false,
+        "durationMs": 777
+      }
+    ],
+    "totalMs": 777
+  },
+  {
+    "name": "E4: extract US dynamic proxy",
+    "suite": "E",
+    "passed": true,
+    "steps": [
+      {
+        "label": "E4.1 英文提取",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ Dynamic proxy extracted!\n\n• User: admin\n• Method: Password\n• Quantity: 5\n• Valid: 5 min\n• Region: US\n• Proxy:\nhost1.ztproxy.net:6666:admin_custom_zone_US_st_city_sid_HLITecqV_time_5:defaultpwd\nhost1",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "a122837e-2b45-4c6a-a726-e86573f31bbe",
+        "hasConfirmation": false,
+        "durationMs": 770
+      }
+    ],
+    "totalMs": 770
+  },
+  {
+    "name": "E5: 英文→socks5→中英混合",
+    "suite": "E",
+    "passed": false,
+    "steps": [
+      {
+        "label": "E5.1 英文提取日本",
+        "passed": false,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 Static products in Japan (21 IP ranges):\n\n日本-JPN000-东京 [Pure Static 1]\nStock: 0; Cost: ¥12; Price: ¥42\n\n日本-JPN000-东京 [Pure Static 2] ⚠️停用\nStock: 229; Cost: ¥12; Price: ¥65\n\n日本-JPN000-横滨 [Pure Stati",
+        "failures": [
+          "[SEMANTIC] intent=\"extract_dynamic\" but got \"query_ip_inventory\""
+        ],
+        "perfWarnings": [],
+        "conversationId": "4f0e2c8e-1b6e-4ee7-8dc2-32a15d110a30",
+        "hasConfirmation": false,
+        "durationMs": 643
+      },
+      {
+        "label": "E5.2 改成socks5",
+        "passed": true,
+        "intent": "unknown",
+        "messagePreview": "目前查询显示的是静态IP库存信息。如果您需要将代理协议改为SOCKS5，这通常是在购买或配置代理时选择的。\n\nNexaLayer支持多种代理协议：\n- HTTP/HTTPS代理\n- SOCKS5代理（支持TCP连接）\n\n**建议操作：**\n1. 购买代理时选择SOCKS5协议\n2. 在代理配置中指定SOCKS5端口\n\n您可以尝试以下命令：\n```\n/help 查看所有可用命令\n/buy 购买代理（",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "4f0e2c8e-1b6e-4ee7-8dc2-32a15d110a30",
+        "hasConfirmation": false,
+        "durationMs": 6883
+      }
+    ],
+    "totalMs": 7526
+  },
+  {
+    "name": "E6: 提取UK→改成Japan",
+    "suite": "E",
+    "passed": true,
+    "steps": [
+      {
+        "label": "E6.1 提取UK动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "未找到用户 UK",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "bb4b73f4-8b6d-4674-b972-b3d209fc0fb5",
+        "hasConfirmation": false,
+        "durationMs": 1108
+      },
+      {
+        "label": "E6.2 改成Japan",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 Japan静态代理产品 (21 个IP段)：\n\n日本-JPN000-东京 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：229；成本：¥12；售价：¥65\n\n日本-JPN000-横滨 [纯净静态3]\n160.22.229.0 库存：142；成本：¥35；售价：¥65\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "bb4b73f4-8b6d-4674-b972-b3d209fc0fb5",
+        "hasConfirmation": false,
+        "durationMs": 530
+      }
+    ],
+    "totalMs": 1638
+  },
+  {
+    "name": "E7: 中英混合: 5个US动态代理http",
+    "suite": "E",
+    "passed": true,
+    "steps": [
+      {
+        "label": "E7.1 混合提取",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: test_user_manual123\n• 提取方式: 账密提取\n• 数量: 5\n• 有效时长: 5分钟\n• 地区: US\n• 代理信息:\nhost1.ztproxy.net:6666:testuse816_custom_zone_US_st_city_sid_hddZftjb_time_5:defaultpwd\nhost1.ztproxy.net:6666:",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "9ed16f4c-f8ae-469c-aabe-fd9d119b1d01",
+        "hasConfirmation": false,
+        "durationMs": 947
+      }
+    ],
+    "totalMs": 947
+  },
+  {
+    "name": "F1: 查动态资源→提取→查订单",
+    "suite": "F",
+    "passed": true,
+    "steps": [
+      {
+        "label": "F1.1 查动态资源",
+        "passed": true,
+        "intent": "query_dynamic_resource",
+        "messagePreview": "⚡ 动态代理资源：\n\n• 动态IP池1  |  总量: 0 GB  |  已用: 0 GB  |  剩余: 0 GB\n• 动态IP池2  |  总量: 0 GB  |  已用: 0 GB  |  剩余: 0 GB\n• 动态IP池3  |  总量: 13,312 GB  |  已用: 1,098.91 GB  |  剩余: 12,213.09 GB\n\n📊 动态消耗详情（第 1 页）\n1. 10  ",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "9be1ad13-2397-4fb0-9554-2036ef182529",
+        "hasConfirmation": false,
+        "durationMs": 4434
+      },
+      {
+        "label": "F1.2 提取一个",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 地区: US\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_US_st_city_sid_tD27K4fm_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "9be1ad13-2397-4fb0-9554-2036ef182529",
+        "hasConfirmation": false,
+        "durationMs": 1575
+      },
+      {
+        "label": "F1.3 查动态订单",
+        "passed": true,
+        "intent": "query_dynamic_orders",
+        "messagePreview": "📋 动态代理订单（第 1 页）\n\n1. DYN32026031619352791aecc  |  active  |  3GB  |  zhengwen0221  |  2026-03-17 03:35\n2. DYN32026031607351917667f  |  active  |  10GB  |  zhengwen0124  |  2026-03-16 15:35\n3. DYN32026",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "9be1ad13-2397-4fb0-9554-2036ef182529",
+        "hasConfirmation": false,
+        "durationMs": 354
+      }
+    ],
+    "totalMs": 6363
+  },
+  {
+    "name": "F2: 查余额→购买动态→取消",
+    "suite": "F",
+    "passed": true,
+    "steps": [
+      {
+        "label": "F2.1 查余额",
+        "passed": true,
+        "intent": "query_balance",
+        "messagePreview": "💰 当前余额: ¥70,947.29",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "3bc71ce8-91e6-4c76-979c-57e0eadce9ec",
+        "hasConfirmation": false,
+        "durationMs": 276
+      },
+      {
+        "label": "F2.2 购买动态代理",
+        "passed": true,
+        "intent": "purchase_dynamic",
+        "messagePreview": "确认开通动态代理？\n• 流量: 5 GB\n• 用户: 5GB",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "3bc71ce8-91e6-4c76-979c-57e0eadce9ec",
+        "hasConfirmation": true,
+        "confirmationId": "72ad061d-1c06-438b-bcf7-0b8cb1f0a86e",
+        "durationMs": 234
+      },
+      {
+        "label": "F2.3 取消",
+        "passed": true,
+        "intent": "cancel_confirmed",
+        "messagePreview": "好的，已取消操作。",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "3bc71ce8-91e6-4c76-979c-57e0eadce9ec",
+        "hasConfirmation": false,
+        "durationMs": 231
+      }
+    ],
+    "totalMs": 741
+  },
+  {
+    "name": "F3: 提取美国→查今天消费",
+    "suite": "F",
+    "passed": true,
+    "steps": [
+      {
+        "label": "F3.1 提取美国动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 地区: US\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_US_st_city_sid_Jv1TiDWm_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "0de9b15b-6a1d-48c4-be0b-842010f434b4",
+        "hasConfirmation": false,
+        "durationMs": 750
+      },
+      {
+        "label": "F3.2 查今天消费",
+        "passed": true,
+        "intent": "query_today_orders",
+        "messagePreview": "📋 今天的消费记录 (2026-03-16)：\n\n🌐 静态代理 (20 笔)：\n• 194.179.155.61  意大利-米兰  纯净静态3  ¥30  success\n• —  美国-洛杉矶  纯净静态3  ¥14  failed\n• 84.233.220.151  新加坡  纯净静态3  ¥16  success\n• —  德国-法兰克福  纯净静态3  ¥15  failed\n• 15",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "0de9b15b-6a1d-48c4-be0b-842010f434b4",
+        "hasConfirmation": false,
+        "durationMs": 4294
+      }
+    ],
+    "totalMs": 5044
+  },
+  {
+    "name": "F4: 帮助→查动态资源→提取",
+    "suite": "F",
+    "passed": true,
+    "steps": [
+      {
+        "label": "F4.1 帮助",
+        "passed": true,
+        "intent": "show_help",
+        "messagePreview": "📖 帮助中心 (管理员)\n━━━━━━━━━━━━━━━━━━━━━━━━\n\n📄 翻页控制\n  • 下一页\n    例: \"下一页\"\n  • 上一页\n    例: \"上一页\"\n  • 跳转到指定页\n    例: \"第3页\"\n  • 修改每页条数\n    例: \"每页20条\"\n\n📋 查询\n  • 查询余额\n    例: \"查询余额\"\n  • 查询统计 (充值/消费/利润)\n    例: \"查询",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "7faaf0df-9110-4ece-9575-f9b5dc7eec33",
+        "hasConfirmation": false,
+        "durationMs": 921
+      },
+      {
+        "label": "F4.2 查动态资源",
+        "passed": true,
+        "intent": "query_dynamic_resource",
+        "messagePreview": "⚡ 动态代理资源：\n\n• 动态IP池1  |  总量: 0 GB  |  已用: 0 GB  |  剩余: 0 GB\n• 动态IP池2  |  总量: 0 GB  |  已用: 0 GB  |  剩余: 0 GB\n• 动态IP池3  |  总量: 13,312 GB  |  已用: 1,098.91 GB  |  剩余: 12,213.09 GB\n\n📊 动态消耗详情（第 1 页）\n1. 10  ",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "7faaf0df-9110-4ece-9575-f9b5dc7eec33",
+        "hasConfirmation": false,
+        "durationMs": 4704
+      },
+      {
+        "label": "F4.3 提取一个",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_global_sid_ONkNxdwv_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "7faaf0df-9110-4ece-9575-f9b5dc7eec33",
+        "hasConfirmation": false,
+        "durationMs": 1508
+      }
+    ],
+    "totalMs": 7133
+  },
+  {
+    "name": "F5: 动态→静态互不污染",
+    "suite": "F",
+    "passed": true,
+    "steps": [
+      {
+        "label": "F5.1 提取美国动态代理",
+        "passed": true,
+        "intent": "extract_dynamic",
+        "messagePreview": "✅ 动态代理提取成功！\n\n• 用户: admin\n• 提取方式: 账密提取\n• 数量: 1\n• 有效时长: 5分钟\n• 地区: US\n• 代理信息:\nhost1.ztproxy.net:6666:admin_custom_zone_US_st_city_sid_2Han82Uw_time_5:defaultpwd",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "2d98d769-d356-48fc-a7c2-569ce3447e1f",
+        "hasConfirmation": false,
+        "durationMs": 770
+      },
+      {
+        "label": "F5.2 查纽约静态IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：29；成本：¥10；售价：¥40\n149.119.141.0 库存：21；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 [纯净静态3] ⚠️停用\n65.87.3.0 库存：60；成本：¥12；售价：¥64\n\n美国-纽约 ",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "2d98d769-d356-48fc-a7c2-569ce3447e1f",
+        "hasConfirmation": false,
+        "durationMs": 734
+      },
+      {
+        "label": "F5.3 开通第一个(指向静态)",
+        "passed": true,
+        "intent": "follow_up_action",
+        "messagePreview": "📦 已为您选中产品：\n• 位置: 美国-纽约-皇后区\n• 价格: ¥40\n\n确认开通吗？(回复\"确认\"执行购买)",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "2d98d769-d356-48fc-a7c2-569ce3447e1f",
+        "hasConfirmation": true,
+        "confirmationId": "d89832a1-d7e3-43c5-8244-062e6f21c656",
+        "durationMs": 231
+      }
+    ],
+    "totalMs": 1735
+  }
+]

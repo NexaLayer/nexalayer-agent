@@ -1,0 +1,975 @@
+[
+  {
+    "name": "A1: 查纽约→最便宜→帮我开通(取消)",
+    "suite": "A",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A1.1 查询纽约IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：30；成本：¥10；售价：¥40\n149.119.141.0 库存：25；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 [纯净静态3] ⚠️停用\n65.87.3.0 库存：60；成本：¥12；售价：¥64\n\n美国-纽约 ",
+        "failures": [],
+        "conversationId": "2e4d44c5-6478-42fa-9959-5f105082758a",
+        "hasConfirmation": false,
+        "durationMs": 2980
+      },
+      {
+        "label": "A1.2 找最便宜的",
+        "passed": true,
+        "intent": "follow_up_recommend",
+        "messagePreview": "🎯 为您推荐 最便宜 的 2 个产品：\n\n1. usa  库存: 58  售价: ¥40\n2. usa  库存: 218  售价: ¥40\n\n您可以输入：\n• \"帮我开通第1个\" — 购买选中的产品\n• \"选第2个\" — 查看详情\n• \"换便宜的\" — 重新筛选",
+        "failures": [],
+        "conversationId": "2e4d44c5-6478-42fa-9959-5f105082758a",
+        "hasConfirmation": false,
+        "durationMs": 726
+      },
+      {
+        "label": "A1.3 帮我开通(不确认)",
+        "passed": true,
+        "intent": "follow_up_action",
+        "messagePreview": "📦 已为您选中产品：\n• 位置: 美国-纽约-皇后区\n• 价格: ¥40\n\n确认开通吗？(回复\"确认\"执行购买)",
+        "failures": [],
+        "conversationId": "2e4d44c5-6478-42fa-9959-5f105082758a",
+        "hasConfirmation": false,
+        "durationMs": 321
+      }
+    ],
+    "totalMs": 4027
+  },
+  {
+    "name": "A2: 查伦敦→下一页→开通第三个",
+    "suite": "A",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A2.1 查询伦敦IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 伦敦静态代理产品 (40 个IP段)：\n\n英国-伦敦 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n英国-英格兰-伦敦 [纯净静态2] ⚠️停用\n库存：1703；成本：¥12；售价：¥65\n\n英国-英格兰-伦敦 [纯净静态1]\n154.62.172.0 库存：58；成本：¥12；售价：¥42\n154.62.180.0 库存：43；成本：¥12；售价：¥42\n154.64.136.0",
+        "failures": [],
+        "conversationId": "cf2ca713-5022-478f-99a0-088c71743cf6",
+        "hasConfirmation": false,
+        "durationMs": 776
+      },
+      {
+        "label": "A2.2 下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "⚠️ 没有正在浏览的列表。请先查询数据，例如：\n- \"查询静态代理订单\"\n- \"查询交易记录\"\n- \"查看用户列表\"",
+        "failures": [],
+        "conversationId": "cf2ca713-5022-478f-99a0-088c71743cf6",
+        "hasConfirmation": false,
+        "durationMs": 325
+      },
+      {
+        "label": "A2.3 开通第三个",
+        "passed": true,
+        "intent": "follow_up_select",
+        "messagePreview": "📋 您选中的 1 个产品：\n\n1. gbr  库存: 383  售价: ¥42\n\n输入 \"帮我开通\" 可直接购买。",
+        "failures": [],
+        "conversationId": "cf2ca713-5022-478f-99a0-088c71743cf6",
+        "hasConfirmation": false,
+        "durationMs": 188
+      }
+    ],
+    "totalMs": 1289
+  },
+  {
+    "name": "A3: 查东京→第一个→不对换第二个",
+    "suite": "A",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A3.1 查询东京IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 东京静态代理产品 (20 个IP段)：\n\n日本-JPN000-东京 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：229；成本：¥12；售价：¥65\n\n日本-JPN000-横滨 [纯净静态3]\n160.22.229.0 库存：142；成本：¥35；售价：¥65\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：10",
+        "failures": [],
+        "conversationId": "ad7da3ae-a27a-417d-831d-9dcca1f326c3",
+        "hasConfirmation": false,
+        "durationMs": 587
+      },
+      {
+        "label": "A3.2 选第一个",
+        "passed": true,
+        "intent": "follow_up_select",
+        "messagePreview": "📋 您选中的 1 个产品：\n\n1. jpn  库存: 0  售价: ¥42\n\n输入 \"帮我开通\" 可直接购买。",
+        "failures": [],
+        "conversationId": "ad7da3ae-a27a-417d-831d-9dcca1f326c3",
+        "hasConfirmation": false,
+        "durationMs": 215
+      },
+      {
+        "label": "A3.3 换第二个",
+        "passed": true,
+        "intent": "follow_up_select",
+        "messagePreview": "序号超出范围，共 1 个。",
+        "failures": [],
+        "conversationId": "ad7da3ae-a27a-417d-831d-9dcca1f326c3",
+        "hasConfirmation": false,
+        "durationMs": 341
+      }
+    ],
+    "totalMs": 1143
+  },
+  {
+    "name": "A4: 查美国→库存最多的→帮我开通",
+    "suite": "A",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A4.1 查美国IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 美国静态代理产品 (292 个IP段)：\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n146.71.35.0 库存：67；成本：¥5.5；售价：¥35.5\n107.178.159.0 库存：62；成本：¥5.5；售价：¥35.5\n146.148.157.0 库存：40；成本：¥5.5；售价：¥35.5\n173.254.199.0 库存：2；成本：¥5.5；售价：¥35.5\n107.178.1",
+        "failures": [],
+        "conversationId": "5948b53a-3f07-433b-aab9-6eab5fb20c9e",
+        "hasConfirmation": false,
+        "durationMs": 633
+      },
+      {
+        "label": "A4.2 库存最多的",
+        "passed": true,
+        "intent": "follow_up_refine",
+        "messagePreview": "📋 共 20 个结果：\n\n1. usa  库存: 1,517  售价: ¥36\n2. usa  库存: 902  售价: ¥35.5\n3. usa  库存: 878  售价: ¥46\n4. usa  库存: 803  售价: ¥40\n5. usa  库存: 742  售价: ¥42\n6. usa  库存: 725  售价: ¥46\n7. usa  库存: 522  售价: ¥46\n8. usa ",
+        "failures": [],
+        "conversationId": "5948b53a-3f07-433b-aab9-6eab5fb20c9e",
+        "hasConfirmation": false,
+        "durationMs": 916
+      },
+      {
+        "label": "A4.3 帮我开通",
+        "passed": true,
+        "intent": "follow_up_action",
+        "messagePreview": "📦 已为您选中产品：\n• 位置: 美国-加利福尼亚-洛杉矶\n• 价格: ¥36\n\n确认开通吗？(回复\"确认\"执行购买)",
+        "failures": [],
+        "conversationId": "5948b53a-3f07-433b-aab9-6eab5fb20c9e",
+        "hasConfirmation": false,
+        "durationMs": 581
+      }
+    ],
+    "totalMs": 2130
+  },
+  {
+    "name": "A5: 查纽约→找质量最好→太贵换便宜的",
+    "suite": "A",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A5.1 查纽约IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：30；成本：¥10；售价：¥40\n149.119.141.0 库存：25；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 [纯净静态3] ⚠️停用\n65.87.3.0 库存：60；成本：¥12；售价：¥64\n\n美国-纽约 ",
+        "failures": [],
+        "conversationId": "b4be7bb9-08f7-42e9-b563-a8bf2c3286fe",
+        "hasConfirmation": false,
+        "durationMs": 540
+      },
+      {
+        "label": "A5.2 找质量最好的",
+        "passed": true,
+        "intent": "find_best_ip",
+        "messagePreview": "⚠️ 即将对 5 个 IP 进行多源质量检测（IPQualityScore / AbuseIPDB / VirusTotal / IPinfo / IP2Location），可能产生 API 费用。\n\n正在检测中...\n\n🏆 纽约 质量最好的 IP:\n\n🔍 IP 综合质量报告: 107.178.159.1\n━━━━━━━━━━━━━━━━━━━━━━━━\n\n📊 综合评估\n  综合评分: 0/",
+        "failures": [],
+        "conversationId": "b4be7bb9-08f7-42e9-b563-a8bf2c3286fe",
+        "hasConfirmation": false,
+        "durationMs": 556
+      },
+      {
+        "label": "A5.3 太贵换便宜的",
+        "passed": true,
+        "intent": "follow_up_refine",
+        "messagePreview": "📋 共 14 个结果：\n\n1. usa  库存: 58  售价: ¥40\n2. usa  库存: 218  售价: ¥40\n3. usa  库存: 58  售价: ¥42\n4. usa  库存: 156  售价: ¥42\n5. usa  库存: 44  售价: ¥42\n6. usa  库存: 272  售价: ¥42\n7. usa  库存: 249  售价: ¥44\n8. usa  库存: 10",
+        "failures": [],
+        "conversationId": "b4be7bb9-08f7-42e9-b563-a8bf2c3286fe",
+        "hasConfirmation": false,
+        "durationMs": 723
+      }
+    ],
+    "totalMs": 1819
+  },
+  {
+    "name": "A6: 查日本→只看静态的→最便宜那个",
+    "suite": "A",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A6.1 查日本IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 日本静态代理产品 (20 个IP段)：\n\n日本-JPN000-东京 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：229；成本：¥12；售价：¥65\n\n日本-JPN000-横滨 [纯净静态3]\n160.22.229.0 库存：142；成本：¥35；售价：¥65\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：10",
+        "failures": [],
+        "conversationId": "5d6d2433-2ecf-4382-afd1-ceb4b98f1a5b",
+        "hasConfirmation": false,
+        "durationMs": 409
+      },
+      {
+        "label": "A6.2 最便宜那个",
+        "passed": true,
+        "intent": "follow_up_recommend",
+        "messagePreview": "🎯 为您推荐 最便宜 的 2 个产品：\n\n1. jpn  库存: 248  售价: ¥40\n2. jpn  库存: 0  售价: ¥42\n\n您可以输入：\n• \"帮我开通第1个\" — 购买选中的产品\n• \"选第2个\" — 查看详情\n• \"换便宜的\" — 重新筛选",
+        "failures": [],
+        "conversationId": "5d6d2433-2ecf-4382-afd1-ceb4b98f1a5b",
+        "hasConfirmation": false,
+        "durationMs": 332
+      }
+    ],
+    "totalMs": 741
+  },
+  {
+    "name": "A7: 查纽约→帮选3个→开通第一个",
+    "suite": "A",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A7.1 查纽约IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：30；成本：¥10；售价：¥40\n149.119.141.0 库存：25；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 [纯净静态3] ⚠️停用\n65.87.3.0 库存：60；成本：¥12；售价：¥64\n\n美国-纽约 ",
+        "failures": [],
+        "conversationId": "15516314-c885-4bcb-a5fd-55f7d55a534d",
+        "hasConfirmation": false,
+        "durationMs": 558
+      },
+      {
+        "label": "A7.2 帮选3个",
+        "passed": true,
+        "intent": "follow_up_select",
+        "messagePreview": "📋 共 3 个结果：\n\n1. usa  库存: 58  售价: ¥40\n2. usa  库存: 60  售价: ¥64\n3. usa  库存: 208  售价: ¥48",
+        "failures": [],
+        "conversationId": "15516314-c885-4bcb-a5fd-55f7d55a534d",
+        "hasConfirmation": false,
+        "durationMs": 362
+      },
+      {
+        "label": "A7.3 开通第一个",
+        "passed": true,
+        "intent": "follow_up_select",
+        "messagePreview": "📋 您选中的 1 个产品：\n\n1. usa  库存: 58  售价: ¥40\n\n输入 \"帮我开通\" 可直接购买。",
+        "failures": [],
+        "conversationId": "15516314-c885-4bcb-a5fd-55f7d55a534d",
+        "hasConfirmation": false,
+        "durationMs": 230
+      }
+    ],
+    "totalMs": 1150
+  },
+  {
+    "name": "B1: 开通第一个→取消→开第二个",
+    "suite": "B",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B1.1 查纽约IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：30；成本：¥10；售价：¥40\n149.119.141.0 库存：25；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 [纯净静态3] ⚠️停用\n65.87.3.0 库存：60；成本：¥12；售价：¥64\n\n美国-纽约 ",
+        "failures": [],
+        "conversationId": "6fb6e04a-e524-4506-a021-f2d8e3410f51",
+        "hasConfirmation": false,
+        "durationMs": 556
+      },
+      {
+        "label": "B1.2 开通第一个",
+        "passed": true,
+        "intent": "follow_up_select",
+        "messagePreview": "📋 您选中的 1 个产品：\n\n1. usa  库存: 58  售价: ¥40\n\n输入 \"帮我开通\" 可直接购买。",
+        "failures": [],
+        "conversationId": "6fb6e04a-e524-4506-a021-f2d8e3410f51",
+        "hasConfirmation": false,
+        "durationMs": 206
+      },
+      {
+        "label": "B1.3 取消",
+        "passed": true,
+        "intent": "unknown",
+        "messagePreview": "已取消选择。\n\n您可以：\n1. 重新选择其他产品\n2. 查看其他地区的代理资源\n\n试试这些命令：\n- `查看 美国` - 查看美国所有代理产品\n- `查看 静态` - 查看所有静态代理\n- `查看 动态` - 查看动态代理产品\n\n💡 输入 \"帮助\" 查看所有可用命令",
+        "failures": [],
+        "conversationId": "6fb6e04a-e524-4506-a021-f2d8e3410f51",
+        "hasConfirmation": false,
+        "durationMs": 18559
+      },
+      {
+        "label": "B1.4 开第二个",
+        "passed": true,
+        "intent": "follow_up_select",
+        "messagePreview": "序号超出范围，共 1 个。",
+        "failures": [],
+        "conversationId": "6fb6e04a-e524-4506-a021-f2d8e3410f51",
+        "hasConfirmation": false,
+        "durationMs": 648
+      }
+    ],
+    "totalMs": 19969
+  },
+  {
+    "name": "B2: 确认态中插话查余额",
+    "suite": "B",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B2.1 查美国IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：30；成本：¥10；售价：¥40\n149.119.141.0 库存：25；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 [纯净静态3] ⚠️停用\n65.87.3.0 库存：60；成本：¥12；售价：¥64\n\n美国-纽约 ",
+        "failures": [],
+        "conversationId": "4759bb4e-8cc2-467e-8d23-c8b7f2dccb98",
+        "hasConfirmation": false,
+        "durationMs": 526
+      },
+      {
+        "label": "B2.2 开通第一个",
+        "passed": true,
+        "intent": "follow_up_select",
+        "messagePreview": "📋 您选中的 1 个产品：\n\n1. usa  库存: 58  售价: ¥40\n\n输入 \"帮我开通\" 可直接购买。",
+        "failures": [],
+        "conversationId": "4759bb4e-8cc2-467e-8d23-c8b7f2dccb98",
+        "hasConfirmation": false,
+        "durationMs": 186
+      },
+      {
+        "label": "B2.3 插话查余额",
+        "passed": true,
+        "intent": "query_balance",
+        "messagePreview": "💰 当前余额: ¥71,660.29",
+        "failures": [],
+        "conversationId": "4759bb4e-8cc2-467e-8d23-c8b7f2dccb98",
+        "hasConfirmation": false,
+        "durationMs": 371
+      },
+      {
+        "label": "B2.4 取消后继续",
+        "passed": true,
+        "intent": "unknown",
+        "messagePreview": "已取消选择。\n\n您可以：\n1. 重新选择其他产品\n2. 查询其他信息\n\n相关命令：\n- `查产品` - 查看所有可用代理产品\n- `查余额` - 查看账户余额\n- `查订单` - 查看历史订单\n\n💡 输入 \"帮助\" 查看所有可用命令",
+        "failures": [],
+        "conversationId": "4759bb4e-8cc2-467e-8d23-c8b7f2dccb98",
+        "hasConfirmation": false,
+        "durationMs": 18003
+      }
+    ],
+    "totalMs": 19086
+  },
+  {
+    "name": "B3: 查询→开通→取消→再查同地区便宜的",
+    "suite": "B",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B3.1 查东京IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 东京静态代理产品 (20 个IP段)：\n\n日本-JPN000-东京 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：229；成本：¥12；售价：¥65\n\n日本-JPN000-横滨 [纯净静态3]\n160.22.229.0 库存：142；成本：¥35；售价：¥65\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：10",
+        "failures": [],
+        "conversationId": "ed35b91e-be75-4f8b-9f0e-978ae6775a18",
+        "hasConfirmation": false,
+        "durationMs": 887
+      },
+      {
+        "label": "B3.2 找质量最好的",
+        "passed": true,
+        "intent": "find_best_ip",
+        "messagePreview": "⚠️ 即将对 5 个 IP 进行多源质量检测（IPQualityScore / AbuseIPDB / VirusTotal / IPinfo / IP2Location），可能产生 API 费用。\n\n正在检测中...\n\n🏆 东京 质量最好的 IP:\n\n🔍 IP 综合质量报告: 103.249.186.1\n━━━━━━━━━━━━━━━━━━━━━━━━\n\n📊 综合评估\n  综合评分: 0/",
+        "failures": [],
+        "conversationId": "ed35b91e-be75-4f8b-9f0e-978ae6775a18",
+        "hasConfirmation": false,
+        "durationMs": 580
+      },
+      {
+        "label": "B3.3 帮我开通",
+        "passed": true,
+        "intent": "follow_up_action",
+        "messagePreview": "📦 已为您选中产品：\n• 位置: 日本-JPN000-东京\n• 价格: ¥42\n\n确认开通吗？(回复\"确认\"执行购买)",
+        "failures": [],
+        "conversationId": "ed35b91e-be75-4f8b-9f0e-978ae6775a18",
+        "hasConfirmation": false,
+        "durationMs": 273
+      },
+      {
+        "label": "B3.4 取消",
+        "passed": true,
+        "intent": "unknown",
+        "messagePreview": "已取消操作。\n\n如果您需要其他帮助，比如：\n- 查看其他地区的代理库存\n- 了解不同代理类型的特点\n- 查询代理使用状态\n\n请告诉我您的具体需求。\n\n**相关命令：**\n- `查看库存` - 查看所有可用代理产品\n- `我的代理` - 查看已开通的代理列表\n- `帮助` - 查看所有可用命令\n\n💡 输入 \"帮助\" 查看所有可用命令",
+        "failures": [],
+        "conversationId": "ed35b91e-be75-4f8b-9f0e-978ae6775a18",
+        "hasConfirmation": false,
+        "durationMs": 19594
+      },
+      {
+        "label": "B3.5 查同地区便宜的",
+        "passed": true,
+        "intent": "follow_up_refine",
+        "messagePreview": "📋 共 13 个结果：\n\n1. jpn  库存: 248  售价: ¥40\n2. jpn  库存: 0  售价: ¥42\n3. jpn  库存: 63  售价: ¥42\n4. jpn  库存: 29  售价: ¥51\n5. jpn  库存: 339  售价: ¥53\n6. jpn  库存: 209  售价: ¥55\n7. jpn  库存: 707  售价: ¥58\n8. jpn  库存: 0  ",
+        "failures": [],
+        "conversationId": "ed35b91e-be75-4f8b-9f0e-978ae6775a18",
+        "hasConfirmation": false,
+        "durationMs": 657
+      }
+    ],
+    "totalMs": 21991
+  },
+  {
+    "name": "B4: 购买确认消息格式校验",
+    "suite": "B",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B4.1 查纽约IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：30；成本：¥10；售价：¥40\n149.119.141.0 库存：25；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 [纯净静态3] ⚠️停用\n65.87.3.0 库存：60；成本：¥12；售价：¥64\n\n美国-纽约 ",
+        "failures": [],
+        "conversationId": "f896211b-c492-453d-9405-ea5ae5dcfce8",
+        "hasConfirmation": false,
+        "durationMs": 468
+      },
+      {
+        "label": "B4.2 开通第一个",
+        "passed": true,
+        "intent": "follow_up_select",
+        "messagePreview": "📋 您选中的 1 个产品：\n\n1. usa  库存: 58  售价: ¥40\n\n输入 \"帮我开通\" 可直接购买。",
+        "failures": [],
+        "conversationId": "f896211b-c492-453d-9405-ea5ae5dcfce8",
+        "hasConfirmation": false,
+        "durationMs": 195
+      }
+    ],
+    "totalMs": 663
+  },
+  {
+    "name": "C1: 查无结果地区→换有结果地区",
+    "suite": "C",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C1.1 查冷门地区",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "未找到 冰岛 的静态代理产品。",
+        "failures": [],
+        "conversationId": "ba1385f0-76ea-49af-bc6e-381af0e4f527",
+        "hasConfirmation": false,
+        "durationMs": 354
+      },
+      {
+        "label": "C1.2 换纽约",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：30；成本：¥10；售价：¥40\n149.119.141.0 库存：25；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 [纯净静态3] ⚠️停用\n65.87.3.0 库存：60；成本：¥12；售价：¥64\n\n美国-纽约 ",
+        "failures": [],
+        "conversationId": "ba1385f0-76ea-49af-bc6e-381af0e4f527",
+        "hasConfirmation": false,
+        "durationMs": 374
+      }
+    ],
+    "totalMs": 728
+  },
+  {
+    "name": "C2: 无上下文直接开通→引导查询",
+    "suite": "C",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C2.1 直接开通(无上下文)",
+        "passed": true,
+        "intent": "purchase_static",
+        "messagePreview": "确认开通静态代理？\n• 地区: 美国-纽约\n• 数量: 1\n• 时长: 30 天",
+        "failures": [],
+        "conversationId": "114e8ec8-8c72-4ef6-887a-bb1436f9ab4d",
+        "hasConfirmation": true,
+        "confirmationId": "636dca4a-62fb-46a1-82bf-f8e3d6bb8755",
+        "durationMs": 202
+      }
+    ],
+    "totalMs": 202
+  },
+  {
+    "name": "C3: 无上下文模糊命令不报错",
+    "suite": "C",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C3.1 模糊命令",
+        "passed": true,
+        "intent": "find_best_ip",
+        "messagePreview": "请指定要查找的地区。\n例如：开通一个美国质量最好的IP",
+        "failures": [],
+        "conversationId": "b9451607-551b-4838-825d-7452f0561ae1",
+        "hasConfirmation": false,
+        "durationMs": 200
+      }
+    ],
+    "totalMs": 200
+  },
+  {
+    "name": "C4: 查询→开通→序号超出范围",
+    "suite": "C",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C4.1 查日本IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 日本静态代理产品 (20 个IP段)：\n\n日本-JPN000-东京 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：229；成本：¥12；售价：¥65\n\n日本-JPN000-横滨 [纯净静态3]\n160.22.229.0 库存：142；成本：¥35；售价：¥65\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：10",
+        "failures": [],
+        "conversationId": "7d4cc2cc-5700-41cc-8a10-f4d4432cbcca",
+        "hasConfirmation": false,
+        "durationMs": 381
+      },
+      {
+        "label": "C4.2 开通第999个",
+        "passed": true,
+        "intent": "follow_up_select",
+        "messagePreview": "序号超出范围，共 13 个。",
+        "failures": [],
+        "conversationId": "7d4cc2cc-5700-41cc-8a10-f4d4432cbcca",
+        "hasConfirmation": false,
+        "durationMs": 178
+      }
+    ],
+    "totalMs": 559
+  },
+  {
+    "name": "C5: 权限测试-管理员可查用户",
+    "suite": "C",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C5.1 查询用户",
+        "passed": true,
+        "intent": "query_users",
+        "messagePreview": "👥 用户列表（第 1 页）\n\n1. ⛔ proves2026@outlook.com  | 用户(未激活)  | 余额: ¥0  代理: agent  | 2026-03-16\n2. ⛔ WAO1556  | 用户(未激活)  | 余额: ¥1000  代理: zhengwenlong2001  | 2026-03-15\n3. ⛔ zhengwen0230  | 用户(未激活)  | 余额: ¥",
+        "failures": [],
+        "conversationId": "109c9f31-7a30-4d22-b2bf-57d9cb1dae39",
+        "hasConfirmation": false,
+        "durationMs": 369
+      }
+    ],
+    "totalMs": 369
+  },
+  {
+    "name": "C6: 查询余额后建议查IP",
+    "suite": "C",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C6.1 查余额",
+        "passed": true,
+        "intent": "query_balance",
+        "messagePreview": "💰 当前余额: ¥71,660.29",
+        "failures": [],
+        "conversationId": "ce355c8c-7cc9-4630-b9e8-9fe62575ebc0",
+        "hasConfirmation": false,
+        "durationMs": 522
+      },
+      {
+        "label": "C6.2 查纽约IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：30；成本：¥10；售价：¥40\n149.119.141.0 库存：25；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 [纯净静态3] ⚠️停用\n65.87.3.0 库存：60；成本：¥12；售价：¥64\n\n美国-纽约 ",
+        "failures": [],
+        "conversationId": "ce355c8c-7cc9-4630-b9e8-9fe62575ebc0",
+        "hasConfirmation": false,
+        "durationMs": 431
+      }
+    ],
+    "totalMs": 953
+  },
+  {
+    "name": "C7: 查询→找最好→换便宜→开通(不确认)",
+    "suite": "C",
+    "passed": false,
+    "steps": [
+      {
+        "label": "C7.1 查美国IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 美国静态代理产品 (292 个IP段)：\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n146.71.35.0 库存：67；成本：¥5.5；售价：¥35.5\n107.178.159.0 库存：62；成本：¥5.5；售价：¥35.5\n146.148.157.0 库存：40；成本：¥5.5；售价：¥35.5\n173.254.199.0 库存：2；成本：¥5.5；售价：¥35.5\n107.178.1",
+        "failures": [],
+        "conversationId": "7ccc7505-1cbf-4364-b9f0-5958dc7cf455",
+        "hasConfirmation": false,
+        "durationMs": 545
+      },
+      {
+        "label": "C7.2 找最好的",
+        "passed": true,
+        "intent": "find_best_ip",
+        "messagePreview": "⚠️ 即将对 5 个 IP 进行多源质量检测（IPQualityScore / AbuseIPDB / VirusTotal / IPinfo / IP2Location），可能产生 API 费用。\n\n正在检测中...\n\n🏆 美国 质量最好的 IP:\n\n🔍 IP 综合质量报告: 107.178.159.1\n━━━━━━━━━━━━━━━━━━━━━━━━\n\n📊 综合评估\n  综合评分: 0/",
+        "failures": [],
+        "conversationId": "7ccc7505-1cbf-4364-b9f0-5958dc7cf455",
+        "hasConfirmation": false,
+        "durationMs": 11082
+      },
+      {
+        "label": "C7.3 换便宜的",
+        "passed": false,
+        "intent": "follow_up_refine",
+        "messagePreview": "📋 共 20 个结果：\n\n1. usa  库存: 902  售价: ¥35.5\n2. usa  库存: 166  售价: ¥35.5\n3. usa  库存: 50  售价: ¥35.5\n4. usa  库存: 1,517  售价: ¥36\n5. usa  库存: 81  售价: ¥40\n6. usa  库存: 58  售价: ¥40\n7. usa  库存: 803  售价: ¥40\n8. usa",
+        "failures": [
+          "message should match ANY of [便宜, cheapest, IP] (preview: 📋 共 20 个结果：\n\n1. usa  库存: 902  售价: ¥35.5\n2. usa  库存: 166  售价: ¥35.5\n3. usa  库存: 50  售价: ¥35.5\n4. usa  库存: 1,517  售价: ¥36\n5. usa  库存: 81  售价: ¥40\n6. usa  库存: 58  售价: ¥40\n7. usa  库存: 803  售价: ¥40\n8. usa)"
+        ],
+        "conversationId": "7ccc7505-1cbf-4364-b9f0-5958dc7cf455",
+        "hasConfirmation": false,
+        "durationMs": 1825
+      },
+      {
+        "label": "C7.4 帮我开通(不确认)",
+        "passed": true,
+        "intent": "follow_up_action",
+        "messagePreview": "📦 已为您选中产品：\n• 位置: 美国-加利福尼亚-洛杉矶\n• 价格: ¥35.5\n\n确认开通吗？(回复\"确认\"执行购买)",
+        "failures": [],
+        "conversationId": "7ccc7505-1cbf-4364-b9f0-5958dc7cf455",
+        "hasConfirmation": false,
+        "durationMs": 203
+      }
+    ],
+    "totalMs": 13655
+  },
+  {
+    "name": "D1: London→切换到东京(英→中)",
+    "suite": "D",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D1.1 查London IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 Static products in London (40 IP ranges):\n\n英国-伦敦 [Pure Static 1]\nStock: 0; Cost: ¥12; Price: ¥42\n\n英国-英格兰-伦敦 [Pure Static 2] ⚠️停用\nStock: 1703; Cost: ¥12; Price: ¥65\n\n英国-英格兰-伦敦 [Pure Static 1]\n154.62",
+        "failures": [],
+        "conversationId": "b7100178-ad11-41d8-a8c0-23dfde4aa23b",
+        "hasConfirmation": false,
+        "durationMs": 565
+      },
+      {
+        "label": "D1.2 切换到东京",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 东京静态代理产品 (20 个IP段)：\n\n日本-JPN000-东京 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：229；成本：¥12；售价：¥65\n\n日本-JPN000-横滨 [纯净静态3]\n160.22.229.0 库存：142；成本：¥35；售价：¥65\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：10",
+        "failures": [],
+        "conversationId": "b7100178-ad11-41d8-a8c0-23dfde4aa23b",
+        "hasConfirmation": false,
+        "durationMs": 359
+      }
+    ],
+    "totalMs": 924
+  },
+  {
+    "name": "D2: 英文全链路 NY→best→purchase",
+    "suite": "D",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D2.1 Query NY IPs",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 Static products in New York (38 IP ranges):\n\n美国-纽约-皇后区 [Pure Static 3]\n149.119.140.0 Stock: 30; Cost: ¥10; Price: ¥40\n149.119.141.0 Stock: 25; Cost: ¥10; Price: ¥40\n149.119.142.0 Stock: 3; Cost: ¥1",
+        "failures": [],
+        "conversationId": "454f57f3-e1d4-4cf5-b0a0-b21c551d0279",
+        "hasConfirmation": false,
+        "durationMs": 671
+      },
+      {
+        "label": "D2.2 find the best one",
+        "passed": true,
+        "intent": "find_best_ip",
+        "messagePreview": "⚠️ Checking 5 IPs across 5 sources (may incur costs).\n\nChecking...\n\n🏆 Best quality IP in 纽约:\n\n🔍 IP Quality Report: 107.178.159.1\n━━━━━━━━━━━━━━━━━━━━━━━━\n\n📊 Overall Assessment\n  Score: 0/100 (lower",
+        "failures": [],
+        "conversationId": "454f57f3-e1d4-4cf5-b0a0-b21c551d0279",
+        "hasConfirmation": false,
+        "durationMs": 13372
+      },
+      {
+        "label": "D2.3 purchase it",
+        "passed": true,
+        "intent": "follow_up_action",
+        "messagePreview": "📦 Selected product:\n• Location: 美国-纽约-皇后区\n• Price: ¥40\n\nConfirm purchase? (reply \"confirm\")",
+        "failures": [],
+        "conversationId": "454f57f3-e1d4-4cf5-b0a0-b21c551d0279",
+        "hasConfirmation": false,
+        "durationMs": 579
+      }
+    ],
+    "totalMs": 14622
+  },
+  {
+    "name": "D3: 中英混合查询",
+    "suite": "D",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D3.1 查London的IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 London静态代理产品 (40 个IP段)：\n\n英国-伦敦 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n英国-英格兰-伦敦 [纯净静态2] ⚠️停用\n库存：1703；成本：¥12；售价：¥65\n\n英国-英格兰-伦敦 [纯净静态1]\n154.62.172.0 库存：58；成本：¥12；售价：¥42\n154.62.180.0 库存：43；成本：¥12；售价：¥42\n154.64.1",
+        "failures": [],
+        "conversationId": "f294a90e-3fbd-4e81-9710-06be3da26165",
+        "hasConfirmation": false,
+        "durationMs": 373
+      },
+      {
+        "label": "D3.2 show最便宜的",
+        "passed": true,
+        "intent": "follow_up_refine",
+        "messagePreview": "📋 共 7 个结果：\n\n1. gbr  库存: 0  售价: ¥42\n2. gbr  库存: 383  售价: ¥42\n3. gbr  库存: 2,775  售价: ¥42\n4. gbr  库存: 370  售价: ¥42\n5. gbr  库存: 169  售价: ¥48\n6. gbr  库存: 0  售价: ¥64\n7. gbr  库存: 1,703  售价: ¥65",
+        "failures": [],
+        "conversationId": "f294a90e-3fbd-4e81-9710-06be3da26165",
+        "hasConfirmation": false,
+        "durationMs": 343
+      }
+    ],
+    "totalMs": 716
+  },
+  {
+    "name": "D4: 首尔/Seoul别名解析",
+    "suite": "D",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D4.1 查Seoul IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 Seoul静态代理产品 (4 个IP段)：\n\n韩国-KOR000-首尔 [纯净静态2] ⚠️停用\n库存：0；成本：¥12；售价：¥65\n\n韩国-KOR000-首尔 [纯净静态3]\n211.255.246.0 库存：11；成本：¥28；售价：¥58\n\n韩国-首尔 [纯净静态2] ⚠️停用\n库存：2060；成本：¥12；售价：¥65\n\n韩国-KOR000-首尔 [纯净静态4]\n203.227.1",
+        "failures": [],
+        "conversationId": "94ba2000-d708-4131-8df3-6ed851a0cc88",
+        "hasConfirmation": false,
+        "durationMs": 337
+      }
+    ],
+    "totalMs": 337
+  },
+  {
+    "name": "D5: 洛杉矶/LA/Los Angeles别名",
+    "suite": "D",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D5.1 查LA IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 全部静态代理产品 (547 个IP段)：\n\n阿联酋-阿布扎比 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n146.71.35.0 库存：67；成本：¥5.5；售价：¥35.5\n107.178.159.0 库存：62；成本：¥5.5；售价：¥35.5\n146.148.157.0 库存：40；成本：¥5.5；售价：¥35.5\n173.254.",
+        "failures": [],
+        "conversationId": "33dc7146-810f-4ecd-942f-b23cc4821b72",
+        "hasConfirmation": false,
+        "durationMs": 476
+      }
+    ],
+    "totalMs": 476
+  },
+  {
+    "name": "D6: 地区显示格式(非英文代码)",
+    "suite": "D",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D6.1 查伦敦IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 伦敦静态代理产品 (40 个IP段)：\n\n英国-伦敦 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n英国-英格兰-伦敦 [纯净静态2] ⚠️停用\n库存：1703；成本：¥12；售价：¥65\n\n英国-英格兰-伦敦 [纯净静态1]\n154.62.172.0 库存：58；成本：¥12；售价：¥42\n154.62.180.0 库存：43；成本：¥12；售价：¥42\n154.64.136.0",
+        "failures": [],
+        "conversationId": "add652eb-a29a-40d4-ac20-34a0d9fde809",
+        "hasConfirmation": false,
+        "durationMs": 407
+      }
+    ],
+    "totalMs": 407
+  },
+  {
+    "name": "D7: 英文follow-up上下文保持",
+    "suite": "D",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D7.1 Query Tokyo IPs",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 Static products in Tokyo (20 IP ranges):\n\n日本-JPN000-东京 [Pure Static 1]\nStock: 0; Cost: ¥12; Price: ¥42\n\n日本-JPN000-东京 [Pure Static 2] ⚠️停用\nStock: 229; Cost: ¥12; Price: ¥65\n\n日本-JPN000-横滨 [Pure Stati",
+        "failures": [],
+        "conversationId": "55af815d-3fe6-4d1e-aae3-4d66b8a98312",
+        "hasConfirmation": false,
+        "durationMs": 348
+      },
+      {
+        "label": "D7.2 which has most stock",
+        "passed": true,
+        "intent": "query_static_products",
+        "messagePreview": "📦 Static products in 东京 (20 IP ranges):\n\n日本-JPN000-东京 [Pure Static 1]\nStock: 0; Cost: ¥12; Price: ¥42\n\n日本-JPN000-东京 [Pure Static 2] ⚠️停用\nStock: 229; Cost: ¥12; Price: ¥65\n\n日本-JPN000-横滨 [Pure Static 3",
+        "failures": [],
+        "conversationId": "55af815d-3fe6-4d1e-aae3-4d66b8a98312",
+        "hasConfirmation": false,
+        "durationMs": 11126
+      }
+    ],
+    "totalMs": 11474
+  },
+  {
+    "name": "D8: 查Australia/澳大利亚互通",
+    "suite": "D",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D8.1 Australia IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 Australia静态代理产品 (4 个IP段)：\n\n澳大利亚-堪培拉 [纯净静态2]\n库存：596；成本：¥12；售价：¥42\n\n澳大利亚-新南威尔士-布里斯班 [纯净静态2]\n库存：1081；成本：¥12；售价：¥42\n\n澳大利亚-新南威尔士-布里斯班 [纯净静态3]\n203.32.21.0 库存：92；成本：¥25；售价：¥55\n\n澳大利亚-堪培拉 [纯净静态4]\n库存：0；成本：¥3",
+        "failures": [],
+        "conversationId": "e399ae85-0f94-4e11-85dd-316e9680ccb4",
+        "hasConfirmation": false,
+        "durationMs": 1246
+      }
+    ],
+    "totalMs": 1246
+  },
+  {
+    "name": "ISO1: 新会话不继承旧上下文",
+    "suite": "ISO",
+    "passed": true,
+    "steps": [
+      {
+        "label": "ISO1.1 旧会话查纽约",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：30；成本：¥10；售价：¥40\n149.119.141.0 库存：25；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 [纯净静态3] ⚠️停用\n65.87.3.0 库存：60；成本：¥12；售价：¥64\n\n美国-纽约 ",
+        "failures": [],
+        "conversationId": "2df90693-61b6-4475-9ed8-2b221177c577",
+        "hasConfirmation": false,
+        "durationMs": 417
+      },
+      {
+        "label": "ISO1.2 新会话-帮我开通",
+        "passed": true,
+        "intent": "unknown",
+        "messagePreview": "欢迎使用NexaLayer！要开通您的第一个代理服务，请按照以下步骤操作：\n\n1. **注册账户**：访问NexaLayer官网完成注册\n2. **选择套餐**：根据您的需求选择住宅、数据中心或ISP代理套餐\n3. **添加余额**：通过支持的支付方式充值\n4. **创建代理**：在控制面板中生成您的第一个代理IP\n\n我们的代理支持HTTP/HTTPS/SOCKS5协议，适用于数据采集、SEO监控",
+        "failures": [],
+        "conversationId": "891e187d-7cce-41ef-8205-f51da17cf329",
+        "hasConfirmation": false,
+        "durationMs": 27261
+      }
+    ],
+    "totalMs": 27678
+  },
+  {
+    "name": "ISO2: 切换主题后旧上下文不干扰",
+    "suite": "ISO",
+    "passed": false,
+    "steps": [
+      {
+        "label": "ISO2.1 查纽约IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：30；成本：¥10；售价：¥40\n149.119.141.0 库存：25；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 [纯净静态3] ⚠️停用\n65.87.3.0 库存：60；成本：¥12；售价：¥64\n\n美国-纽约 ",
+        "failures": [],
+        "conversationId": "58712dbb-e63c-4ec5-9681-c37bdbfc12b5",
+        "hasConfirmation": false,
+        "durationMs": 1490
+      },
+      {
+        "label": "ISO2.2 查伦敦IP(换主题)",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 伦敦静态代理产品 (40 个IP段)：\n\n英国-伦敦 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n英国-英格兰-伦敦 [纯净静态2] ⚠️停用\n库存：1703；成本：¥12；售价：¥65\n\n英国-英格兰-伦敦 [纯净静态1]\n154.62.172.0 库存：58；成本：¥12；售价：¥42\n154.62.180.0 库存：43；成本：¥12；售价：¥42\n154.64.136.0",
+        "failures": [],
+        "conversationId": "58712dbb-e63c-4ec5-9681-c37bdbfc12b5",
+        "hasConfirmation": false,
+        "durationMs": 853
+      },
+      {
+        "label": "ISO2.3 开通第一个(应指向伦敦)",
+        "passed": false,
+        "intent": "follow_up_select",
+        "messagePreview": "📋 您选中的 1 个产品：\n\n1. gbr  库存: 0  售价: ¥42\n\n输入 \"帮我开通\" 可直接购买。",
+        "failures": [
+          "message should match ANY of [英国, 伦敦, London, UK, 位置, Location] (preview: 📋 您选中的 1 个产品：\n\n1. gbr  库存: 0  售价: ¥42\n\n输入 \"帮我开通\" 可直接购买。)"
+        ],
+        "conversationId": "58712dbb-e63c-4ec5-9681-c37bdbfc12b5",
+        "hasConfirmation": false,
+        "durationMs": 344
+      }
+    ],
+    "totalMs": 2687
+  },
+  {
+    "name": "DIS1: 顺序词—质量第二好的",
+    "suite": "DIS",
+    "passed": true,
+    "steps": [
+      {
+        "label": "DIS1.1 查纽约IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：30；成本：¥10；售价：¥40\n149.119.141.0 库存：25；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 [纯净静态3] ⚠️停用\n65.87.3.0 库存：60；成本：¥12；售价：¥64\n\n美国-纽约 ",
+        "failures": [],
+        "conversationId": "160a001e-62bc-41ba-8120-3b0307414722",
+        "hasConfirmation": false,
+        "durationMs": 541
+      },
+      {
+        "label": "DIS1.2 找质量最好的",
+        "passed": true,
+        "intent": "find_best_ip",
+        "messagePreview": "⚠️ 即将对 5 个 IP 进行多源质量检测（IPQualityScore / AbuseIPDB / VirusTotal / IPinfo / IP2Location），可能产生 API 费用。\n\n正在检测中...\n\n🏆 纽约 质量最好的 IP:\n\n🔍 IP 综合质量报告: 107.178.159.1\n━━━━━━━━━━━━━━━━━━━━━━━━\n\n📊 综合评估\n  综合评分: 0/",
+        "failures": [],
+        "conversationId": "160a001e-62bc-41ba-8120-3b0307414722",
+        "hasConfirmation": false,
+        "durationMs": 690
+      },
+      {
+        "label": "DIS1.3 第二个",
+        "passed": true,
+        "intent": "follow_up_select",
+        "messagePreview": "📋 您选中的 1 个产品：\n\n1. usa  库存: 60  售价: ¥64\n\n输入 \"帮我开通\" 可直接购买。",
+        "failures": [],
+        "conversationId": "160a001e-62bc-41ba-8120-3b0307414722",
+        "hasConfirmation": false,
+        "durationMs": 335
+      }
+    ],
+    "totalMs": 1566
+  },
+  {
+    "name": "DIS2: \"这个\"\"那个\"指代",
+    "suite": "DIS",
+    "passed": true,
+    "steps": [
+      {
+        "label": "DIS2.1 查日本IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 日本静态代理产品 (20 个IP段)：\n\n日本-JPN000-东京 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：229；成本：¥12；售价：¥65\n\n日本-JPN000-横滨 [纯净静态3]\n160.22.229.0 库存：142；成本：¥35；售价：¥65\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：10",
+        "failures": [],
+        "conversationId": "6ef92374-3018-45cf-a2cc-3f4b6a705c49",
+        "hasConfirmation": false,
+        "durationMs": 608
+      },
+      {
+        "label": "DIS2.2 帮我开通这个",
+        "passed": true,
+        "intent": "follow_up_action",
+        "messagePreview": "📦 已为您选中产品：\n• 位置: 日本-JPN000-东京\n• 价格: ¥42\n\n确认开通吗？(回复\"确认\"执行购买)",
+        "failures": [],
+        "conversationId": "6ef92374-3018-45cf-a2cc-3f4b6a705c49",
+        "hasConfirmation": false,
+        "durationMs": 336
+      }
+    ],
+    "totalMs": 944
+  },
+  {
+    "name": "DIS3: \"查最近开通的IP\"识别为查询非购买",
+    "suite": "DIS",
+    "passed": true,
+    "steps": [
+      {
+        "label": "DIS3.1 查最近开通的IP",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA2026031615230145ssvh  |  美国-欧文  |  301  |  到期: 2026-04-15\n   157.238.220.232:5206:ngkxcsdrippk:vkpqshsmunub\n2. STA202603161515593vbu9t  |  美国-洛杉矶  |  301  |  到期: 2026-04-15\n   ",
+        "failures": [],
+        "conversationId": "170702ab-4d02-4682-be42-5dbf458c18a5",
+        "hasConfirmation": false,
+        "durationMs": 3683
+      }
+    ],
+    "totalMs": 3683
+  }
+]

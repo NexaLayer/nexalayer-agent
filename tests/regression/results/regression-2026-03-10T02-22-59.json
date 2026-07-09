@@ -1,0 +1,8008 @@
+{
+  "timestamp": "2026-03-10T02:22:59.685Z",
+  "summary": {
+    "total_cases": 340,
+    "passed": 296,
+    "failed": 44,
+    "accuracy": "87.1%",
+    "intent_accuracy": "97.9%"
+  },
+  "by_intent": [
+    {
+      "intent": "query_balance",
+      "description": "查询余额",
+      "total": 30,
+      "passed": 29,
+      "failed": 1,
+      "accuracy": "96.7%",
+      "failures": [
+        {
+          "input": "帮我看下 user01 的余额",
+          "got_intent": "query_balance",
+          "got_slots": {}
+        }
+      ]
+    },
+    {
+      "intent": "query_ip_inventory",
+      "description": "查询IP库存/地区IP",
+      "total": 35,
+      "passed": 26,
+      "failed": 9,
+      "accuracy": "74.3%",
+      "failures": [
+        {
+          "input": "看看美国的IP库存",
+          "got_intent": "check_ip_quality",
+          "got_slots": {
+            "country": "USA"
+          }
+        },
+        {
+          "input": "查看纽约的IP",
+          "got_intent": "query_ip_inventory",
+          "got_slots": {
+            "city": "USA0NY",
+            "country": "USA"
+          }
+        },
+        {
+          "input": "洛杉矶有哪些IP",
+          "got_intent": "query_ip_inventory",
+          "got_slots": {
+            "city": "USA0CALAX",
+            "country": "USA"
+          }
+        },
+        {
+          "input": "查查芝加哥的IP",
+          "got_intent": "query_ip_inventory",
+          "got_slots": {
+            "city": "USA0ILCHI",
+            "country": "USA"
+          }
+        },
+        {
+          "input": "check IP inventory for UK",
+          "got_intent": "query_ip_inventory",
+          "got_slots": {
+            "country": "CHE"
+          }
+        },
+        {
+          "input": "看看有哪些IP资源",
+          "got_intent": "check_ip_quality",
+          "got_slots": {}
+        },
+        {
+          "input": "找个最便宜的美国IP",
+          "got_intent": "find_best_ip",
+          "got_slots": {
+            "country": "USA"
+          }
+        },
+        {
+          "input": "台湾IP",
+          "got_intent": "query_ip_inventory",
+          "got_slots": {
+            "country": "CHN"
+          }
+        },
+        {
+          "input": "韩国有哪些IP",
+          "got_intent": "query_ip_inventory",
+          "got_slots": {
+            "country": "KOR"
+          }
+        }
+      ]
+    },
+    {
+      "intent": "find_best_ip",
+      "description": "推荐最优质IP",
+      "total": 35,
+      "passed": 32,
+      "failed": 3,
+      "accuracy": "91.4%",
+      "failures": [
+        {
+          "input": "找最好质量的洛杉矶IP",
+          "got_intent": "find_best_ip",
+          "got_slots": {
+            "city": "USA0CALAX",
+            "country": "USA"
+          }
+        },
+        {
+          "input": "find me the best US IP",
+          "got_intent": "find_best_ip",
+          "got_slots": {
+            "country": "IND"
+          }
+        },
+        {
+          "input": "best quality IP in US",
+          "got_intent": "find_best_ip",
+          "got_slots": {
+            "country": "EST"
+          }
+        }
+      ]
+    },
+    {
+      "intent": "check_ip_quality",
+      "description": "检测IP质量",
+      "total": 30,
+      "passed": 29,
+      "failed": 1,
+      "accuracy": "96.7%",
+      "failures": [
+        {
+          "input": "检查这个号段 1.2.3 的质量",
+          "got_intent": "check_ip_quality",
+          "got_slots": {}
+        }
+      ]
+    },
+    {
+      "intent": "purchase_static",
+      "description": "开通静态代理",
+      "total": 30,
+      "passed": 19,
+      "failed": 11,
+      "accuracy": "63.3%",
+      "failures": [
+        {
+          "input": "开通一个洛杉矶的IP",
+          "got_intent": "purchase_static",
+          "got_slots": {
+            "city": "USA0CALAX",
+            "country": "USA"
+          }
+        },
+        {
+          "input": "帮我开通一个华盛顿IP",
+          "got_intent": "purchase_static",
+          "got_slots": {
+            "city": "USA0DC",
+            "country": "USA"
+          }
+        },
+        {
+          "input": "开一个纽约的IP",
+          "got_intent": "purchase_static",
+          "got_slots": {
+            "city": "USA0NY",
+            "country": "USA"
+          }
+        },
+        {
+          "input": "开一个香港IP 3个月",
+          "got_intent": "purchase_static",
+          "got_slots": {
+            "country": "HKG",
+            "city": "HKG000HKG",
+            "quantity": 3,
+            "duration": 90
+          }
+        },
+        {
+          "input": "open a static IP in Tokyo",
+          "got_intent": "query_static_resource",
+          "got_slots": {
+            "city": "JPN000TYO",
+            "country": "JPN"
+          }
+        },
+        {
+          "input": "帮我开个芝加哥的IP",
+          "got_intent": "purchase_static",
+          "got_slots": {
+            "city": "USA0ILCHI",
+            "country": "USA"
+          }
+        },
+        {
+          "input": "开通IP 美国纽约",
+          "got_intent": "purchase_static",
+          "got_slots": {
+            "country": "USA",
+            "city": "USA0NY"
+          }
+        },
+        {
+          "input": "买5个美国IP 1个月",
+          "got_intent": "purchase_static",
+          "got_slots": {
+            "country": "USA",
+            "quantity": 5,
+            "duration": 30
+          }
+        },
+        {
+          "input": "买个韩国IP",
+          "got_intent": "purchase_static",
+          "got_slots": {
+            "country": "KOR"
+          }
+        },
+        {
+          "input": "帮我开个达拉斯的IP",
+          "got_intent": "purchase_static",
+          "got_slots": {
+            "city": "USA0TXDAL",
+            "country": "USA"
+          }
+        },
+        {
+          "input": "帮我买个台湾IP",
+          "got_intent": "purchase_static",
+          "got_slots": {
+            "country": "CHN"
+          }
+        }
+      ]
+    },
+    {
+      "intent": "purchase_dynamic",
+      "description": "开通动态代理",
+      "total": 20,
+      "passed": 12,
+      "failed": 8,
+      "accuracy": "60.0%",
+      "failures": [
+        {
+          "input": "开通2G动态代理",
+          "got_intent": "purchase_dynamic",
+          "got_slots": {}
+        },
+        {
+          "input": "买5GB动态流量",
+          "got_intent": "purchase_dynamic",
+          "got_slots": {}
+        },
+        {
+          "input": "帮我买10G动态流量",
+          "got_intent": "purchase_dynamic",
+          "got_slots": {}
+        },
+        {
+          "input": "充3GB流量",
+          "got_intent": "purchase_dynamic",
+          "got_slots": {}
+        },
+        {
+          "input": "加5G动态",
+          "got_intent": "purchase_dynamic",
+          "got_slots": {}
+        },
+        {
+          "input": "购买20G动态",
+          "got_intent": "purchase_dynamic",
+          "got_slots": {}
+        },
+        {
+          "input": "开通1G动态代理",
+          "got_intent": "purchase_dynamic",
+          "got_slots": {}
+        },
+        {
+          "input": "开通100G动态流量",
+          "got_intent": "purchase_dynamic",
+          "got_slots": {}
+        }
+      ]
+    },
+    {
+      "intent": "purchase_ip",
+      "description": "购买指定IP",
+      "total": 10,
+      "passed": 8,
+      "failed": 2,
+      "accuracy": "80.0%",
+      "failures": [
+        {
+          "input": "帮忙开 1.2.3.4 3个月",
+          "got_intent": "purchase_ip",
+          "got_slots": {
+            "ip_segment": "1.2.3.4",
+            "quantity": 3,
+            "duration": 90
+          }
+        },
+        {
+          "input": "开通 1.2.3.4 一个月",
+          "got_intent": "purchase_ip",
+          "got_slots": {
+            "ip_segment": "1.2.3.4"
+          }
+        }
+      ]
+    },
+    {
+      "intent": "extract_dynamic",
+      "description": "提取动态代理链接",
+      "total": 20,
+      "passed": 19,
+      "failed": 1,
+      "accuracy": "95.0%",
+      "failures": [
+        {
+          "input": "extract 5 US dynamic proxies",
+          "got_intent": "extract_dynamic",
+          "got_slots": {
+            "country": "USA"
+          }
+        }
+      ]
+    },
+    {
+      "intent": "renew_static",
+      "description": "续费静态代理",
+      "total": 15,
+      "passed": 9,
+      "failed": 6,
+      "accuracy": "60.0%",
+      "failures": [
+        {
+          "input": "续费 1.2.3.4 3个月",
+          "got_intent": "renew_static",
+          "got_slots": {
+            "ip_segment": "1.2.3.4",
+            "duration": 90
+          }
+        },
+        {
+          "input": "续费IP 1.2.3.4 一个月",
+          "got_intent": "renew_static",
+          "got_slots": {
+            "ip_segment": "1.2.3.4"
+          }
+        },
+        {
+          "input": "renew 1.2.3.4 for 3 months",
+          "got_intent": "renew_static",
+          "got_slots": {
+            "ip_segment": "1.2.3.4",
+            "duration": 90
+          }
+        },
+        {
+          "input": "1.2.3.4 续费半年",
+          "got_intent": "renew_static",
+          "got_slots": {
+            "ip_segment": "1.2.3.4"
+          }
+        },
+        {
+          "input": "帮我续费所有快到期的IP",
+          "got_intent": "query_static_orders",
+          "got_slots": {}
+        },
+        {
+          "input": "给 1.2.3.4 续3个月",
+          "got_intent": "renew_static",
+          "got_slots": {
+            "ip_segment": "1.2.3.4",
+            "duration": 90
+          }
+        }
+      ]
+    },
+    {
+      "intent": "query_stats",
+      "description": "查询消费/利润/充值统计",
+      "total": 20,
+      "passed": 19,
+      "failed": 1,
+      "accuracy": "95.0%",
+      "failures": [
+        {
+          "input": "今天消费了多少",
+          "got_intent": "query_today_orders",
+          "got_slots": {}
+        }
+      ]
+    },
+    {
+      "intent": "query_static_orders",
+      "description": "查询静态订单/已购IP",
+      "total": 20,
+      "passed": 19,
+      "failed": 1,
+      "accuracy": "95.0%",
+      "failures": [
+        {
+          "input": "查一下我有哪些静态IP",
+          "got_intent": "query_static_resource",
+          "got_slots": {}
+        }
+      ]
+    },
+    {
+      "intent": "query_dynamic_orders",
+      "description": "查询动态订单",
+      "total": 10,
+      "passed": 10,
+      "failed": 0,
+      "accuracy": "100.0%",
+      "failures": []
+    },
+    {
+      "intent": "query_transactions",
+      "description": "查询交易记录",
+      "total": 10,
+      "passed": 10,
+      "failed": 0,
+      "accuracy": "100.0%",
+      "failures": []
+    },
+    {
+      "intent": "query_dynamic_resource",
+      "description": "查询动态资源/流量",
+      "total": 10,
+      "passed": 10,
+      "failed": 0,
+      "accuracy": "100.0%",
+      "failures": []
+    },
+    {
+      "intent": "query_expiring_ips",
+      "description": "查询即将到期的IP",
+      "total": 15,
+      "passed": 15,
+      "failed": 0,
+      "accuracy": "100.0%",
+      "failures": []
+    },
+    {
+      "intent": "query_today_orders",
+      "description": "查询今日消费",
+      "total": 10,
+      "passed": 10,
+      "failed": 0,
+      "accuracy": "100.0%",
+      "failures": []
+    },
+    {
+      "intent": "query_static_resource",
+      "description": "查询静态代理资源",
+      "total": 10,
+      "passed": 10,
+      "failed": 0,
+      "accuracy": "100.0%",
+      "failures": []
+    },
+    {
+      "intent": "create_session",
+      "description": "创建代理会话",
+      "total": 10,
+      "passed": 10,
+      "failed": 0,
+      "accuracy": "100.0%",
+      "failures": []
+    }
+  ],
+  "details": [
+    {
+      "input": "查余额",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我余额多少",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我还有多少钱",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "余额还剩多少",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "看看我的余额",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查一下账户余额",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我的账户还有钱吗",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我查下余额",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "余额查询",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "账户里还有多少",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看余额",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我有多少余额",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询我的余额",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "check my balance",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {
+          "target_user": "my"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {
+          "target_user": "my"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "show balance",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "what is my balance",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "how much balance do I have",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我看看还有多少钱",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "钱还够不够",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查查余额",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "余额",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询 test@qq.com 的余额",
+      "expected_intent": "query_balance",
+      "expected_slots": {
+        "target_user": "test@qq.com"
+      },
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {
+          "target_user": "test@qq.com"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {
+          "target_user": "test@qq.com"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "用户 agent01 余额多少",
+      "expected_intent": "query_balance",
+      "expected_slots": {
+        "target_user": "agent01"
+      },
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {
+          "target_user": "agent01"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {
+          "target_user": "agent01"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我看下 user01 的余额",
+      "expected_intent": "query_balance",
+      "expected_slots": {
+        "target_user": "user01"
+      },
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "账上还有多少余额",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "现在余额是多少",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "还剩多少钱可以用",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "资金还有多少",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我的账户余额",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "get my balance",
+      "expected_intent": "query_balance",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_balance",
+        "slots": {
+          "target_user": "my"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_balance",
+        "slots": {
+          "target_user": "my"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "美国有哪些IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "美国有哪些地区的IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "美国都有哪些IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "美国有什么IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看美国的IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "看看美国的IP库存",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": false,
+      "slot_match": true,
+      "pass": false
+    },
+    {
+      "input": "美国IP有多少",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询美国IP库存",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "美国哪些城市有IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "美国目前有哪些IP可用",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "有没有美国的IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "日本有哪些IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "JP"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "JPN"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "JPN"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "英国有什么IP可以买",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "GB"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "GBR"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "GBR"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "德国IP库存",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "DE"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "DEU"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "DEU"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看纽约的IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "city": "new york",
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "city": "USA0NY",
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "city": "USA0NY",
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "洛杉矶有哪些IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "city": "los angeles",
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "city": "USA0CALAX",
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "city": "USA0CALAX",
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "查查芝加哥的IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "city": "chicago",
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "city": "USA0ILCHI",
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "city": "USA0ILCHI",
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "香港有IP吗",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "HK"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "city": "HKG000HKG",
+          "country": "HKG"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "city": "HKG000HKG",
+          "country": "HKG"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "show available US IPs",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "list IPs in Japan",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "JP"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "JPN"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "JPN"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "what IPs are available in Germany",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "DE"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "DEU"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "DEU"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "check IP inventory for UK",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "GB"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "CHE"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "CHE"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "查查有哪些IP可以用",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "IP库存",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "有哪些地区的IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "都有哪些IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "看看有哪些IP资源",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {}
+      },
+      "intent_match": false,
+      "slot_match": true,
+      "pass": false
+    },
+    {
+      "input": "最便宜的IP是哪个",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "sort": "price_asc"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "sort": "price_asc"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "sort": "price_asc"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "找个最便宜的美国IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "US",
+        "sort": "price_asc"
+      },
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": false,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "哪个IP最便宜",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "sort": "price_asc"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "sort": "price_asc"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "sort": "price_asc"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "推荐最低价的IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "sort": "price_asc"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "sort": "price_asc"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "sort": "price_asc"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "美国IP价格",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "新加坡有IP吗",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "SG"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "city": "SGP000SIN",
+          "country": "SGP"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "city": "SGP000SIN",
+          "country": "SGP"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "台湾IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "TW"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "CHN"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "CHN"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "韩国有哪些IP",
+      "expected_intent": "query_ip_inventory",
+      "expected_slots": {
+        "country": "KR"
+      },
+      "rule_engine": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "KOR"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_ip_inventory",
+        "slots": {
+          "country": "KOR"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "推荐一个美国质量最好的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我找一个质量最好的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "推荐最优质的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我想要一个最干净的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "最安全的美国IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "推荐IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "推荐一个IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我推荐IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "推荐一个好用的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "有没有质量好的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "给我推荐一个IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "推荐质量最高的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "找个质量好的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮忙推荐个美国IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "推荐一个日本的好IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {
+        "country": "JP"
+      },
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "JPN"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "JPN"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "开通一个美国质量最好的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "找最好质量的洛杉矶IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {
+        "city": "los angeles",
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {
+          "city": "USA0CALAX",
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {
+          "city": "USA0CALAX",
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "我需要一个不容易被封的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "给我一个纯净的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "推荐一个没被污染的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "recommend best quality IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "EST"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "EST"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "find me the best US IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "IND"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "IND"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "I want the cleanest IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "EST"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "EST"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "suggest a good IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "EST"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "EST"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "best quality IP in US",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "EST"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "EST"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "推荐个质量高的德国IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {
+        "country": "DE"
+      },
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "DEU"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {
+          "country": "DEU"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "有什么好的IP推荐吗",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我选一个好IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "哪个IP质量最好",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "推荐最好的IP给我",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我要一个质量最好的",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "推荐个靠谱的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "有好的IP吗",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "推荐稳定的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "找个好用不被封的IP",
+      "expected_intent": "find_best_ip",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "find_best_ip",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "find_best_ip",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询 1.2.3.4 的质量",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "检测 8.8.8.8 质量",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "8.8.8.8"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "8.8.8.8"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "8.8.8.8"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "1.2.3.4 质量怎么样",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "看看 192.168.1.1 的IP质量",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "192.168.1.1"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "192.168.1.1"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "192.168.1.1"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我查下 10.0.0.1 的质量",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "10.0.0.1"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "10.0.0.1"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "10.0.0.1"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "检测下IP质量 5.6.7.8",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "5.6.7.8"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "5.6.7.8"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "5.6.7.8"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "check quality of 1.2.3.4",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "IP质量检测 3.4.5.6",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "3.4.5.6"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "3.4.5.6"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "3.4.5.6"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询IP质量",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "用ping0检测 1.2.3.4",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "这个IP干净吗 2.3.4.5",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "2.3.4.5"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "2.3.4.5"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "2.3.4.5"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "1.2.3.4 有没有被标记",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "1.2.3.4 被封了吗",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "检查 1.2.3.4 是不是干净的",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "1.2.3.4 质量好不好",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我测一下 7.8.9.10 的质量",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "7.8.9.10"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "7.8.9.10"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "7.8.9.10"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "check 1.2.3.4 quality",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "is 1.2.3.4 a clean IP",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "质量检测 1.1.1.1",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.1.1.1"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.1.1.1"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.1.1.1"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "看下这个IP怎么样 4.5.6.7",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "4.5.6.7"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "4.5.6.7"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "4.5.6.7"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮忙检测 9.8.7.6 的IP质量",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "9.8.7.6"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "9.8.7.6"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "9.8.7.6"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "1.2.3.4 的质量分数",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "检查这个号段 1.2.3 的质量",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "通过 ipqualityscore 检测 1.2.3.4",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "1.2.3.4 是不是住宅IP",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "测一下IP 6.7.8.9",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "6.7.8.9"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "6.7.8.9"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "6.7.8.9"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "IP 1.2.3.4 质量报告",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "看看 1.2.3.4 有没有被污染",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "1.2.3.4 安全吗",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查下 1.2.3.4 有没有风险",
+      "expected_intent": "check_ip_quality",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "check_ip_quality",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我开一个美国的IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "开通一个洛杉矶的IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "city": "los angeles",
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "city": "USA0CALAX",
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "city": "USA0CALAX",
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "买一个日本的静态代理",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "JP"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "JPN"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "JPN"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我开通一个华盛顿IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "city": "washington"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "city": "USA0DC",
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "city": "USA0DC",
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "开通静态代理 美国",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "买个IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我买一个IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "开一个纽约的IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "city": "new york",
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "city": "USA0NY",
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "city": "USA0NY",
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "我要开一个美国IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "购买美国静态代理",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "开通2个美国IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "US",
+        "quantity": 2
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA",
+          "quantity": 2
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA",
+          "quantity": 2
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮忙开3个日本IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "JP",
+        "quantity": 3
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "JPN",
+          "quantity": 3
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "JPN",
+          "quantity": 3
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我想要一个德国的IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "DE"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "DEU"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "DEU"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "开一个香港IP 3个月",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "HK",
+        "duration": 3
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "HKG",
+          "city": "HKG000HKG",
+          "quantity": 3,
+          "duration": 90
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "HKG",
+          "city": "HKG000HKG",
+          "quantity": 3,
+          "duration": 90
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "buy a US static proxy",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "open a static IP in Tokyo",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "city": "tokyo",
+        "country": "JP"
+      },
+      "rule_engine": {
+        "intent": "query_static_resource",
+        "slots": {
+          "city": "JPN000TYO",
+          "country": "JPN"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_resource",
+        "slots": {
+          "city": "JPN000TYO",
+          "country": "JPN"
+        }
+      },
+      "intent_match": false,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "purchase static proxy",
+      "expected_intent": "purchase_static",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我开个芝加哥的IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "city": "chicago",
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "city": "USA0ILCHI",
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "city": "USA0ILCHI",
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "给我开一个英国IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "GB"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "GBR"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "GBR"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "开通IP 美国纽约",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "city": "new york",
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA",
+          "city": "USA0NY"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA",
+          "city": "USA0NY"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "我需要一个新加坡的IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "SG"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "SGP",
+          "city": "SGP000SIN"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "SGP",
+          "city": "SGP000SIN"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "买5个美国IP 1个月",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "US",
+        "quantity": 5,
+        "duration": 1
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA",
+          "quantity": 5,
+          "duration": 30
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA",
+          "quantity": 5,
+          "duration": 30
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "帮我开个加拿大的IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "CA"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "CAN"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "CAN"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "买个韩国IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "KR"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "KOR"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "KOR"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "开通一个法国IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "FR"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "FRA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "FRA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我开个达拉斯的IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "city": "dallas",
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "city": "USA0TXDAL",
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "city": "USA0TXDAL",
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "开IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "买代理",
+      "expected_intent": "purchase_static",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我要开IP 美国",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我买个台湾IP",
+      "expected_intent": "purchase_static",
+      "expected_slots": {
+        "country": "TW"
+      },
+      "rule_engine": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "CHN"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_static",
+        "slots": {
+          "country": "CHN"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "开通2G动态代理",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {
+        "traffic_gb": 2
+      },
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "买5GB动态流量",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {
+        "traffic_gb": 5
+      },
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "购买动态代理 10G",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {
+        "traffic_gb": 10
+      },
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {
+          "traffic_gb": 10
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {
+          "traffic_gb": 10
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "充值动态流量 3G",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {
+        "traffic_gb": 3
+      },
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {
+          "traffic_gb": 3
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {
+          "traffic_gb": 3
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "开通动态代理",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "买动态流量",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我买10G动态流量",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {
+        "traffic_gb": 10
+      },
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "充3GB流量",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {
+        "traffic_gb": 3
+      },
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "加5G动态",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {
+        "traffic_gb": 5
+      },
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "buy 2GB dynamic proxy",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {
+        "traffic_gb": 2
+      },
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {
+          "traffic_gb": 2
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {
+          "traffic_gb": 2
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "purchase dynamic proxy 5GB",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {
+        "traffic_gb": 5
+      },
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {
+          "traffic_gb": 5
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {
+          "traffic_gb": 5
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "open dynamic proxy",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我买点动态流量",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我要买动态代理",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "购买20G动态",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {
+        "traffic_gb": 20
+      },
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "开通1G动态代理",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {
+        "traffic_gb": 1
+      },
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "动态代理充值 5G",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {
+        "traffic_gb": 5
+      },
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {
+          "traffic_gb": 5
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {
+          "traffic_gb": 5
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "需要动态代理流量",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "开通100G动态流量",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {
+        "traffic_gb": 100
+      },
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "买动态的",
+      "expected_intent": "purchase_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "purchase_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我开通 1.2.3.4",
+      "expected_intent": "purchase_ip",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我要买 5.6.7.8",
+      "expected_intent": "purchase_ip",
+      "expected_slots": {
+        "ip_segment": "5.6.7.8"
+      },
+      "rule_engine": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "5.6.7.8"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "5.6.7.8"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "开通 10.20.30.40",
+      "expected_intent": "purchase_ip",
+      "expected_slots": {
+        "ip_segment": "10.20.30.40"
+      },
+      "rule_engine": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "10.20.30.40"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "10.20.30.40"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "购买 192.168.1.1",
+      "expected_intent": "purchase_ip",
+      "expected_slots": {
+        "ip_segment": "192.168.1.1"
+      },
+      "rule_engine": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "192.168.1.1"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "192.168.1.1"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮忙开 1.2.3.4 3个月",
+      "expected_intent": "purchase_ip",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4",
+        "duration": 3
+      },
+      "rule_engine": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "1.2.3.4",
+          "quantity": 3,
+          "duration": 90
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "1.2.3.4",
+          "quantity": 3,
+          "duration": 90
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "buy 1.2.3.4",
+      "expected_intent": "purchase_ip",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "open 5.6.7.8",
+      "expected_intent": "purchase_ip",
+      "expected_slots": {
+        "ip_segment": "5.6.7.8"
+      },
+      "rule_engine": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "5.6.7.8"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "5.6.7.8"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我要 1.2.3.4 这个IP",
+      "expected_intent": "purchase_ip",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "开通 1.2.3.4 一个月",
+      "expected_intent": "purchase_ip",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4",
+        "duration": 1
+      },
+      "rule_engine": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "purchase 10.0.0.1",
+      "expected_intent": "purchase_ip",
+      "expected_slots": {
+        "ip_segment": "10.0.0.1"
+      },
+      "rule_engine": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "10.0.0.1"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "purchase_ip",
+        "slots": {
+          "ip_segment": "10.0.0.1"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我提取一个动态链接",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "提取动态代理链接",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "获取一个动态代理",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "给我一个动态代理链接",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮忙提取5个动态链接",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {
+        "quantity": 5
+      },
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {
+          "quantity": 5
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {
+          "quantity": 5
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "提取美国动态代理链接",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我提取3个日本的动态链接",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {
+        "country": "JP",
+        "quantity": 3
+      },
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {
+          "country": "JPN",
+          "quantity": 3
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {
+          "country": "JPN",
+          "quantity": 3
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "extract dynamic proxy",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "get me a dynamic proxy link",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "获取动态代理地址",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "生成动态代理链接",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "给我动态代理地址",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "导出动态链接",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我提取动态的",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "拿一个动态代理",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "提取10个动态代理",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {
+        "quantity": 10
+      },
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {
+          "quantity": 10
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {
+          "quantity": 10
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "extract 5 US dynamic proxies",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {
+        "country": "US",
+        "quantity": 5
+      },
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "给我几个动态链接",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "动态代理链接",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "提取链接",
+      "expected_intent": "extract_dynamic",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "extract_dynamic",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "extract_dynamic",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "续费 1.2.3.4 3个月",
+      "expected_intent": "renew_static",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4",
+        "duration": 3
+      },
+      "rule_engine": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4",
+          "duration": 90
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4",
+          "duration": 90
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "帮我续费 5.6.7.8",
+      "expected_intent": "renew_static",
+      "expected_slots": {
+        "ip_segment": "5.6.7.8"
+      },
+      "rule_engine": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "5.6.7.8"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "5.6.7.8"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "续费IP 1.2.3.4 一个月",
+      "expected_intent": "renew_static",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4",
+        "duration": 1
+      },
+      "rule_engine": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "renew 1.2.3.4 for 3 months",
+      "expected_intent": "renew_static",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4",
+        "duration": 3
+      },
+      "rule_engine": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4",
+          "duration": 90
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4",
+          "duration": 90
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "续费",
+      "expected_intent": "renew_static",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "renew_static",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "renew_static",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮忙续费一下IP",
+      "expected_intent": "renew_static",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "renew_static",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "renew_static",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "续费静态代理",
+      "expected_intent": "renew_static",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "renew_static",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "renew_static",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "续期 1.2.3.4",
+      "expected_intent": "renew_static",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "1.2.3.4 续费半年",
+      "expected_intent": "renew_static",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4",
+        "duration": 6
+      },
+      "rule_engine": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "renew my IP",
+      "expected_intent": "renew_static",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "renew_static",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "renew_static",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "extend subscription for 1.2.3.4",
+      "expected_intent": "renew_static",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "续费订单 ORD-123",
+      "expected_intent": "renew_static",
+      "expected_slots": {
+        "order_no": "ORD-123"
+      },
+      "rule_engine": {
+        "intent": "renew_static",
+        "slots": {
+          "order_no": "RD-123"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "renew_static",
+        "slots": {
+          "order_no": "RD-123"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我续费所有快到期的IP",
+      "expected_intent": "renew_static",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": false,
+      "slot_match": true,
+      "pass": false
+    },
+    {
+      "input": "给 1.2.3.4 续3个月",
+      "expected_intent": "renew_static",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4",
+        "duration": 3
+      },
+      "rule_engine": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4",
+          "duration": 90
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4",
+          "duration": 90
+        }
+      },
+      "intent_match": true,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "续费代理 1.2.3.4",
+      "expected_intent": "renew_static",
+      "expected_slots": {
+        "ip_segment": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "renew_static",
+        "slots": {
+          "ip_segment": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询本月消费",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "period": "month"
+      },
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "本月花了多少钱",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "period": "month"
+      },
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "overview",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "overview",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "这个月消费了多少",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "period": "month"
+      },
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看本月利润",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "type": "profit",
+        "period": "month"
+      },
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "profit",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "profit",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "上月充值多少",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "type": "recharge",
+        "period": "month"
+      },
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "recharge",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "recharge",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "今天消费了多少",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "period": "day"
+      },
+      "rule_engine": {
+        "intent": "query_today_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_today_orders",
+        "slots": {}
+      },
+      "intent_match": false,
+      "slot_match": false,
+      "pass": false
+    },
+    {
+      "input": "本周消费统计",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "period": "week"
+      },
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "week"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "week"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询累计利润",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "type": "profit"
+      },
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "profit",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "profit",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "show monthly spending",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "period": "month"
+      },
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "get profit stats",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "type": "profit"
+      },
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "profit",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "profit",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我查看消费统计",
+      "expected_intent": "query_stats",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "这个月的消费报表",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "period": "month"
+      },
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看消费概览",
+      "expected_intent": "query_stats",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我的充值记录",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "type": "recharge"
+      },
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "recharge",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "recharge",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "总共消费了多少",
+      "expected_intent": "query_stats",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看用户 agent01 的统计",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "target_user": "agent01"
+      },
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "overview",
+          "period": "month",
+          "target_user": "agent01"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "overview",
+          "period": "month",
+          "target_user": "agent01"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "消费统计",
+      "expected_intent": "query_stats",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "consumption",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "收支情况",
+      "expected_intent": "query_stats",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "overview",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "overview",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "今日利润",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "type": "profit",
+        "period": "day"
+      },
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "profit",
+          "period": "day"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "profit",
+          "period": "day"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "本月开支",
+      "expected_intent": "query_stats",
+      "expected_slots": {
+        "period": "month"
+      },
+      "rule_engine": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "overview",
+          "period": "month"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_stats",
+        "slots": {
+          "type": "overview",
+          "period": "month"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我有哪些静态订单",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看静态订单",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询静态代理订单",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我买了哪些IP",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我的IP列表",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "最近开通了哪些IP",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我开通过哪些IP",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "列出我的所有IP",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "show my static orders",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "list my IPs",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "list my proxies",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询我购买的IP",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我有多少个IP",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我查看我的订单",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我都买过什么IP",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看最近的订单",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我最近买过的IP",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看 1.2.3.4 的订单",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {
+        "search": "1.2.3.4"
+      },
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {
+          "search": "1.2.3.4"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {
+          "search": "1.2.3.4"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我的代理列表",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查一下我有哪些静态IP",
+      "expected_intent": "query_static_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_resource",
+        "slots": {}
+      },
+      "intent_match": false,
+      "slot_match": true,
+      "pass": false
+    },
+    {
+      "input": "查看动态订单",
+      "expected_intent": "query_dynamic_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询动态代理订单",
+      "expected_intent": "query_dynamic_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我的动态订单",
+      "expected_intent": "query_dynamic_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "动态代理订单列表",
+      "expected_intent": "query_dynamic_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "show dynamic orders",
+      "expected_intent": "query_dynamic_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看动态代理购买记录",
+      "expected_intent": "query_dynamic_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我买过哪些动态代理",
+      "expected_intent": "query_dynamic_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "动态订单",
+      "expected_intent": "query_dynamic_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "list dynamic proxy orders",
+      "expected_intent": "query_dynamic_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看我的动态代理",
+      "expected_intent": "query_dynamic_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询最近100条交易记录",
+      "expected_intent": "query_transactions",
+      "expected_slots": {
+        "count": 100
+      },
+      "rule_engine": {
+        "intent": "query_transactions",
+        "slots": {
+          "count": 100
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_transactions",
+        "slots": {
+          "count": 100
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看交易记录",
+      "expected_intent": "query_transactions",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_transactions",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_transactions",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "最近的交易",
+      "expected_intent": "query_transactions",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_transactions",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_transactions",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我看看交易流水",
+      "expected_intent": "query_transactions",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_transactions",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_transactions",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "show transactions",
+      "expected_intent": "query_transactions",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_transactions",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_transactions",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看最近50条记录",
+      "expected_intent": "query_transactions",
+      "expected_slots": {
+        "count": 50
+      },
+      "rule_engine": {
+        "intent": "query_transactions",
+        "slots": {
+          "count": 50
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_transactions",
+        "slots": {
+          "count": 50
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "交易记录",
+      "expected_intent": "query_transactions",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_transactions",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_transactions",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询消费记录",
+      "expected_intent": "query_transactions",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_transactions",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_transactions",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "recent transactions",
+      "expected_intent": "query_transactions",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_transactions",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_transactions",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我查最近的流水",
+      "expected_intent": "query_transactions",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_transactions",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_transactions",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看动态资源",
+      "expected_intent": "query_dynamic_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "动态流量还剩多少",
+      "expected_intent": "query_dynamic_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询动态代理流量",
+      "expected_intent": "query_dynamic_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "动态代理资源",
+      "expected_intent": "query_dynamic_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "还有多少动态流量",
+      "expected_intent": "query_dynamic_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "show dynamic resources",
+      "expected_intent": "query_dynamic_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "动态流量消耗",
+      "expected_intent": "query_dynamic_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看动态代理剩余流量",
+      "expected_intent": "query_dynamic_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "dynamic resource",
+      "expected_intent": "query_dynamic_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查下动态流量",
+      "expected_intent": "query_dynamic_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_dynamic_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_dynamic_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我的哪些IP快到期了",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "有哪些IP要到期",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "快到期的IP",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "即将过期的代理",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "哪些代理快过期了",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "which IPs are expiring",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看快到期的IP",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "到期IP列表",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "有没有快到期的IP",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我看看哪些IP快要过期",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "IP到期提醒",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "expiring IPs",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "我的IP什么时候到期",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "看看有没有要过期的",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "about to expire",
+      "expected_intent": "query_expiring_ips",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_expiring_ips",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_expiring_ips",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "今天都消费了什么",
+      "expected_intent": "query_today_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_today_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_today_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "今天买了什么",
+      "expected_intent": "query_today_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_today_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_today_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "今日消费",
+      "expected_intent": "query_today_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_today_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_today_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "今天开通了什么",
+      "expected_intent": "query_today_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_today_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_today_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "今天购买了哪些",
+      "expected_intent": "query_today_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_today_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_today_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "what did I buy today",
+      "expected_intent": "query_today_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_today_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_today_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "today's orders",
+      "expected_intent": "query_today_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_today_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_today_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "今天花了多少",
+      "expected_intent": "query_today_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_today_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_today_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "今天的消费记录",
+      "expected_intent": "query_today_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_today_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_today_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我看看今天买了什么",
+      "expected_intent": "query_today_orders",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_today_orders",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_today_orders",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查看静态资源",
+      "expected_intent": "query_static_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询静态代理资源",
+      "expected_intent": "query_static_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "静态IP有多少",
+      "expected_intent": "query_static_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "静态代理可用数量",
+      "expected_intent": "query_static_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "show static resources",
+      "expected_intent": "query_static_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "static IP count",
+      "expected_intent": "query_static_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "静态代理资源",
+      "expected_intent": "query_static_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "有多少静态IP",
+      "expected_intent": "query_static_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "查询静态资源",
+      "expected_intent": "query_static_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "还有多少可用的静态IP",
+      "expected_intent": "query_static_resource",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "query_static_resource",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "query_static_resource",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "创建一个美国会话",
+      "expected_intent": "create_session",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "create_session",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "create_session",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "新建会话",
+      "expected_intent": "create_session",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "create_session",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "create_session",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "创建代理会话",
+      "expected_intent": "create_session",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "create_session",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "create_session",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "create a US session",
+      "expected_intent": "create_session",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "create_session",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "create_session",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "创建日本的代理会话",
+      "expected_intent": "create_session",
+      "expected_slots": {
+        "country": "JP"
+      },
+      "rule_engine": {
+        "intent": "create_session",
+        "slots": {
+          "country": "JPN"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "create_session",
+        "slots": {
+          "country": "JPN"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "新建一个英国session",
+      "expected_intent": "create_session",
+      "expected_slots": {
+        "country": "GB"
+      },
+      "rule_engine": {
+        "intent": "create_session",
+        "slots": {
+          "country": "GBR"
+        },
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "create_session",
+        "slots": {
+          "country": "GBR"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "create session",
+      "expected_intent": "create_session",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "create_session",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "create_session",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "帮我建一个会话",
+      "expected_intent": "create_session",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "create_session",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "create_session",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "创建动态会话",
+      "expected_intent": "create_session",
+      "expected_slots": {},
+      "rule_engine": {
+        "intent": "create_session",
+        "slots": {},
+        "confidence": 0.7,
+        "lang": "zh"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "create_session",
+        "slots": {}
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    },
+    {
+      "input": "create dynamic session US",
+      "expected_intent": "create_session",
+      "expected_slots": {
+        "country": "US"
+      },
+      "rule_engine": {
+        "intent": "create_session",
+        "slots": {
+          "country": "USA"
+        },
+        "confidence": 0.7,
+        "lang": "en"
+      },
+      "llm_output": null,
+      "final": {
+        "intent": "create_session",
+        "slots": {
+          "country": "USA"
+        }
+      },
+      "intent_match": true,
+      "slot_match": true,
+      "pass": true
+    }
+  ]
+}

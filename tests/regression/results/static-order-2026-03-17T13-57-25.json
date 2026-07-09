@@ -1,0 +1,356 @@
+[
+  {
+    "name": "A1",
+    "suite": "A. Default page size",
+    "description": "Admin: static orders default 20 items",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A1.1 查静态订单",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA20260118025255047x70\n149.119.142.230:6013:egkhnaq8p68a:nrvgvmsnmsmp\n美国-皇后区  纯净静态3 30天 运行中\npengya",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "2d867958-8bca-4254-a20b-63116f8c0f9f",
+        "durationMs": 4035
+      }
+    ],
+    "totalMs": 4035
+  },
+  {
+    "name": "A2",
+    "suite": "A. Default page size",
+    "description": "Admin: IP inventory default 20 items",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A2.1 都有哪些IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 全部静态代理产品 (549 个IP段，第 1 页)：\n\n阿联酋-阿布扎比 [纯净静态1]\n1. 库存：0；成本：¥12；售价：¥42\n\n美国-加利福尼亚-洛杉矶 [纯净静态3]\n2. 146.71.35.0 库存：47；成本：¥5.5",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "05812ef8-9ba4-432e-bddc-f897eb2a3993",
+        "durationMs": 2638
+      }
+    ],
+    "totalMs": 2638
+  },
+  {
+    "name": "A3",
+    "suite": "A. Default page size",
+    "description": "Admin: transaction list default 20 items",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A3.1 查交易记录",
+        "passed": true,
+        "intent": "query_nl_history",
+        "messagePreview": "📜 所有用户对话历史（第 1 页）\n\n1. [admin] 2026-03-17 13:56\n   意图: query_ip_inventory\n   用户: 都有哪些IP\n   系统: 📦 全部静态代理产品 (549 个IP段，第 1",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "ac20540d-3d44-4548-a6c4-5bfce62070c6",
+        "durationMs": 1228
+      }
+    ],
+    "totalMs": 1228
+  },
+  {
+    "name": "A4",
+    "suite": "A. Default page size",
+    "description": "Admin: dynamic orders default 20 items",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A4.1 查动态订单",
+        "passed": true,
+        "intent": "query_dynamic_orders",
+        "messagePreview": "📋 动态代理订单（第 1 页）\n\n1. DYN32026031619352791aecc  |  active  |  3GB  |  zhengwen0221  |  2026-03-17 03:35\n2. DYN32026031607",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "5d4c7c68-d463-4d3c-9e0d-55da6db619fe",
+        "durationMs": 1149
+      }
+    ],
+    "totalMs": 1150
+  },
+  {
+    "name": "A5",
+    "suite": "A. Default page size",
+    "description": "Admin: NL history default 20 items",
+    "passed": true,
+    "steps": [
+      {
+        "label": "A5.1 查历史记录",
+        "passed": true,
+        "intent": "query_nl_history",
+        "messagePreview": "📜 所有用户对话历史（第 1 页）\n\n1. [admin] 2026-03-17 13:56\n   意图: query_dynamic_orders\n   用户: 查看动态订单\n   系统: 📋 动态代理订单（第 1 页）\n\n1. DY",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "11e6c612-9733-4654-8426-82c87fd70be3",
+        "durationMs": 827
+      }
+    ],
+    "totalMs": 827
+  },
+  {
+    "name": "B1",
+    "suite": "B. Admin display",
+    "description": "Admin sees all fields incl. user, agent, all prices, both remarks",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B1.1 Admin查静态订单",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA20260118025255047x70\n149.119.142.230:6013:egkhnaq8p68a:nrvgvmsnmsmp\n美国-皇后区  纯净静态3 30天 运行中\npengya",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "5510a765-50a2-46f1-a622-268db0930b79",
+        "durationMs": 3394
+      }
+    ],
+    "totalMs": 3394
+  },
+  {
+    "name": "B2",
+    "suite": "B. Admin display",
+    "description": "Admin order block has proxy info host:port:user:pass format",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B2.1 Admin order proxy format",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA20260118025255047x70\n149.119.142.230:6013:egkhnaq8p68a:nrvgvmsnmsmp\n美国-皇后区  纯净静态3 30天 运行中\npengya",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "1a0792d4-b0d6-498b-88d5-1ae205778403",
+        "durationMs": 3454
+      }
+    ],
+    "totalMs": 3454
+  },
+  {
+    "name": "B3",
+    "suite": "B. Admin display",
+    "description": "Admin sees dates: 到期/创建/更新",
+    "passed": true,
+    "steps": [
+      {
+        "label": "B3.1 Admin dates",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA20260118025255047x70\n149.119.142.230:6013:egkhnaq8p68a:nrvgvmsnmsmp\n美国-皇后区  纯净静态3 30天 运行中\npengya",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "6907271c-2a83-4aba-b715-8007395b7f83",
+        "durationMs": 3700
+      }
+    ],
+    "totalMs": 3700
+  },
+  {
+    "name": "C1",
+    "suite": "C. Agent display",
+    "description": "Agent sees user_price, agent_price, no cost",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C1.1 Agent查静态订单",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA202603171141132gb0mx\n—\n中国-台北  纯净静态1 30天 冷却期\nashuqwqq\n¥0.00；¥0.00\n到期: 2026-03-17 19:42:17\n创建: 202",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "aa96c256-e2b6-4c2d-ad34-b0a02fcf0c0d",
+        "durationMs": 2578
+      }
+    ],
+    "totalMs": 2578
+  },
+  {
+    "name": "C2",
+    "suite": "C. Agent display",
+    "description": "Agent proxy info shows IP only, no port/user/pass",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C2.1 Agent proxy format",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA202603171141132gb0mx\n—\n中国-台北  纯净静态1 30天 冷却期\nashuqwqq\n¥0.00；¥0.00\n到期: 2026-03-17 19:42:17\n创建: 202",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "ae908dc0-6992-4de1-8604-1a772a0541c6",
+        "durationMs": 2707
+      }
+    ],
+    "totalMs": 2707
+  },
+  {
+    "name": "C3",
+    "suite": "C. Agent display",
+    "description": "Agent sees 到期/创建/更新",
+    "passed": true,
+    "steps": [
+      {
+        "label": "C3.1 Agent dates",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA202603171141132gb0mx\n—\n中国-台北  纯净静态1 30天 冷却期\nashuqwqq\n¥0.00；¥0.00\n到期: 2026-03-17 19:42:17\n创建: 202",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "e893f559-f9e8-4a28-85ba-f4908c8540ab",
+        "durationMs": 1925
+      }
+    ],
+    "totalMs": 1925
+  },
+  {
+    "name": "D1",
+    "suite": "D. User display",
+    "description": "User sees order with user_price, dates, proxy info",
+    "passed": true,
+    "steps": [
+      {
+        "label": "D1.1 User查静态订单",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA20260306122053ee0r61\n146.71.35.236:5206:jgkwvhu32zu9:rwmnetpiahhg\n美国-洛杉矶  纯净静态3 30天 运行中\n¥15.50\n到",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "ab75ef52-1ab3-40db-bcf1-48c5a7646830",
+        "durationMs": 710
+      }
+    ],
+    "totalMs": 710
+  },
+  {
+    "name": "E1",
+    "suite": "E. Pagination multi-turn",
+    "description": "Admin: query → next page → prev page",
+    "passed": true,
+    "steps": [
+      {
+        "label": "E1.1 查静态订单",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA20260118025255047x70\n149.119.142.230:6013:egkhnaq8p68a:nrvgvmsnmsmp\n美国-皇后区  纯净静态3 30天 运行中\npengya",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "8ed07508-4e25-47f7-9774-e99b23951f2b",
+        "durationMs": 5777
+      },
+      {
+        "label": "E1.2 下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 静态代理订单（第 2 页）\n\n21. STA20260215141206jfyjqs\n149.119.150.133:35258:1A2jFcA149119150133A35258:nlpeKsszc7Vo\n美国-皇后区  纯净静态1",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "8ed07508-4e25-47f7-9774-e99b23951f2b",
+        "durationMs": 4115
+      },
+      {
+        "label": "E1.3 上一页",
+        "passed": true,
+        "intent": "paginate_prev",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA20260118025255047x70\n149.119.142.230:6013:egkhnaq8p68a:nrvgvmsnmsmp\n美国-皇后区  纯净静态3 30天 运行中\npengya",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "8ed07508-4e25-47f7-9774-e99b23951f2b",
+        "durationMs": 4300
+      }
+    ],
+    "totalMs": 14192
+  },
+  {
+    "name": "E2",
+    "suite": "E. Pagination multi-turn",
+    "description": "Agent: query → next page",
+    "passed": true,
+    "steps": [
+      {
+        "label": "E2.1 Agent查静态订单",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA202603171141132gb0mx\n—\n中国-台北  纯净静态1 30天 冷却期\nashuqwqq\n¥0.00；¥0.00\n到期: 2026-03-17 19:42:17\n创建: 202",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "46795b72-89dd-4383-bbc5-248ee6b4f45d",
+        "durationMs": 3076
+      },
+      {
+        "label": "E2.2 Agent下一页",
+        "passed": true,
+        "intent": "paginate_next",
+        "messagePreview": "📦 静态代理订单（第 2 页）\n\n21. STA20260317092555lvlsh9\n103.249.186.252\n103.249.186.35\n日本-东京  纯净静态3 30天 运行中\nziyongvip\n¥23.00；¥23.0",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "46795b72-89dd-4383-bbc5-248ee6b4f45d",
+        "durationMs": 2143
+      }
+    ],
+    "totalMs": 5219
+  },
+  {
+    "name": "E3",
+    "suite": "E. Pagination multi-turn",
+    "description": "Admin: query → jump to page 3",
+    "passed": true,
+    "steps": [
+      {
+        "label": "E3.1 查静态订单",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA20260118025255047x70\n149.119.142.230:6013:egkhnaq8p68a:nrvgvmsnmsmp\n美国-皇后区  纯净静态3 30天 运行中\npengya",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "320fe477-faff-4dc0-ba88-450490ab312d",
+        "durationMs": 7980
+      },
+      {
+        "label": "E3.2 跳转到第3页",
+        "passed": true,
+        "intent": "paginate_to_page",
+        "messagePreview": "📦 静态代理订单（第 3 页）\n\n41. STA202603171051048k86v4\n38.244.72.29:5206:hgkxe5yu7yih:kkhry2s43qdf\n38.244.72.27:5206:ygkxe5yu7iuv",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "320fe477-faff-4dc0-ba88-450490ab312d",
+        "durationMs": 4240
+      }
+    ],
+    "totalMs": 12220
+  },
+  {
+    "name": "E4",
+    "suite": "E. Pagination multi-turn",
+    "description": "Admin: query → change page size",
+    "passed": true,
+    "steps": [
+      {
+        "label": "E4.1 查静态订单",
+        "passed": true,
+        "intent": "query_static_orders",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA20260118025255047x70\n149.119.142.230:6013:egkhnaq8p68a:nrvgvmsnmsmp\n美国-皇后区  纯净静态3 30天 运行中\npengya",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "4e81dd68-8567-46e7-9795-47df669168dc",
+        "durationMs": 4845
+      },
+      {
+        "label": "E4.2 每页5条",
+        "passed": true,
+        "intent": "paginate_change_page_size",
+        "messagePreview": "📦 静态代理订单（第 1 页）\n\n1. STA20260118025255047x70\n149.119.142.230:6013:egkhnaq8p68a:nrvgvmsnmsmp\n美国-皇后区  纯净静态3 30天 运行中\npengya",
+        "failures": [],
+        "perfWarnings": [],
+        "conversationId": "4e81dd68-8567-46e7-9795-47df669168dc",
+        "durationMs": 3994
+      }
+    ],
+    "totalMs": 8839
+  }
+]

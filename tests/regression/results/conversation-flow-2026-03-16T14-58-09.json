@@ -1,0 +1,181 @@
+[
+  {
+    "name": "场景1: 查IP→找最好→开通→取消 (完整链路)",
+    "passed": false,
+    "steps": [
+      {
+        "label": "1.1 查询纽约IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：30；成本：¥10；售价：¥40\n149.119.141.0 库存：25；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 ",
+        "failures": [],
+        "conversationId": "98411595-2e5d-45d1-b9c7-d216d9892161",
+        "hasConfirmation": false,
+        "durationMs": 5477
+      },
+      {
+        "label": "1.2 follow-up: 找质量最好的",
+        "passed": true,
+        "intent": "find_best_ip",
+        "messagePreview": "⚠️ 即将对 5 个 IP 进行多源质量检测（IPQualityScore / AbuseIPDB / VirusTotal / IPinfo / IP2Location），可能产生 API 费用。\n\n正在检测中...\n\n🏆 纽约 质量最好的 IP:\n\n🔍 IP 综合质量报告: 107.178.",
+        "failures": [],
+        "conversationId": "98411595-2e5d-45d1-b9c7-d216d9892161",
+        "hasConfirmation": false,
+        "durationMs": 4320
+      },
+      {
+        "label": "1.3 follow-up: 帮我开通",
+        "passed": false,
+        "intent": "follow_up_action",
+        "messagePreview": "确认执行此操作？",
+        "failures": [
+          "message should contain \"开通\" but not found (preview: 确认执行此操作？)"
+        ],
+        "conversationId": "98411595-2e5d-45d1-b9c7-d216d9892161",
+        "hasConfirmation": true,
+        "confirmationId": "b3d8da67-9026-43b5-a5e6-748b74385c2a",
+        "durationMs": 4451
+      },
+      {
+        "label": "1.4 取消操作",
+        "passed": true,
+        "intent": "unknown",
+        "messagePreview": "已取消操作。\n\n您可以：\n1. 查看其他地区的代理库存\n2. 了解不同代理类型的特点\n3. 咨询具体使用场景的代理选择建议\n\n试试这些命令：\n- `查看库存` - 浏览可用代理资源\n- `推荐代理` - 根据您的需求推荐合适代理\n- `帮助` - 查看完整命令列表\n\n💡 输入 \"帮助\" 查看所有可",
+        "failures": [],
+        "conversationId": "98411595-2e5d-45d1-b9c7-d216d9892161",
+        "hasConfirmation": false,
+        "durationMs": 17540
+      }
+    ],
+    "totalMs": 31788
+  },
+  {
+    "name": "场景2: 查伦敦IP→下一页(分页保持)",
+    "passed": true,
+    "steps": [
+      {
+        "label": "2.1 查询伦敦IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 伦敦静态代理产品 (40 个IP段)：\n\n英国-伦敦 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n英国-英格兰-伦敦 [纯净静态2] ⚠️停用\n库存：1703；成本：¥12；售价：¥65\n\n英国-英格兰-伦敦 [纯净静态1]\n154.62.172.0 库存：58；成本：¥12；售价",
+        "failures": [],
+        "conversationId": "f9510cdd-d03d-4397-95bd-31575fb5a496",
+        "hasConfirmation": false,
+        "durationMs": 8164
+      },
+      {
+        "label": "2.2 follow-up: 换一个",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 伦敦静态代理产品 (40 个IP段)：\n\n英国-伦敦 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n英国-英格兰-伦敦 [纯净静态2] ⚠️停用\n库存：1703；成本：¥12；售价：¥65\n\n英国-英格兰-伦敦 [纯净静态1]\n154.62.172.0 库存：58；成本：¥12；售价",
+        "failures": [],
+        "conversationId": "f9510cdd-d03d-4397-95bd-31575fb5a496",
+        "hasConfirmation": false,
+        "durationMs": 11196
+      }
+    ],
+    "totalMs": 19360
+  },
+  {
+    "name": "场景3: 查日本IP→开通第一个→确认",
+    "passed": true,
+    "steps": [
+      {
+        "label": "3.1 查询日本IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 日本静态代理产品 (20 个IP段)：\n\n日本-JPN000-东京 [纯净静态1]\n库存：0；成本：¥12；售价：¥42\n\n日本-JPN000-东京 [纯净静态2] ⚠️停用\n库存：229；成本：¥12；售价：¥65\n\n日本-JPN000-横滨 [纯净静态3]\n160.22.229.0 库存：",
+        "failures": [],
+        "conversationId": "1dbabe27-fe3d-4d13-a647-0d4b8e27b812",
+        "hasConfirmation": false,
+        "durationMs": 9755
+      },
+      {
+        "label": "3.2 follow-up: 开通第一个",
+        "passed": true,
+        "intent": "follow_up_select",
+        "messagePreview": "📋 您选中的 1 个产品：\n\n1. jpn  库存: 0  售价: ¥42\n\n输入 \"帮我开通\" 可直接购买。",
+        "failures": [],
+        "conversationId": "1dbabe27-fe3d-4d13-a647-0d4b8e27b812",
+        "hasConfirmation": false,
+        "durationMs": 6114
+      }
+    ],
+    "totalMs": 15869
+  },
+  {
+    "name": "场景4: 购买确认消息格式检查",
+    "passed": true,
+    "steps": [
+      {
+        "label": "4.1 查询美国IP",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 纽约静态代理产品 (38 个IP段)：\n\n美国-纽约-皇后区 [纯净静态3]\n149.119.140.0 库存：30；成本：¥10；售价：¥40\n149.119.141.0 库存：25；成本：¥10；售价：¥40\n149.119.142.0 库存：3；成本：¥10；售价：¥40\n\n美国-纽约 ",
+        "failures": [],
+        "conversationId": "02e3489e-e7ee-4289-a3af-ee7d7091e4ad",
+        "hasConfirmation": false,
+        "durationMs": 5260
+      },
+      {
+        "label": "4.2 开通第一个",
+        "passed": true,
+        "intent": "follow_up_select",
+        "messagePreview": "📋 您选中的 1 个产品：\n\n1. usa  库存: 58  售价: ¥40\n\n输入 \"帮我开通\" 可直接购买。",
+        "failures": [],
+        "conversationId": "02e3489e-e7ee-4289-a3af-ee7d7091e4ad",
+        "hasConfirmation": false,
+        "durationMs": 11238
+      }
+    ],
+    "totalMs": 16498
+  },
+  {
+    "name": "场景5: 英文对话上下文",
+    "passed": true,
+    "steps": [
+      {
+        "label": "5.1 Query New York IPs",
+        "passed": true,
+        "intent": "query_ip_inventory",
+        "messagePreview": "📦 Static products in New York (38 IP ranges):\n\n美国-纽约-皇后区 [Pure Static 3]\n149.119.140.0 Stock: 30; Cost: ¥10; Price: ¥40\n149.119.141.0 Stock: 25; Cost",
+        "failures": [],
+        "conversationId": "760572ef-de7f-437c-b1d1-4948481b1ba7",
+        "hasConfirmation": false,
+        "durationMs": 11186
+      },
+      {
+        "label": "5.2 Follow-up: find best",
+        "passed": true,
+        "intent": "find_best_ip",
+        "messagePreview": "⚠️ Checking 5 IPs across 5 sources (may incur costs).\n\nChecking...\n\n🏆 Best quality IP in 纽约:\n\n🔍 IP Quality Report: 107.178.159.1\n━━━━━━━━━━━━━━━━━━━",
+        "failures": [],
+        "conversationId": "760572ef-de7f-437c-b1d1-4948481b1ba7",
+        "hasConfirmation": false,
+        "durationMs": 15320
+      }
+    ],
+    "totalMs": 26506
+  },
+  {
+    "name": "场景6: 上下文超时后独立执行",
+    "passed": false,
+    "steps": [
+      {
+        "label": "6.1 无上下文的模糊命令",
+        "passed": false,
+        "intent": "find_best_ip",
+        "messagePreview": "请指定要查找的地区。\n例如：开通一个美国质量最好的IP",
+        "failures": [
+          "intent should contain \"follow_up\" but got \"find_best_ip\"",
+          "intent should contain \"query\" but got \"find_best_ip\"",
+          "intent should contain \"unknown\" but got \"find_best_ip\""
+        ],
+        "conversationId": "3bb8065e-80e0-47d9-80c4-59ae4d0ce3cb",
+        "hasConfirmation": false,
+        "durationMs": 6315
+      }
+    ],
+    "totalMs": 6315
+  }
+]

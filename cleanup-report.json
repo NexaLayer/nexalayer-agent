@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-02-24T08:37:57.085Z",
+  "failures": [
+    {
+      "sessionId": "sess_81d1c0ec-e329-4aaa-9d2f-14551caabe8b",
+      "status": "failed",
+      "error": "HTTP 500",
+      "attempts": 3
+    }
+  ]
+}

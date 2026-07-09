@@ -1,0 +1,466 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AgentApp {
+  id                 Int       @id @default(autoincrement())
+  name               String    @db.VarChar(100)
+  description        String?   @db.Text
+  apiKey             String    @unique @map("api_key") @db.VarChar(64)
+  apiSecretHash      String    @map("api_secret_hash") @db.VarChar(256)
+  backendUserId      Int?      @map("backend_user_id")
+  backendUsername    String?   @map("backend_username") @db.VarChar(50)
+  backendPasswordEnc String?   @map("backend_password_enc") @db.VarChar(256)
+  status             String    @default("active") @db.VarChar(20)
+  balanceCache       Decimal   @default(0) @map("balance_cache") @db.Decimal(12, 2)
+  trialBalance       Decimal   @default(5.00) @map("trial_balance") @db.Decimal(12, 2)
+  isTrial            Boolean   @default(true) @map("is_trial")
+  permissions        Json      @default("[\"proxy:read\",\"proxy:write\",\"session:manage\",\"billing:read\"]")
+  rateLimitPerMin    Int       @default(60) @map("rate_limit_per_min")
+  rateLimitPerDay    Int       @default(10000) @map("rate_limit_per_day")
+  maxActiveSessions  Int       @default(100) @map("max_active_sessions")
+  authMode           String    @default("api_key_only") @map("auth_mode") @db.VarChar(20)
+  contactEmail       String?   @map("contact_email") @db.VarChar(200)
+  webhookUrl         String?   @map("webhook_url") @db.VarChar(500)
+  metadata           Json      @default("{}")
+  lastActiveAt       DateTime? @map("last_active_at") @db.Timestamptz
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  sessions        AgentSession[]
+  apiLogs         AgentApiLog[]
+  usageRecords    AgentUsageRecord[]
+  events          AgentEvent[]
+  telemetry       AgentTelemetry[]
+  idempotencyKeys AgentIdempotencyKey[]
+  profiles        BrowserProfile[]
+  proxies         AgentProxy[]
+  browserTasks    BrowserTask[]
+  workspaces      Workspace[]
+  workflows       Workflow[]
+  proxyPools      ProxyPool[]
+
+  @@index([status])
+  @@index([backendUserId])
+  @@map("agent_apps")
+}
+
+model AgentSession {
+  id                  Int       @id @default(autoincrement())
+  sessionId           String    @unique @map("session_id") @db.VarChar(50)
+  agentId             Int       @map("agent_id")
+  sessionType         String    @map("session_type") @db.VarChar(20)
+  status              String    @default("creating") @db.VarChar(20)
+  proxyHost           String?   @map("proxy_host") @db.VarChar(200)
+  proxyPort           Int?      @map("proxy_port")
+  proxyUsername       String?   @map("proxy_username") @db.VarChar(100)
+  proxyPasswordEnc    String?   @map("proxy_password_enc") @db.VarChar(256)
+  proxyProtocol       String    @default("socks5") @map("proxy_protocol") @db.VarChar(10)
+  countryCode         String?   @map("country_code") @db.VarChar(10)
+  cityCode            String?   @map("city_code") @db.VarChar(20)
+  ispType             String?   @map("isp_type") @db.VarChar(20)
+  identityId          String?   @map("identity_id") @db.VarChar(36)
+  identityPool        String?   @map("identity_pool") @db.VarChar(50)
+  rotationMode        String    @default("fixed") @map("rotation_mode") @db.VarChar(20)
+  rotationIntervalSec Int       @default(0) @map("rotation_interval_sec")
+  lastRotatedAt       DateTime? @map("last_rotated_at") @db.Timestamptz
+  lastRotateReason    String?   @map("last_rotate_reason") @db.VarChar(50)
+  backendOrderNo      String?   @map("backend_order_no") @db.VarChar(50)
+  backendProductNo    String?   @map("backend_product_no") @db.VarChar(50)
+  backendInstanceId   String?   @map("backend_instance_id") @db.VarChar(50)
+  riskLevel           String    @default("low") @map("risk_level") @db.VarChar(10)
+  healthScore         Int       @default(100) @map("health_score")
+  successRate         Decimal   @default(1.0000) @map("success_rate") @db.Decimal(5, 4)
+  consecutiveFailures Int       @default(0) @map("consecutive_failures")
+  lastErrorType       String?   @map("last_error_type") @db.VarChar(50)
+  totalEvents         Int       @default(0) @map("total_events")
+  bytesUsed           BigInt    @default(0) @map("bytes_used")
+  requestsCount       Int       @default(0) @map("requests_count")
+  expiresAt           DateTime? @map("expires_at") @db.Timestamptz
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt           DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  agent AgentApp @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([identityId])
+  @@index([riskLevel])
+  @@map("agent_sessions")
+}
+
+model AgentApiLog {
+  id              BigInt   @id @default(autoincrement())
+  agentId         Int?     @map("agent_id")
+  method          String   @db.VarChar(10)
+  path            String   @db.VarChar(500)
+  statusCode      Int?     @map("status_code")
+  latencyMs       Int?     @map("latency_ms")
+  requestBody     Json?    @map("request_body")
+  responseSummary String?  @map("response_summary") @db.Text
+  ipAddress       String?  @map("ip_address") @db.VarChar(45)
+  userAgent       String?  @map("user_agent") @db.VarChar(500)
+  idempotencyKey  String?  @map("idempotency_key") @db.VarChar(64)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  agent AgentApp? @relation(fields: [agentId], references: [id])
+
+  @@index([agentId, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@map("agent_api_logs")
+}
+
+model AgentIdempotencyKey {
+  id             BigInt   @id @default(autoincrement())
+  agentId        Int      @map("agent_id")
+  idempotencyKey String   @map("idempotency_key") @db.VarChar(64)
+  requestPath    String   @map("request_path") @db.VarChar(500)
+  responseStatus Int?     @map("response_status")
+  responseBody   Json?    @map("response_body")
+  expiresAt      DateTime @map("expires_at") @db.Timestamptz
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  agent AgentApp @relation(fields: [agentId], references: [id])
+
+  @@unique([agentId, idempotencyKey], name: "uq_agent_idempotency")
+  @@index([expiresAt])
+  @@map("agent_idempotency_keys")
+}
+
+model AgentUsageRecord {
+  id           BigInt   @id @default(autoincrement())
+  agentId      Int      @map("agent_id")
+  sessionId    String?  @map("session_id") @db.VarChar(50)
+  action       String   @db.VarChar(50)
+  resourceType String?  @map("resource_type") @db.VarChar(20)
+  costAmount   Decimal  @default(0) @map("cost_amount") @db.Decimal(12, 4)
+  details      Json     @default("{}")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  agent AgentApp @relation(fields: [agentId], references: [id])
+
+  @@index([agentId, createdAt(sort: Desc)])
+  @@index([sessionId])
+  @@map("agent_usage_records")
+}
+
+model AgentEvent {
+  id        BigInt   @id @default(autoincrement())
+  agentId   Int?     @map("agent_id")
+  sessionId String?  @map("session_id") @db.VarChar(50)
+  eventType String   @map("event_type") @db.VarChar(50)
+  payload   Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  agent AgentApp? @relation(fields: [agentId], references: [id])
+
+  @@index([agentId, createdAt(sort: Desc)])
+  @@index([eventType])
+  @@map("agent_events")
+}
+
+model AgentTelemetry {
+  id               BigInt   @id @default(autoincrement())
+  agentId          Int      @map("agent_id")
+  sessionId        String   @map("session_id") @db.VarChar(50)
+  eventType        String   @map("event_type") @db.VarChar(30)
+  statusCode       Int?     @map("status_code")
+  targetHost       String?  @map("target_host") @db.VarChar(200)
+  latencyMs        Int?     @map("latency_ms")
+  errorMessage     String?  @map("error_message") @db.VarChar(500)
+  riskLevel        String?  @map("risk_level") @db.VarChar(10)
+  blockProbability Decimal? @map("block_probability") @db.Decimal(5, 4)
+  metadata         Json     @default("{}")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  agent AgentApp @relation(fields: [agentId], references: [id])
+
+  @@index([sessionId, createdAt(sort: Desc)])
+  @@index([agentId, createdAt(sort: Desc)])
+  @@index([eventType])
+  @@index([riskLevel, createdAt(sort: Desc)])
+  @@map("agent_telemetry")
+}
+
+// ========== Phase 2: Fingerprint Profile Management ==========
+
+model BrowserProfile {
+  id        Int     @id @default(autoincrement())
+  profileId String  @unique @map("profile_id") @db.VarChar(36)
+  agentId   Int     @map("agent_id")
+  name      String  @db.VarChar(200)
+  status    String  @default("active") @db.VarChar(20)
+  tags      Json    @default("[]")
+  groupId   Int?    @map("group_id")
+  notes     String? @db.Text
+
+  fingerprint  Json  @default("{}")
+  proxyBinding Json? @map("proxy_binding")
+  storageData  Json? @map("storage_data")
+  extensions   Json  @default("[]")
+
+  lastLaunchedAt DateTime? @map("last_launched_at") @db.Timestamptz
+  launchCount    Int       @default(0) @map("launch_count")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  workspaceId Int?      @map("workspace_id")
+
+  agent     AgentApp          @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  group     ProfileGroup?     @relation(fields: [groupId], references: [id])
+  workspace Workspace?        @relation(fields: [workspaceId], references: [id])
+  instances BrowserInstance[]
+  tasks     BrowserTask[]
+  cookies   BrowserCookie[]
+
+  @@index([agentId])
+  @@index([status])
+  @@index([groupId])
+  @@index([workspaceId])
+  @@map("browser_profiles")
+}
+
+model ProfileGroup {
+  id          Int      @id @default(autoincrement())
+  groupId     String   @unique @map("group_id") @db.VarChar(36)
+  agentId     Int      @map("agent_id")
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  color       String?  @db.VarChar(7)
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  profiles BrowserProfile[]
+
+  @@index([agentId])
+  @@map("profile_groups")
+}
+
+model AgentProxy {
+  id             Int       @id @default(autoincrement())
+  proxyId        String    @unique @map("proxy_id") @db.VarChar(36)
+  agentId        Int       @map("agent_id")
+  name           String?   @db.VarChar(200)
+  proxyType      String    @map("proxy_type") @db.VarChar(10)
+  host           String    @db.VarChar(200)
+  port           Int
+  username       String?   @db.VarChar(100)
+  passwordEnc    String?   @map("password_enc") @db.VarChar(256)
+  status         String    @default("untested") @db.VarChar(20)
+  countryCode    String?   @map("country_code") @db.VarChar(10)
+  cityCode       String?   @map("city_code") @db.VarChar(50)
+  tags           Json      @default("[]")
+  latencyMs      Int?      @map("latency_ms")
+  anonymity      String?   @db.VarChar(20)
+  lastVerifiedAt DateTime? @map("last_verified_at") @db.Timestamptz
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  agent AgentApp @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([status])
+  @@index([countryCode])
+  @@map("agent_proxies")
+}
+
+// ========== Phase 3: Browser Automation ==========
+
+model BrowserInstance {
+  id           Int       @id @default(autoincrement())
+  instanceId   String    @unique @map("instance_id") @db.VarChar(36)
+  profileId    String    @map("profile_id") @db.VarChar(36)
+  agentId      Int       @map("agent_id")
+  status       String    @default("launching") @db.VarChar(20)
+  browserType  String    @default("chromium") @map("browser_type") @db.VarChar(20)
+  headless     Boolean   @default(true)
+  cdpEndpoint  String?   @map("cdp_endpoint") @db.VarChar(500)
+  pid          Int?
+  memoryMb     Int?      @map("memory_mb")
+  cpuPercent   Decimal?  @map("cpu_percent") @db.Decimal(5, 2)
+  pagesCount   Int       @default(0) @map("pages_count")
+  currentUrl   String?   @map("current_url") @db.VarChar(2000)
+  currentTitle String?   @map("current_title") @db.VarChar(500)
+  lastActionAt DateTime? @map("last_action_at") @db.Timestamptz
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  closedAt     DateTime? @map("closed_at") @db.Timestamptz
+
+  profile BrowserProfile @relation(fields: [profileId], references: [profileId])
+  tasks   BrowserTask[]
+
+  @@index([agentId])
+  @@index([profileId])
+  @@index([status])
+  @@map("browser_instances")
+}
+
+model BrowserTask {
+  id             Int       @id @default(autoincrement())
+  taskId         String    @unique @map("task_id") @db.VarChar(36)
+  agentId        Int       @map("agent_id")
+  profileId      String    @map("profile_id") @db.VarChar(36)
+  instanceId     String?   @map("instance_id") @db.VarChar(36)
+  taskType       String    @map("task_type") @db.VarChar(30)
+  priority       String    @default("normal") @db.VarChar(10)
+  status         String    @default("queued") @db.VarChar(20)
+  targetUrl      String?   @map("target_url") @db.VarChar(2000)
+  steps          Json      @default("[]")
+  script         String?   @db.Text
+  timeoutMs      Int       @default(60000) @map("timeout_ms")
+  maxRetries     Int       @default(1) @map("max_retries")
+  retryCount     Int       @default(0) @map("retry_count")
+  scheduledAt    DateTime? @map("scheduled_at") @db.Timestamptz
+  resultStatus   Int?      @map("result_status")
+  resultData     Json      @default("{}") @map("result_data")
+  screenshots    String[]  @default([])
+  errorMessage   String?   @map("error_message") @db.Text
+  durationMs     Int?      @map("duration_ms")
+  idempotencyKey String?   @map("idempotency_key") @db.VarChar(64)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  startedAt      DateTime? @map("started_at") @db.Timestamptz
+  completedAt    DateTime? @map("completed_at") @db.Timestamptz
+
+  agent    AgentApp         @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  profile  BrowserProfile   @relation(fields: [profileId], references: [profileId])
+  instance BrowserInstance? @relation(fields: [instanceId], references: [instanceId])
+
+  @@index([agentId, status])
+  @@index([profileId])
+  @@index([status, priority])
+  @@index([scheduledAt])
+  @@map("browser_tasks")
+}
+
+model BrowserCookie {
+  id        Int       @id @default(autoincrement())
+  profileId String    @map("profile_id") @db.VarChar(36)
+  domain    String    @db.VarChar(500)
+  name      String    @db.VarChar(500)
+  valueEnc  String    @map("value_enc") @db.Text
+  path      String    @default("/") @db.VarChar(500)
+  secure    Boolean   @default(false)
+  httpOnly  Boolean   @default(false) @map("http_only")
+  sameSite  String    @default("Lax") @map("same_site") @db.VarChar(10)
+  expiresAt DateTime? @map("expires_at") @db.Timestamptz
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  profile BrowserProfile @relation(fields: [profileId], references: [profileId], onDelete: Cascade)
+
+  @@unique([profileId, domain, name, path], name: "uq_cookie")
+  @@index([profileId])
+  @@map("browser_cookies")
+}
+
+// ========== Phase 4: Agent Browser OS ==========
+
+model Workspace {
+  id          Int       @id @default(autoincrement())
+  workspaceId String    @unique @map("workspace_id") @db.VarChar(36)
+  agentId     Int       @map("agent_id")
+  name        String    @db.VarChar(200)
+  description String?   @db.Text
+  color       String?   @db.VarChar(7)
+  icon        String?   @db.VarChar(50)
+  sortOrder   Int       @default(0) @map("sort_order")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  agent    AgentApp         @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  profiles BrowserProfile[]
+
+  @@index([agentId])
+  @@map("workspaces")
+}
+
+model Workflow {
+  id               Int       @id @default(autoincrement())
+  workflowId       String    @unique @map("workflow_id") @db.VarChar(36)
+  agentId          Int       @map("agent_id")
+  name             String    @db.VarChar(200)
+  description      String?   @db.Text
+  status           String    @default("draft") @db.VarChar(20)
+  triggerType      String    @default("manual") @map("trigger_type") @db.VarChar(20)
+  scheduleCron     String?   @map("schedule_cron") @db.VarChar(100)
+  scheduleTimezone String?   @map("schedule_timezone") @db.VarChar(50)
+  maxRetries       Int       @default(3) @map("max_retries")
+  timeoutMs        Int       @default(300000) @map("timeout_ms")
+  lastRunAt        DateTime? @map("last_run_at") @db.Timestamptz
+  lastRunStatus    String?   @map("last_run_status") @db.VarChar(20)
+  runCount         Int       @default(0) @map("run_count")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  agent AgentApp       @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  steps WorkflowStep[]
+
+  @@index([agentId])
+  @@index([status])
+  @@map("workflows")
+}
+
+model WorkflowStep {
+  id         Int      @id @default(autoincrement())
+  workflowId String   @map("workflow_id") @db.VarChar(36)
+  stepOrder  Int      @map("step_order")
+  actionType String   @map("action_type") @db.VarChar(50)
+  config     Json     @default("{}")
+  onError    String   @default("abort") @map("on_error") @db.VarChar(20)
+  timeoutMs  Int      @default(30000) @map("timeout_ms")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  workflow Workflow @relation(fields: [workflowId], references: [workflowId], onDelete: Cascade)
+
+  @@index([workflowId])
+  @@map("workflow_steps")
+}
+
+// ========== NL Chat History ==========
+
+model NlChatLog {
+  id               BigInt   @id @default(autoincrement())
+  userId           Int      @map("user_id")
+  username         String   @db.VarChar(100)
+  conversationId   String   @map("conversation_id") @db.VarChar(50)
+  userMessage      String   @map("user_message") @db.Text
+  assistantMessage String   @map("assistant_message") @db.Text
+  intent           String?  @db.VarChar(80)
+  confidence       Decimal? @db.Decimal(3, 2)
+  slots            Json     @default("{}")
+  isAdmin          Boolean  @default(false) @map("is_admin")
+  isAgent          Boolean  @default(false) @map("is_agent")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@index([intent])
+  @@index([username])
+  @@map("nl_chat_logs")
+}
+
+model ProxyPool {
+  id                     Int      @id @default(autoincrement())
+  poolId                 String   @unique @map("pool_id") @db.VarChar(36)
+  agentId                Int      @map("agent_id")
+  name                   String   @db.VarChar(200)
+  countryCode            String?  @map("country_code") @db.VarChar(10)
+  proxyType              String   @map("proxy_type") @db.VarChar(10)
+  proxyIds               Json     @default("[]") @map("proxy_ids")
+  rotationStrategy       String   @default("round_robin") @map("rotation_strategy") @db.VarChar(20)
+  healthCheckIntervalSec Int      @default(300) @map("health_check_interval_sec")
+  createdAt              DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  agent AgentApp @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@map("proxy_pools")
+}
