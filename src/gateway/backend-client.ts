@@ -22,6 +22,12 @@ const TOKEN_CACHE_KEY = 'backend_admin_token';
 const REQUEST_TIMEOUT = 15_000;
 
 type StandardProductItem = Record<string, unknown>;
+type BackendUserSummary = {
+  id: number;
+  username: string;
+  agent_id?: number;
+  agent_name?: string;
+};
 
 function asArrayData<T>(
   data: T[] | { items?: T[]; list?: T[] } | null | undefined
@@ -67,6 +73,51 @@ async function queryStandardProducts(
 function num(value: unknown, fallback = 0): number {
   const n = Number(value);
   return Number.isFinite(n) ? n : fallback;
+}
+
+function normalizeBackendUser(
+  raw: unknown,
+  fallbackUsername: string
+): BackendUserSummary | null {
+  const root = raw as Record<string, unknown> | null;
+  if (!root) return null;
+  const data =
+    (root.data as Record<string, unknown> | undefined) ??
+    (root.user as Record<string, unknown> | undefined) ??
+    root;
+  const candidate =
+    (data.user as Record<string, unknown> | undefined) ??
+    (data.item as Record<string, unknown> | undefined) ??
+    data;
+  const id = num(
+    candidate.id ??
+      candidate.user_id ??
+      candidate.userId ??
+      data.id ??
+      data.user_id ??
+      data.userId
+  );
+  const username = String(
+    candidate.username ?? data.username ?? fallbackUsername
+  );
+  if (!id || !username) return null;
+  const agentId = num(
+    candidate.agent_id ??
+      candidate.agentId ??
+      data.agent_id ??
+      data.agentId
+  );
+  const agentName =
+    (candidate.agent_name as string | undefined) ??
+    (candidate.agentName as string | undefined) ??
+    (data.agent_name as string | undefined) ??
+    (data.agentName as string | undefined);
+  return {
+    id,
+    username,
+    agent_id: agentId || undefined,
+    agent_name: agentName,
+  };
 }
 
 async function fetchJson<T>(
@@ -187,17 +238,13 @@ export async function createBackendUser(
   password: string,
   email?: string,
   agentId?: number
-): Promise<{
-  id: number;
-  username: string;
-  agent_id?: number;
-  agent_name?: string;
-}> {
+): Promise<BackendUserSummary> {
   const headers = await authHeaders();
   const payload: Record<string, unknown> = {
     username,
     password,
     email,
+    balance: 0,
   };
   if (agentId !== undefined) {
     payload.agent_id = agentId;
@@ -207,24 +254,74 @@ export async function createBackendUser(
     headers,
     body: JSON.stringify(payload),
   };
+  let created: BackendUserSummary | null = null;
+  let firstError: unknown;
+
+  try {
+    const res = await fetchJson<BackendResponse>(
+      '/api/open/app/user/v2',
+      request
+    );
+    created =
+      normalizeBackendUser(res, username) ??
+      (await findBackendUserByUsername(headers, username));
+  } catch (err) {
+    firstError = err;
+  }
+
+  if (!created) {
+    try {
+      const legacy = await fetchJson<BackendResponse>(
+        '/api/open/app/user/create/v2',
+        request
+      );
+      created =
+        normalizeBackendUser(legacy, username) ??
+        (await findBackendUserByUsername(headers, username));
+    } catch (err) {
+      if (!firstError) firstError = err;
+    }
+  }
+
+  if (!created) {
+    throw new Error(
+      `Backend user sync failed: ${
+        firstError instanceof Error
+          ? firstError.message
+          : 'response did not include user id and lookup by username failed'
+      }`
+    );
+  }
+  return created;
+}
+
+async function findBackendUserByUsername(
+  headers: Record<string, string>,
+  username: string
+): Promise<BackendUserSummary | null> {
+  const qs = new URLSearchParams({
+    page: '1',
+    pageSize: '5',
+    search: username,
+  });
   const res = await fetchJson<
     BackendResponse<{
-      id: number;
-      username: string;
-      agent_id?: number;
-      agent_name?: string;
+      items?: Record<string, unknown>[];
+      list?: Record<string, unknown>[];
     }>
-  >('/api/open/app/user/v2', request).catch(() =>
-    fetchJson<
-      BackendResponse<{
-        id: number;
-        username: string;
-        agent_id?: number;
-        agent_name?: string;
-      }>
-    >('/api/open/app/user/create/v2', request)
-  );
-  return res.data;
+  >(`/api/open/app/agent/sub-users?${qs}`, {
+    headers,
+  }).catch(() => null);
+  const users = res?.data?.items ?? res?.data?.list ?? [];
+  const match =
+    users.find(
+      (u) =>
+        String(u.username ?? '').toLowerCase() ===
+        username.toLowerCase()
+    ) ?? users[0];
+  return match
+    ? normalizeBackendUser({ data: match }, username)
+    : null;
 }
 
 export async function getBalance(

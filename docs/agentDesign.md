@@ -2996,7 +2996,7 @@ Agent              Agent Layer              代理后端
   │                    │ 生成后端用户名/密码     │
   │                    │                       │
   │                    │ POST /api/open/app/    │
-  │                    │   user/create/v2       │
+  │                    │   user/v2              │
   │                    ├──────────────────────►│
   │                    │                       │ 创建用户
   │                    │◄──────────────────────┤
@@ -3031,10 +3031,15 @@ Agent              Agent Layer              代理后端
   │◄───────────────────┤                       │
   │                    │                       │
   │                    │ [后台异步]              │
-  │                    │ POST /api/business/    │
-  │                    │ dynamic-proxy/open     │
+  │                    │ POST /api/open/app/    │
+  │                    │ order/create/v2        │
   │                    ├──────────────────────►│
-  │                    │                       │ 开通动态代理
+  │                    │                       │ 创建动态流量订单
+  │                    │◄──────────────────────┤
+  │                    │ POST /api/business/    │
+  │                    │ dynamic-proxy/extract  │
+  │                    ├──────────────────────►│
+  │                    │                       │ 提取可用代理
   │                    │◄──────────────────────┤
   │                    │ 更新 Session → active  │
   │                    │ 记录使用日志            │
@@ -3071,7 +3076,8 @@ Agent              Agent Layer              代理后端
   │                    │ [后台异步]              │
   │                    │ 查询产品可用性          │
   │                    │ POST /api/open/app/    │
-  │                    │ static/order/create/v2 │
+  │                    │ static/order/          │
+  │                    │ create-standard/v2     │
   │                    ├──────────────────────►│
   │                    │                       │ 创建静态订单
   │                    │◄──────────────────────┤
@@ -3107,10 +3113,10 @@ Agent              Agent Layer              代理后端
   │                    │ (仅动态代理可轮换)      │
   │                    │ 记录轮换原因到 telemetry│
   │                    │                       │
-  │                    │ POST /api/open/app/    │
-  │                    │ proxy/refresh/v2/{no}  │
+  │                    │ POST /api/business/    │
+  │                    │ dynamic-proxy/extract  │
   │                    ├──────────────────────►│
-  │                    │                       │ 刷新代理
+  │                    │                       │ 重新提取代理
   │                    │◄──────────────────────┤
   │                    │                       │
   │                    │ 更新 Session 信息      │
@@ -4107,18 +4113,18 @@ Agent Layer 对代理后端 API 的调用映射：
 
 | Agent Layer API | 后端 API | 说明 |
 |-----------------|----------|------|
-| `POST /v1/account/register` | `POST /api/open/app/user/create/v2` | 创建后端用户 |
+| `POST /v1/account/register` | `POST /api/open/app/user/v2`（兼容回退 `user/create/v2`） | 创建后端用户 |
 | `POST /v1/auth/token` | `POST /api/auth/login` | 获取后端 Token |
 | `GET /v1/billing/balance` | `GET /api/open/app/user/balance/current` | 查询余额 |
-| `POST /v1/billing/recharge` | `POST /api/usdt/create-order` | 创建充值单 |
+| `POST /v1/billing/recharge` | `POST /api/usdt/create-order` (`amount_cny`) | 创建充值单 |
 | `GET /v1/billing/recharge/:id/status` | `GET /api/usdt/check-status` | 充值状态 |
-| `GET /v1/products` | `GET /api/settings/prices?is_global=false&proxy_types=101,102,103` + 客户端地域筛选 | 产品列表 |
+| `GET /v1/products` | `POST /api/open/app/product/query-standard/v2` | 动态/静态标准产品列表 |
 | `GET /v1/products/regions` | `GET /api/areas/hierarchy` | 地域列表 |
-| `POST /v1/sessions` (dynamic) | `POST /api/business/dynamic-proxy/open` | 开通动态代理 |
-| `POST /v1/sessions` (static) | `POST /api/open/app/static/order/create/v2` | 开通静态代理 |
+| `POST /v1/sessions` (dynamic) | `POST /api/open/app/order/create/v2` + `POST /api/business/dynamic-proxy/extract` | 创建动态流量订单并提取代理 |
+| `POST /v1/sessions` (static) | `POST /api/open/app/static/order/create-standard/v2`（兼容回退 `create/v2`） | 开通静态代理 |
 | `GET /v1/sessions` | `GET /api/open/app/static/order/list/v2?search=X&is_search=true` + 动态查询 | 查询订单 |
-| `POST /v1/sessions/:id/rotate` | `POST /api/open/app/proxy/refresh/v2/{no}` | 代理轮换 |
-| `POST /v1/sessions/:id/renew` | `POST /api/renew-order` | 续费 |
+| `POST /v1/sessions/:id/rotate` | `POST /api/business/dynamic-proxy/extract` | 动态 Session 重新提取代理 |
+| `POST /v1/sessions/:id/renew` | `POST /api/open/app/static/order/renew` | 静态订单续费 |
 | `POST /v1/sessions/:id/whitelist` | `POST /api/open/app/proxy/addIpWhiteList/v2` | IP白名单 |
 | `GET /v1/sessions/:id/usage` | `GET /api/proxy/dynamic-resource` + 流量查询 | 使用量 |
 | `GET /v1/billing/transactions` | `GET /api/open/app/user/transactions` | 交易记录 |

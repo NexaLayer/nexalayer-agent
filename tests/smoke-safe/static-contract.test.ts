@@ -14,6 +14,7 @@ describe('safe smoke: static MVP contract', () => {
     expect(
       existsSync('examples/playwright-session-demo/index.mjs')
     ).toBe(true);
+    expect(existsSync('scripts/phase0-smoke.mjs')).toBe(true);
   });
 
   it('documents session telemetry, idempotency, and proxy.full_url', () => {

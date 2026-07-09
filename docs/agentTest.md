@@ -105,7 +105,7 @@
 ### 1.6 后端代理商体系说明
 
 Agent Layer 创建的所有用户都在 Backend 的代理商 `openAgent`（ID=1474）名下：
-- Agent 注册 → 调用 Backend `/api/open/app/user/create/v2`
+- Agent 注册 → 调用 Backend `/api/open/app/user/v2`（兼容回退 `/api/open/app/user/create/v2`）
 - 创建的 Backend 用户：`agent_id = 1474`，`agent_name = "openAgent"`
 - 代理开通扣费：扣用户余额 + 扣 openAgent 代理商余额
 - 价格体系：未设置 openAgent 专属价格，按系统全局价格

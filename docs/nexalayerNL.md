@@ -966,14 +966,10 @@ Agent 向后端 `POST /api/business/dynamic-proxy/extract` 发送的请求体与
 
 | 顶层参数 | 类型 | 说明 |
 |----------|------|------|
-| `userId` | number | 目标用户 ID |
+| `userId` | number | 目标用户 ID（Agent Session API 内部使用已绑定的后端用户） |
 | `username` | string | 目标用户名 |
-| `productNo` | string | 固定为 `"dynamic_ipweb"` |
-| `proxyType` | number | 固定为 `104` |
-| `flow` | number | `0`（提取不扣费） |
-| `maxFlowLimit` | number | `0` |
-| `unitPrice` | number | `0` |
-| `totalAmount` | number | `0` |
+| `productNo` | string | 动态代理产品编号，来自 `/api/open/app/product/query-standard/v2` |
+| `proxyType` | number | 动态代理通常为 `104` |
 | `extractConfig` | object | 提取配置（见下表） |
 
 | extractConfig 参数 | 类型 | 默认值 | 说明 |
@@ -2529,7 +2525,8 @@ interface ExecutionStep {
    示例: Kx9#mP2$nQ7!
 
 3. 调用 Backend API:
-   POST /api/open/app/user/create/v2
+   POST /api/open/app/user/v2
+   （兼容旧后端时可回退 /api/open/app/user/create/v2）
    Body: {
      "username": "<生成的用户名>",
      "password": "<生成的密码>",
@@ -2732,7 +2729,8 @@ interface ExecutionStep {
      后端自动匹配用户价格
 
 4. 订单创建:
-   POST /api/open/app/static/order/create/v2
+   POST /api/open/app/static/order/create-standard/v2
+   （兼容旧后端时可回退 /api/open/app/static/order/create/v2）
    Body: {
      orderType: 'static_proxy',
      poolId: productNo,
@@ -2821,9 +2819,9 @@ interface ConversationContext {
 
 | 意图 | 调用的后端 API | 认证方式 |
 |------|---------------|---------|
-| `create_user` | `POST /api/open/app/user/create/v2` | Admin Token |
-| `batch_create_users` | `POST /api/open/app/user/create/v2` × N | Admin Token |
-| `assign_balance` | `POST /api/open/app/user/adjust-balance` | Admin Token |
+| `create_user` | 已停用 | 不允许通过 NL 指令创建用户 |
+| `batch_create_users` | 已停用 | 不允许通过 NL 指令批量创建用户 |
+| `assign_balance` | `POST /api/open/app/agent/sub-users/{id}/balance` | Admin/Agent Token |
 | `reset_password` | `POST /api/open/app/user/{id}/change-password` | Admin Token |
 | `get_referral_code` | `GET /api/agent/referral` | User Token |
 | `query_stats` | `GET /api/open/app/dashboard/info/v2` | User Token |
