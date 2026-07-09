@@ -12,9 +12,27 @@ const SESSION_TIMEOUT_MS = Number(
   process.env.PHASE0_SESSION_TIMEOUT_MS ?? 90_000
 );
 const POLL_MS = Number(process.env.PHASE0_POLL_MS ?? 3_000);
+const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL;
+const BACKEND_AGENT_USERNAME =
+  process.env.BACKEND_AGENT_USERNAME ??
+  process.env.BACKEND_ADMIN_USERNAME;
+const BACKEND_AGENT_PASSWORD =
+  process.env.BACKEND_AGENT_PASSWORD ??
+  process.env.BACKEND_ADMIN_PASSWORD;
+const TOPUP_CNY = Number(
+  process.env.PHASE0_TOPUP_CNY ??
+    (ALLOW_PAID && BACKEND_BASE_URL && BACKEND_AGENT_USERNAME
+      ? 20
+      : 0)
+);
 
 let apiKey = process.env.NEXALAYER_API_KEY ?? '';
 let sessionId = '';
+let registeredAgentName = '';
+let registeredAgentId = 0;
+let backendUsername = '';
+let backendUserId = 0;
+let backendToken = '';
 
 function log(label, data) {
   console.log(JSON.stringify({ label, ...data }));
@@ -61,9 +79,13 @@ async function register() {
       `${name}@nexalayer.net`,
   });
   apiKey = data.api_key;
+  registeredAgentName = name;
+  registeredAgentId = data.agent_id;
+  backendUsername = generateBackendUsername(name, data.agent_id);
   log('register', {
     agent_id: data.agent_id,
     backend_ready: data.backend_ready,
+    backend_username: backendUsername,
     trial_balance: data.trial?.trial_balance,
     has_api_key: Boolean(apiKey),
   });
@@ -71,6 +93,118 @@ async function register() {
     throw new Error(
       `backend_ready=false: ${data.backend_sync_error ?? 'unknown'}`
     );
+  }
+}
+
+function generateBackendUsername(agentName, agentId) {
+  const cleaned = agentName
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .toLowerCase()
+    .slice(0, 8);
+  return `ag_${cleaned}${agentId}`;
+}
+
+async function backendApi(method, path, body) {
+  if (!BACKEND_BASE_URL) {
+    throw new Error('BACKEND_BASE_URL is required for backend top-up');
+  }
+  const headers = { 'Content-Type': 'application/json' };
+  if (backendToken) {
+    headers.Authorization = `Bearer ${backendToken}`;
+  }
+  const res = await fetch(`${BACKEND_BASE_URL}${path}`, {
+    method,
+    headers,
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const text = await res.text();
+  let json;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    json = { raw: text };
+  }
+  if (!res.ok || (typeof json?.code === 'number' && json.code !== 0)) {
+    throw new Error(
+      `${method} ${path} failed: HTTP ${res.status} ` +
+        `${json?.msg ?? json?.message ?? ''}`
+    );
+  }
+  return json?.data;
+}
+
+async function ensureBackendToken() {
+  if (backendToken) return backendToken;
+  if (!BACKEND_AGENT_USERNAME || !BACKEND_AGENT_PASSWORD) {
+    throw new Error(
+      'Backend top-up requires BACKEND_AGENT_USERNAME/PASSWORD or BACKEND_ADMIN_USERNAME/PASSWORD'
+    );
+  }
+  const data = await backendApi('POST', '/api/auth/login', {
+    username: BACKEND_AGENT_USERNAME,
+    password: BACKEND_AGENT_PASSWORD,
+  });
+  backendToken = data.token;
+  return backendToken;
+}
+
+async function findBackendUser() {
+  if (backendUserId) return backendUserId;
+  await ensureBackendToken();
+  const qs = new URLSearchParams({
+    page: '1',
+    pageSize: '5',
+    search: backendUsername,
+  });
+  const data = await backendApi(
+    'GET',
+    `/api/open/app/agent/sub-users?${qs}`
+  );
+  const users = data?.items ?? data?.list ?? [];
+  const match =
+    users.find((u) => u.username === backendUsername) ?? users[0];
+  if (!match?.id) {
+    throw new Error(`Backend user not found: ${backendUsername}`);
+  }
+  backendUserId = match.id;
+  return backendUserId;
+}
+
+async function adjustBackendBalance(amount, remark) {
+  if (!amount) return null;
+  await ensureBackendToken();
+  const id = await findBackendUser();
+  return backendApi(
+    'POST',
+    `/api/open/app/agent/sub-users/${id}/balance`,
+    { amount, remark }
+  );
+}
+
+async function cleanupBackendBalance() {
+  if (!backendUserId || !backendToken) return;
+  const qs = new URLSearchParams({
+    page: '1',
+    pageSize: '5',
+    search: backendUsername,
+  });
+  const data = await backendApi(
+    'GET',
+    `/api/open/app/agent/sub-users?${qs}`
+  );
+  const users = data?.items ?? data?.list ?? [];
+  const match =
+    users.find((u) => u.id === backendUserId) ?? users[0];
+  const balance = Number(match?.balance ?? 0);
+  if (balance > 0) {
+    await adjustBackendBalance(
+      -balance,
+      'phase0 cleanup: remove remaining test balance'
+    );
+    log('backend.balance.cleanup', {
+      backend_user_id: backendUserId,
+      removed_balance: balance,
+    });
   }
 }
 
@@ -163,6 +297,7 @@ async function run() {
     base_url: BASE_URL,
     allow_paid: ALLOW_PAID,
     register: SHOULD_REGISTER,
+    topup_cny: TOPUP_CNY,
   });
 
   if (SHOULD_REGISTER) {
@@ -198,6 +333,18 @@ async function run() {
       next: 'set PHASE0_ALLOW_PAID=1 to create a low-volume dynamic session',
     });
     return;
+  }
+
+  if (TOPUP_CNY > 0) {
+    const adjusted = await adjustBackendBalance(
+      TOPUP_CNY,
+      'phase0 real smoke top-up'
+    );
+    log('backend.balance.topup', {
+      backend_user_id: backendUserId,
+      amount: TOPUP_CNY,
+      balance: adjusted?.balance,
+    });
   }
 
   const idempotencyKey = `phase0-${Date.now()}`;
@@ -279,5 +426,14 @@ try {
       });
       process.exitCode = 1;
     }
+  }
+  try {
+    await cleanupBackendBalance();
+  } catch (err) {
+    log('backend.balance.cleanup_failed', {
+      backend_user_id: backendUserId || undefined,
+      error: err.message,
+    });
+    process.exitCode = 1;
   }
 }
