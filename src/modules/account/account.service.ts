@@ -65,6 +65,8 @@ export async function registerAgent(
     agent_id?: number;
     agent_name?: string;
   } = {};
+  let backendReady = false;
+  let backendSyncError: string | undefined;
 
   try {
     const backendUser = await createBackendUser(
@@ -87,17 +89,19 @@ export async function registerAgent(
         backendPasswordEnc: encrypt(backendPassword),
       },
     });
+    backendReady = true;
   } catch (err) {
+    backendSyncError = (err as Error).message;
     console.error(
       '[REGISTER] createBackendUser failed:',
-      (err as Error).message
+      backendSyncError
     );
     await prisma.agentApp.update({
       where: { id: agent.id },
       data: {
         metadata: {
           backend_sync_pending: true,
-          error: (err as Error).message,
+          error: backendSyncError,
         },
       },
     });
@@ -114,6 +118,8 @@ export async function registerAgent(
     api_key: apiKey,
     api_secret: apiSecret,
     status: agent.status,
+    backend_ready: backendReady,
+    backend_sync_error: backendSyncError,
     referral: referralInfo.agent_name
       ? {
           agent_id: referralInfo.agent_id,
@@ -175,6 +181,11 @@ export async function getAgentInfo(agentId: number) {
       per_day: agent.rateLimitPerDay,
     },
     auth_mode: agent.authMode,
+    backend_ready: Boolean(
+      agent.backendUserId &&
+        agent.backendUsername &&
+        agent.backendPasswordEnc
+    ),
     contact_email: agent.contactEmail,
     webhook_url: agent.webhookUrl,
     last_active_at: agent.lastActiveAt?.toISOString(),

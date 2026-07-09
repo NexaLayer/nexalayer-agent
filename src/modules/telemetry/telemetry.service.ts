@@ -13,6 +13,7 @@ const RISK_EVENTS = new Set([
   'captcha',
   'block',
   'rate_limit',
+  'timeout',
 ]);
 
 export async function reportEvent(
@@ -157,7 +158,8 @@ function computeRiskLevel(
   }
   if (
     input.event_type === 'rate_limit' ||
-    input.event_type === 'http_error'
+    input.event_type === 'http_error' ||
+    input.event_type === 'timeout'
   ) {
     return RISK_LEVEL.MEDIUM;
   }
@@ -210,7 +212,11 @@ async function updateSessionHealth(
       ? newSuccessCount / newTotalEvents
       : 1;
 
-  const healthDelta = isFailure ? -10 : 2;
+  const healthDelta = isFailure
+    ? eventType === 'timeout'
+      ? -5
+      : -10
+    : 2;
   const newHealthScore = Math.max(
     0,
     Math.min(100, session.healthScore + healthDelta)

@@ -11,9 +11,10 @@
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "lint": "eslint src --ext .ts",
+    "lint": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:smoke:safe": "vitest run --config vitest.config.safe-smoke.ts",
     "test:smoke": "vitest run --config vitest.config.ts"
   },
   "dependencies": {

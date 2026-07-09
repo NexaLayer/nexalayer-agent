@@ -13,18 +13,29 @@ import {
   handleGetHealth,
 } from '../telemetry/telemetry.controller';
 import { authGuard } from '../../middleware/auth.middleware';
+import {
+  idempotencyGuard,
+} from '../../middleware/idempotency';
 
 export async function sessionRoutes(
   app: FastifyInstance
 ): Promise<void> {
   app.addHook('preHandler', authGuard);
 
-  app.post('/', handleCreate);
+  app.post('/', { preHandler: idempotencyGuard }, handleCreate);
   app.get('/', handleList);
   app.get('/:session_id', handleGet);
-  app.post('/:session_id/rotate', handleRotate);
+  app.post<{ Params: { session_id: string } }>(
+    '/:session_id/rotate',
+    { preHandler: idempotencyGuard },
+    handleRotate
+  );
   app.delete('/:session_id', handleTerminate);
-  app.post('/:session_id/renew', handleRenew);
+  app.post<{ Params: { session_id: string } }>(
+    '/:session_id/renew',
+    { preHandler: idempotencyGuard },
+    handleRenew
+  );
   app.post('/:session_id/whitelist', handleWhitelist);
 
   app.post(

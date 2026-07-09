@@ -27,6 +27,18 @@ export async function createSession(
     );
   }
 
+  if (
+    !agent.backendUserId ||
+    !agent.backendUsername ||
+    !agent.backendPasswordEnc
+  ) {
+    throw new AppError(
+      ERROR_CODES.BACKEND_ERROR,
+      'Backend account is not ready. Complete backend sync before creating sessions.',
+      { backend_ready: false }
+    );
+  }
+
   const activeSessions = await prisma.agentSession.count({
     where: {
       agentId,
@@ -217,6 +229,21 @@ async function provisionSessionAsync(
             `(agentId=${agent.id})`,
         });
       backendOrderNo = dynResult.orderNo;
+      const proxy = extractProxyInfo(dynResult);
+      await prisma.agentSession.update({
+        where: { id: sessionDbId },
+        data: proxy
+          ? {
+              proxyHost: proxy.host,
+              proxyPort: proxy.port,
+              proxyUsername: proxy.username,
+              proxyPasswordEnc: proxy.password
+                ? encrypt(proxy.password)
+                : undefined,
+              proxyProtocol: proxy.protocol,
+            }
+          : {},
+      });
     } else {
       const staticResult =
         await backend.createStaticOrderV2(
@@ -377,21 +404,22 @@ export async function rotateSession(
       session.backendOrderNo
     );
 
-    const proxyInfo =
-      result as Record<string, unknown>;
+    const proxyInfo = extractProxyInfo(result);
 
     await prisma.agentSession.update({
       where: { id: session.id },
       data: {
         status: SESSION_STATUS.ACTIVE,
-        proxyHost: (proxyInfo.ip as string) ?? session.proxyHost,
-        proxyPort: (proxyInfo.port as number) ?? session.proxyPort,
+        proxyHost: proxyInfo?.host ?? session.proxyHost,
+        proxyPort: proxyInfo?.port ?? session.proxyPort,
         proxyUsername:
-          (proxyInfo.username as string) ??
+          proxyInfo?.username ??
           session.proxyUsername,
-        proxyPasswordEnc: proxyInfo.password
-          ? encrypt(proxyInfo.password as string)
+        proxyPasswordEnc: proxyInfo?.password
+          ? encrypt(proxyInfo.password)
           : session.proxyPasswordEnc,
+        proxyProtocol:
+          proxyInfo?.protocol ?? session.proxyProtocol,
         lastRotatedAt: new Date(),
         lastRotateReason: reason,
       },
@@ -615,6 +643,7 @@ function formatSession(
               ? decrypt(session.proxyPasswordEnc)
               : null,
             protocol: session.proxyProtocol,
+            full_url: buildProxyUrl(session),
           }
         : undefined,
     location: {
@@ -651,4 +680,96 @@ function formatSession(
     created_at: session.createdAt.toISOString(),
     updated_at: session.updatedAt.toISOString(),
   };
+}
+
+function extractProxyInfo(
+  rawValue: unknown
+):
+  | {
+      host: string;
+      port: number;
+      username: string | null;
+      password: string | null;
+      protocol: string;
+    }
+  | null {
+  const value = rawValue as Record<string, unknown>;
+  const directHost =
+    (value.host as string | undefined) ??
+    (value.ip as string | undefined);
+  const directPort = value.port;
+  const directUsername =
+    (value.username as string | undefined) ??
+    (value.user as string | undefined);
+  const directPassword =
+    (value.password as string | undefined) ??
+    (value.pass as string | undefined);
+  const directProtocol =
+    (value.protocol as string | undefined) ?? 'socks5';
+
+  if (directHost && directPort) {
+    return {
+      host: directHost,
+      port:
+        typeof directPort === 'number'
+          ? directPort
+          : Number(directPort),
+      username: directUsername ?? null,
+      password: directPassword ?? null,
+      protocol: directProtocol,
+    };
+  }
+
+  const nestedProxy =
+    value.proxy as Record<string, unknown> | undefined;
+  const proxyUrl =
+    (nestedProxy?.url as string | undefined) ??
+    (value.full_url as string | undefined) ??
+    (value.proxy_url as string | undefined);
+
+  if (!proxyUrl) return null;
+
+  try {
+    const parsed = new URL(proxyUrl);
+    return {
+      host: parsed.hostname,
+      port: Number(parsed.port),
+      username: parsed.username
+        ? decodeURIComponent(parsed.username)
+        : null,
+      password: parsed.password
+        ? decodeURIComponent(parsed.password)
+        : null,
+      protocol: parsed.protocol.replace(':', '') || 'socks5',
+    };
+  } catch {
+    return null;
+  }
+}
+
+function buildProxyUrl(session: {
+  proxyHost: string | null;
+  proxyPort: number | null;
+  proxyUsername: string | null;
+  proxyPasswordEnc: string | null;
+  proxyProtocol: string;
+}): string | null {
+  if (!session.proxyHost || !session.proxyPort) {
+    return null;
+  }
+
+  const protocol = session.proxyProtocol || 'socks5';
+  const password = session.proxyPasswordEnc
+    ? decrypt(session.proxyPasswordEnc)
+    : null;
+  const auth =
+    session.proxyUsername && password
+      ? `${encodeURIComponent(session.proxyUsername)}:` +
+        `${encodeURIComponent(password)}@`
+      : '';
+
+  return (
+    `${protocol}://` +
+    `${auth}${session.proxyHost}:${session.proxyPort}`
+  );
 }

@@ -1,0 +1,11 @@
+{
+  "name": "nexalayer-playwright-session-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.45.0"
+  }
+}

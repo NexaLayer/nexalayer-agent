@@ -1,0 +1,260 @@
+openapi: 3.0.3
+info:
+  title: NexaLayer Agent API
+  version: 1.0.0
+  description: Session-based Network Execution Layer API for AI agents and browser automation.
+servers:
+  - url: https://api.nexalayer.net/v1
+security:
+  - ApiKey: []
+paths:
+  /account/register:
+    post:
+      summary: Register an Agent account and receive API credentials.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+                contact_email: { type: string }
+                referral_code: { type: string }
+      responses:
+        "201":
+          description: Registered. Check backend_ready before creating sessions.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+  /account/info:
+    get:
+      summary: Get Agent account state.
+      responses:
+        "200":
+          description: Account info.
+  /products:
+    get:
+      summary: List dynamic and static proxy products.
+      parameters:
+        - in: query
+          name: type
+          schema: { type: string, enum: [all, dynamic, static] }
+        - in: query
+          name: country_code
+          schema: { type: string }
+      responses:
+        "200":
+          description: Product list.
+  /sessions:
+    post:
+      summary: Create a dynamic or static proxy session asynchronously.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionRequest"
+      responses:
+        "202":
+          description: Session creation accepted. Poll GET /sessions/{session_id}.
+  /sessions/{session_id}:
+    get:
+      summary: Get session status, proxy config, health, and usage.
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Session detail.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+    delete:
+      summary: Terminate a session.
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Terminated.
+  /sessions/{session_id}/rotate:
+    post:
+      summary: Rotate a session proxy and record the reason.
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  enum: [manual, scheduled, http_403, http_429, captcha, timeout, block]
+      responses:
+        "200":
+          description: Rotated session.
+  /sessions/{session_id}/renew:
+    post:
+      summary: Renew a static session.
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [duration]
+              properties:
+                duration: { type: integer, minimum: 1 }
+      responses:
+        "200":
+          description: Renewed session.
+  /sessions/{session_id}/report-event:
+    post:
+      summary: Report execution telemetry for a session.
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TelemetryEvent"
+      responses:
+        "200":
+          description: Event recorded.
+  /sessions/{session_id}/health:
+    get:
+      summary: Get session health metrics and rotation recommendation.
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Health metrics.
+  /billing/balance:
+    get:
+      summary: Get balance and trial credit.
+      responses:
+        "200":
+          description: Balance.
+  /billing/recharge:
+    post:
+      summary: Create a recharge order.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount]
+              properties:
+                amount: { type: number, minimum: 1 }
+      responses:
+        "201":
+          description: Recharge order created.
+  /billing/transactions:
+    get:
+      summary: List billing transactions.
+      responses:
+        "200":
+          description: Transaction list.
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  parameters:
+    SessionId:
+      in: path
+      name: session_id
+      required: true
+      schema: { type: string }
+    IdempotencyKey:
+      in: header
+      name: Idempotency-Key
+      required: false
+      schema: { type: string, maxLength: 64 }
+  schemas:
+    RegisterResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:
+          type: object
+          properties:
+            agent_id: { type: integer }
+            api_key: { type: string }
+            api_secret: { type: string }
+            backend_ready: { type: boolean }
+            backend_sync_error: { type: string }
+            trial:
+              type: object
+              properties:
+                is_trial: { type: boolean }
+                trial_balance: { type: number, example: 5 }
+    CreateSessionRequest:
+      type: object
+      required: [session_type, product_no]
+      properties:
+        session_type: { type: string, enum: [dynamic, static] }
+        product_no: { type: string }
+        quantity: { type: integer, minimum: 1, default: 1 }
+        duration: { type: integer, minimum: 1 }
+        protocol: { type: string, enum: [socks5, http, https], default: socks5 }
+        country_code: { type: string }
+        city_code: { type: string }
+        rotation_mode: { type: string, enum: [fixed, timed, on_demand] }
+        rotation_interval_sec: { type: integer }
+    SessionResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:
+          type: object
+          properties:
+            session_id: { type: string }
+            session_type: { type: string }
+            status: { type: string }
+            proxy:
+              type: object
+              properties:
+                host: { type: string }
+                port: { type: integer }
+                username: { type: string }
+                password: { type: string }
+                protocol: { type: string }
+                full_url:
+                  type: string
+                  nullable: true
+                  example: socks5://user:pass@proxy.example.com:1080
+            health:
+              type: object
+              properties:
+                risk_level: { type: string, enum: [low, medium, high] }
+                health_score: { type: integer }
+                success_rate: { type: number }
+                consecutive_failures: { type: integer }
+    TelemetryEvent:
+      type: object
+      required: [event_type]
+      properties:
+        event_type:
+          type: string
+          enum: [success, http_error, captcha, timeout, block, rate_limit, custom]
+        status_code: { type: integer }
+        target_host: { type: string }
+        latency_ms: { type: integer }
+        error_message: { type: string }
+        metadata: { type: object }

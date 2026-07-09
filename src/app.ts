@@ -7,6 +7,9 @@ import { API_PREFIX } from './config/constants';
 import { registerErrorHandler } from './middleware/error-handler';
 import { registerRateLimit } from './middleware/rate-limit';
 import { registerLogger } from './middleware/logger';
+import {
+  registerIdempotencyPersistence,
+} from './middleware/idempotency';
 import { authRoutes } from './modules/auth/auth.routes';
 import { accountRoutes } from './modules/account/account.routes';
 import { sessionRoutes } from './modules/session/session.routes';
@@ -50,6 +53,7 @@ export async function buildApp() {
   await registerRateLimit(app);
   registerErrorHandler(app);
   registerLogger(app);
+  registerIdempotencyPersistence(app);
 
   app.get(
     `${API_PREFIX}/health`,
