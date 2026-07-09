@@ -14,14 +14,18 @@ const SESSION_TIMEOUT_MS = Number(
 const POLL_MS = Number(process.env.PHASE0_POLL_MS ?? 3_000);
 const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL;
 const BACKEND_AGENT_USERNAME =
-  process.env.BACKEND_AGENT_USERNAME ??
-  process.env.BACKEND_ADMIN_USERNAME;
+  process.env.BACKEND_AGENT_USERNAME;
 const BACKEND_AGENT_PASSWORD =
-  process.env.BACKEND_AGENT_PASSWORD ??
+  process.env.BACKEND_AGENT_PASSWORD;
+const BACKEND_ADMIN_USERNAME =
+  process.env.BACKEND_ADMIN_USERNAME;
+const BACKEND_ADMIN_PASSWORD =
   process.env.BACKEND_ADMIN_PASSWORD;
 const TOPUP_CNY = Number(
   process.env.PHASE0_TOPUP_CNY ??
-    (ALLOW_PAID && BACKEND_BASE_URL && BACKEND_AGENT_USERNAME
+    (ALLOW_PAID &&
+    BACKEND_BASE_URL &&
+    (BACKEND_AGENT_USERNAME || BACKEND_ADMIN_USERNAME)
       ? 20
       : 0)
 );
@@ -135,17 +139,39 @@ async function backendApi(method, path, body) {
 
 async function ensureBackendToken() {
   if (backendToken) return backendToken;
-  if (!BACKEND_AGENT_USERNAME || !BACKEND_AGENT_PASSWORD) {
+  const candidates = [
+    {
+      role: 'agent',
+      username: BACKEND_AGENT_USERNAME,
+      password: BACKEND_AGENT_PASSWORD,
+    },
+    {
+      role: 'admin',
+      username: BACKEND_ADMIN_USERNAME,
+      password: BACKEND_ADMIN_PASSWORD,
+    },
+  ].filter((c) => c.username && c.password);
+  if (!candidates.length) {
     throw new Error(
       'Backend top-up requires BACKEND_AGENT_USERNAME/PASSWORD or BACKEND_ADMIN_USERNAME/PASSWORD'
     );
   }
-  const data = await backendApi('POST', '/api/auth/login', {
-    username: BACKEND_AGENT_USERNAME,
-    password: BACKEND_AGENT_PASSWORD,
-  });
-  backendToken = data.token;
-  return backendToken;
+  let lastError;
+  for (const c of candidates) {
+    try {
+      const data = await backendApi('POST', '/api/auth/login', {
+        username: c.username,
+        password: c.password,
+      });
+      backendToken = data.token;
+      log('backend.login', { role: c.role, ok: true });
+      return backendToken;
+    } catch (err) {
+      lastError = err;
+      log('backend.login', { role: c.role, ok: false });
+    }
+  }
+  throw lastError;
 }
 
 async function findBackendUser() {
