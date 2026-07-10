@@ -3031,13 +3031,13 @@ Agent              Agent Layer              代理后端
   │◄───────────────────┤                       │
   │                    │                       │
   │                    │ [后台异步]              │
-  │                    │ POST /api/open/app/    │
-  │                    │ order/create/v2        │
-  │                    ├──────────────────────►│
-  │                    │                       │ 创建动态流量订单
-  │                    │◄──────────────────────┤
   │                    │ POST /api/business/    │
-  │                    │ dynamic-proxy/extract  │
+  │                    │ dynamic-proxy/open     │
+  │                    ├──────────────────────►│
+  │                    │                       │ 开通/充值动态账号
+  │                    │◄──────────────────────┤
+  │                    │ 如开通响应未返回代理， │
+  │                    │ 再调用 extract 兜底     │
   │                    ├──────────────────────►│
   │                    │                       │ 提取可用代理
   │                    │◄──────────────────────┤
@@ -4120,7 +4120,7 @@ Agent Layer 对代理后端 API 的调用映射：
 | `GET /v1/billing/recharge/:id/status` | `GET /api/usdt/check-status` | 充值状态 |
 | `GET /v1/products` | `POST /api/open/app/product/query-standard/v2` | 动态/静态标准产品列表 |
 | `GET /v1/products/regions` | `GET /api/areas/hierarchy` | 地域列表 |
-| `POST /v1/sessions` (dynamic) | `POST /api/open/app/order/create/v2` + `POST /api/business/dynamic-proxy/extract` | 创建动态流量订单并提取代理 |
+| `POST /v1/sessions` (dynamic) | `POST /api/business/dynamic-proxy/open`，必要时兜底 `POST /api/business/dynamic-proxy/extract` | 开通/充值动态代理账号并返回可用代理 |
 | `POST /v1/sessions` (static) | `POST /api/open/app/static/order/create-standard/v2`（兼容回退 `create/v2`） | 开通静态代理 |
 | `GET /v1/sessions` | `GET /api/open/app/static/order/list/v2?search=X&is_search=true` + 动态查询 | 查询订单 |
 | `POST /v1/sessions/:id/rotate` | `POST /api/business/dynamic-proxy/extract` | 动态 Session 重新提取代理 |

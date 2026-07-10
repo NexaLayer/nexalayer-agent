@@ -216,39 +216,41 @@ async function provisionSessionAsync(
     if (
       input.session_type === SESSION_TYPE.DYNAMIC
     ) {
-      const dynOrder =
-        await backend.createDynamicOrderV2(
-          userToken,
-          {
-            orderType: 'dynamic_proxy',
-            poolId: input.product_no,
-            userId: agent.backendUserId,
-            unitPrice: product.price,
-            totalAmount,
-            trafficAmount: qty,
-            ipCount: 1,
-            duration: 30,
-            unit: 1,
-            remark: `Agent session ` +
-              `(agentId=${agent.id})`,
-          }
-        );
-      backendOrderNo = dynOrder.order_no;
-      const dynExtract =
-        await backend.extractDynamicProxy(
-          userToken,
-          {
-            productNo: input.product_no,
-            proxyType: product.proxyType,
-            username: undefined,
-            protocol: input.protocol,
-            quantity: 1,
-            validTime: dynamicValidTimeMinutes(input),
-            countryCode: input.country_code,
-            cityCode: input.city_code,
-          }
-        );
-      const proxy = extractProxyInfo(dynExtract);
+      const dynOpen = await backend.openDynamicProxy(
+        userToken,
+        {
+          productNo: input.product_no,
+          proxyType: product.proxyType,
+          flow: qty,
+          maxFlowLimit: qty,
+          username: agent.backendUsername,
+          userId: agent.backendUserId,
+          unitPrice: product.price,
+          totalAmount,
+          remark:
+            `Agent session (agentId=${agent.id})`,
+        }
+      );
+      backendOrderNo = dynOpen.order_no;
+      let proxy = extractProxyInfo(dynOpen.payload);
+      if (!proxy) {
+        const dynExtract =
+          await backend.extractDynamicProxy(
+            userToken,
+            {
+              productNo: input.product_no,
+              proxyType: product.proxyType,
+              username: undefined,
+              protocol: input.protocol,
+              quantity: 1,
+              validTime:
+                dynamicValidTimeMinutes(input),
+              countryCode: input.country_code,
+              cityCode: input.city_code,
+            }
+          );
+        proxy = extractProxyInfo(dynExtract);
+      }
       if (!proxy) {
         throw new Error(
           'Dynamic proxy extraction returned no proxy endpoint'

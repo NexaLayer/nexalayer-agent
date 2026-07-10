@@ -1838,6 +1838,13 @@ weighted_score =
 | `country` | string | ❌ | 国家代码 |
 | `target_user` | string | ❌ | 目标用户（代理商可代开） |
 
+> **后端接口要求**: 动态代理开通必须调用
+> `POST /api/business/dynamic-proxy/open`，由后端完成
+> DYN3 主动态账号创建/充值、余额扣减和订单记录。
+> `POST /api/open/app/order/create/v2` 只创建本地订单，
+> 不会保证 `dynamic_ipweb` 可提取，不能作为 Agent
+> Session 的动态开通链路。
+
 #### purchase_static（开通静态代理 — v3.0 更新）
 
 | 槽位 | 类型 | 必填 | 说明 |

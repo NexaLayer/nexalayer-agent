@@ -608,6 +608,14 @@ curl -X GET \
 > 数秒到数十秒。创建 API 立即返回 `creating` 
 > 状态，后台异步完成。Agent 可通过轮询或
 > Webhook 获取就绪通知。
+>
+> 动态 Session 的后端链路使用
+> `POST /api/business/dynamic-proxy/open` 开通/充值
+> 动态账号；如果开通响应没有直接返回代理 URL，
+> Agent Layer 再调用 `POST /api/business/dynamic-proxy/extract`
+> 兜底提取。不要把 `POST /api/open/app/order/create/v2`
+> 当成动态 Session 开通接口，它只会创建订单记录，
+> 不保证 DYN3 账号可提取。
 
 **动态代理配置参数**:
 

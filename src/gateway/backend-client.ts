@@ -512,6 +512,65 @@ export async function createDynamicOrderV2(
   return { order_no: orderNo };
 }
 
+export async function openDynamicProxy(
+  userToken: string,
+  params: {
+    productNo: string;
+    proxyType: number;
+    flow: number;
+    maxFlowLimit: number;
+    username: string;
+    userId: number;
+    unitPrice: number;
+    totalAmount: number;
+    remark?: string;
+  }
+): Promise<{
+  order_no: string;
+  payload: Record<string, unknown>;
+}> {
+  const res = await fetchJson<
+    BackendResponse<Record<string, unknown>>
+  >('/api/business/dynamic-proxy/open', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${userToken}`,
+    },
+    body: JSON.stringify({
+      productNo: params.productNo,
+      proxyType: params.proxyType,
+      flow: params.flow,
+      maxFlowLimit: params.maxFlowLimit,
+      username: params.username,
+      userId: params.userId,
+      unitPrice: params.unitPrice,
+      totalAmount: params.totalAmount,
+      remark: params.remark ?? 'Agent dynamic session',
+    }),
+  });
+
+  if (!res.data) {
+    throw new Error(
+      `Dynamic proxy open failed: ${res.msg}`
+    );
+  }
+
+  const d = res.data as Record<string, unknown>;
+  const orderNo =
+    (d.order_no as string) ??
+    (d.orderNo as string);
+  if (!orderNo) {
+    throw new Error(
+      `Backend returned no dynamic order_no. ` +
+        `Keys: ${Object.keys(d).join(',')}`
+    );
+  }
+  return {
+    order_no: orderNo,
+    payload: d,
+  };
+}
+
 export async function extractDynamicProxy(
   userToken: string,
   params: {
