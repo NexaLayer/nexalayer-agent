@@ -19,7 +19,9 @@ const tokenCache = new NodeCache({
 });
 
 const TOKEN_CACHE_KEY = 'backend_admin_token';
-const REQUEST_TIMEOUT = 15_000;
+const REQUEST_TIMEOUT = Number(
+  process.env.BACKEND_REQUEST_TIMEOUT_MS ?? 60_000
+);
 
 type StandardProductItem = Record<string, unknown>;
 type BackendUserSummary = {
