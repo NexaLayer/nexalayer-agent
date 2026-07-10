@@ -631,7 +631,10 @@ export interface CreateOrderParams {
 export async function createStaticOrderV2(
   userToken: string,
   params: CreateOrderParams
-): Promise<{ order_no: string }> {
+): Promise<{
+  order_no: string;
+  payload: Record<string, unknown>;
+}> {
   const request = {
     method: 'POST',
     headers: {
@@ -685,7 +688,7 @@ export async function createStaticOrderV2(
         `Keys: ${Object.keys(d).join(',')}`
     );
   }
-  return { order_no: orderNo };
+  return { order_no: orderNo, payload: d };
 }
 
 export async function createStaticOrder(
@@ -704,7 +707,12 @@ export async function createStaticOrder(
 
 export async function getStaticOrders(
   userToken: string,
-  params: { page?: number; page_size?: number }
+  params: {
+    page?: number;
+    page_size?: number;
+    search?: string;
+    status?: string;
+  }
 ): Promise<{
   items: BackendStaticOrderResponse[];
   total: number;
@@ -714,16 +722,22 @@ export async function getStaticOrders(
   if (params.page_size) {
     qs.set('pageSize', String(params.page_size));
   }
+  if (params.search) qs.set('search', params.search);
+  if (params.status) qs.set('status', params.status);
 
   const res = await fetchJson<
     BackendResponse<{
       items: BackendStaticOrderResponse[];
+      list?: BackendStaticOrderResponse[];
       total: number;
     }>
   >(`/api/open/app/static/order/list/v2?${qs}`, {
     headers: { Authorization: `Bearer ${userToken}` },
   });
-  return res.data;
+  return {
+    items: res.data.items ?? res.data.list ?? [],
+    total: res.data.total ?? 0,
+  };
 }
 
 export async function createUsdtRechargeOrder(
@@ -793,6 +807,45 @@ export async function getStaticOrderDetail(
     }
   );
   return res.data;
+}
+
+export async function releaseZtProxyStaticOrder(
+  orderNo: string
+): Promise<Record<string, unknown>> {
+  const adminToken = await getAdminToken();
+  const res = await fetchJson<
+    BackendResponse<Record<string, unknown>>
+  >('/api/release-ztproxy-orders', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    body: JSON.stringify({
+      orderNos: [orderNo],
+      refund: false,
+    }),
+  });
+  const data = res.data ?? {};
+  const results = (
+    data.results ??
+    data.items ??
+    []
+  ) as Array<Record<string, unknown>>;
+  if (Array.isArray(results) && results.length > 0) {
+    const target =
+      results.find(
+        (r) =>
+          r.orderNo === orderNo ||
+          r.order_no === orderNo
+      ) ?? results[0];
+    if (target.success !== true) {
+      throw new Error(
+        `Static release failed for ${orderNo}: ` +
+          `${String(target.msg ?? target.message ?? 'unknown')}`
+      );
+    }
+  }
+  return data;
 }
 
 export interface RenewStaticParams {

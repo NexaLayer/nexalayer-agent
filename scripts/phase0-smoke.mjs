@@ -8,6 +8,10 @@ const PRINT_PROXY_URL =
   process.env.PHASE0_PRINT_PROXY_URL === '1';
 const TEST_PROXY =
   process.env.PHASE0_TEST_PROXY !== '0';
+const SESSION_TYPE =
+  process.env.PHASE0_SESSION_TYPE ?? 'dynamic';
+const STATIC_ZT_ONLY =
+  process.env.PHASE0_STATIC_ZT_ONLY !== '0';
 const SESSION_TIMEOUT_MS = Number(
   process.env.PHASE0_SESSION_TIMEOUT_MS ?? 90_000
 );
@@ -29,7 +33,9 @@ const TOPUP_CNY = Number(
     (ALLOW_PAID &&
     BACKEND_BASE_URL &&
     (BACKEND_AGENT_USERNAME || BACKEND_ADMIN_USERNAME)
-      ? 20
+      ? SESSION_TYPE === 'static'
+        ? 40
+        : 20
       : 0)
 );
 
@@ -276,25 +282,46 @@ async function cleanupBackendBalance() {
   }
 }
 
-async function pickDynamicProduct() {
-  const data = await api('GET', '/products?type=dynamic');
+async function pickProduct(sessionType) {
+  const data = await api('GET', `/products?type=${sessionType}`);
   const items = data.items ?? [];
-  log('products.dynamic', {
+  log(`products.${sessionType}`, {
     total: data.total ?? items.length,
     sample: items.slice(0, 3).map((p) => ({
       product_no: p.product_no,
       price: p.price,
       unit: p.unit,
+      stock: p.stock,
     })),
   });
-  const configured = process.env.NEXALAYER_PRODUCT_NO;
+  const configured =
+    process.env.PHASE0_PRODUCT_NO ??
+    process.env.NEXALAYER_PRODUCT_NO;
   if (configured) return configured;
-  const sorted = items
-    .filter((p) => p.product_no)
-    .sort((a, b) => Number(a.price ?? 0) - Number(b.price ?? 0));
-  if (!sorted.length) {
-    throw new Error('No dynamic product available');
+
+  let candidates = items.filter((p) => p.product_no);
+  if (sessionType === 'static') {
+    candidates = candidates.filter((p) => Number(p.stock ?? 0) > 0);
+    if (STATIC_ZT_ONLY) {
+      candidates = candidates.filter((p) =>
+        String(p.product_no).startsWith('ZT_')
+      );
+    }
   }
+  const sorted = candidates.sort(
+    (a, b) => Number(a.price ?? 0) - Number(b.price ?? 0)
+  );
+  if (!sorted.length) {
+    throw new Error(
+      `No ${sessionType}${sessionType === 'static' && STATIC_ZT_ONLY ? ' ZT_' : ''} product available`
+    );
+  }
+  log('products.selected', {
+    session_type: sessionType,
+    product_no: sorted[0].product_no,
+    price: sorted[0].price,
+    stock: sorted[0].stock,
+  });
   return sorted[0].product_no;
 }
 
@@ -361,10 +388,18 @@ async function tryProxy(proxyUrl) {
 }
 
 async function run() {
+  if (!['dynamic', 'static'].includes(SESSION_TYPE)) {
+    throw new Error(
+      `Unsupported PHASE0_SESSION_TYPE: ${SESSION_TYPE}`
+    );
+  }
+
   log('config', {
     base_url: BASE_URL,
     allow_paid: ALLOW_PAID,
     register: SHOULD_REGISTER,
+    session_type: SESSION_TYPE,
+    static_zt_only: SESSION_TYPE === 'static' ? STATIC_ZT_ONLY : undefined,
     topup_cny: TOPUP_CNY,
   });
 
@@ -383,7 +418,7 @@ async function run() {
     max_active_sessions: info.max_active_sessions,
   });
 
-  const productNo = await pickDynamicProduct();
+  const productNo = await pickProduct(SESSION_TYPE);
   const balanceBefore = await api('GET', '/billing/balance');
   log('billing.balance.before', {
     balance: balanceBefore.balance,
@@ -398,7 +433,7 @@ async function run() {
     log('phase0.result', {
       mode: 'safe',
       completed_until: 'register_api_key_products_balance_transactions',
-      next: 'set PHASE0_ALLOW_PAID=1 to create a low-volume dynamic session',
+      next: `set PHASE0_ALLOW_PAID=1 to create a low-volume ${SESSION_TYPE} session`,
     });
     return;
   }
@@ -416,21 +451,29 @@ async function run() {
   }
 
   const idempotencyKey = `phase0-${Date.now()}`;
+  const createBody = {
+    session_type: SESSION_TYPE,
+    product_no: productNo,
+    quantity: Number(process.env.PHASE0_QUANTITY ?? 1),
+    protocol: process.env.PHASE0_PROTOCOL ?? 'socks5',
+    rotation_mode:
+      SESSION_TYPE === 'dynamic' ? 'on_demand' : 'fixed',
+  };
+  if (SESSION_TYPE === 'static') {
+    createBody.duration = Number(
+      process.env.PHASE0_STATIC_DURATION ?? 30
+    );
+  }
   const created = await api(
     'POST',
     '/sessions',
-    {
-      session_type: 'dynamic',
-      product_no: productNo,
-      quantity: Number(process.env.PHASE0_QUANTITY ?? 1),
-      protocol: process.env.PHASE0_PROTOCOL ?? 'socks5',
-      rotation_mode: 'on_demand',
-    },
+    createBody,
     { 'Idempotency-Key': idempotencyKey }
   );
   sessionId = created.session_id;
   log('session.create', {
     session_id: sessionId,
+    session_type: SESSION_TYPE,
     status: created.status,
     product_no: productNo,
   });

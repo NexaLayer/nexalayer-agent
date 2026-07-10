@@ -13,6 +13,9 @@ import {
   ListSessionsQuery,
 } from './session.schema';
 
+const STATIC_ORDER_READY_TIMEOUT_MS = 120_000;
+const STATIC_ORDER_POLL_MS = 3_000;
+
 export async function createSession(
   agentId: number,
   input: CreateSessionRequest
@@ -289,8 +292,30 @@ async function provisionSessionAsync(
             remark: `Agent session ` +
               `(agentId=${agent.id})`,
           }
-        );
+      );
       backendOrderNo = staticResult.order_no;
+      const proxy = await waitForStaticProxy(
+        userToken,
+        staticResult.order_no,
+        staticResult.payload
+      );
+      if (!proxy) {
+        throw new Error(
+          'Static order creation returned no proxy endpoint'
+        );
+      }
+      await prisma.agentSession.update({
+        where: { id: sessionDbId },
+        data: {
+          proxyHost: proxy.host,
+          proxyPort: proxy.port,
+          proxyUsername: proxy.username,
+          proxyPasswordEnc: proxy.password
+            ? encrypt(proxy.password)
+            : undefined,
+          proxyProtocol: proxy.protocol,
+        },
+      });
       expiresAt = new Date(
         Date.now() + dur * 24 * 60 * 60 * 1000
       );
@@ -320,6 +345,80 @@ async function provisionSessionAsync(
       },
     });
   }
+}
+
+async function waitForStaticProxy(
+  userToken: string,
+  orderNo: string,
+  initialPayload: Record<string, unknown>
+): Promise<{
+  host: string;
+  port: number;
+  username: string | null;
+  password: string | null;
+  protocol: string;
+} | null> {
+  const initial = extractProxyInfo(initialPayload);
+  if (initial) return initial;
+
+  const deadline =
+    Date.now() + STATIC_ORDER_READY_TIMEOUT_MS;
+  let lastStatus = String(
+    initialPayload.status ?? 'unknown'
+  );
+
+  while (Date.now() < deadline) {
+    const orders = await backend.getStaticOrders(
+      userToken,
+      {
+        page: 1,
+        page_size: 10,
+        search: orderNo,
+      }
+    );
+    const matching =
+      orders.items.find(
+        (item) => {
+          const record =
+            item as unknown as Record<string, unknown>;
+          return (
+            item.order_no === orderNo ||
+            record.orderNo === orderNo
+          );
+        }
+      ) ?? orders.items[0];
+    if (matching) {
+      const record =
+        matching as unknown as Record<string, unknown>;
+      lastStatus = String(
+        matching.status ??
+          record.effective_status ??
+          lastStatus
+      );
+      const proxy = extractProxyInfo(matching);
+      if (proxy) return proxy;
+      if (
+        ['failed', 'cancelled', 'released'].includes(
+          lastStatus
+        )
+      ) {
+        throw new Error(
+          `Static order ${orderNo} entered ${lastStatus} status`
+        );
+      }
+    }
+    await sleep(STATIC_ORDER_POLL_MS);
+  }
+
+  throw new Error(
+    `Static order ${orderNo} did not return proxy info before timeout; last_status=${lastStatus}`
+  );
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
 
 function dynamicValidTimeMinutes(input: {
@@ -530,6 +629,16 @@ export async function terminateSession(
     throw new AppError(
       ERROR_CODES.SESSION_NOT_FOUND,
       'Session not found'
+    );
+  }
+
+  if (
+    session.sessionType === SESSION_TYPE.STATIC &&
+    session.backendOrderNo &&
+    session.status !== SESSION_STATUS.TERMINATED
+  ) {
+    await backend.releaseZtProxyStaticOrder(
+      session.backendOrderNo
     );
   }
 
@@ -766,17 +875,38 @@ function extractProxyInfo(
       protocol: string;
     }
   | null {
+  if (Array.isArray(rawValue)) {
+    for (const item of rawValue) {
+      const proxy = extractProxyInfo(item);
+      if (proxy) return proxy;
+    }
+    return null;
+  }
+
   const value = rawValue as Record<string, unknown>;
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
   const directHost =
     (value.host as string | undefined) ??
-    (value.ip as string | undefined);
-  const directPort = value.port;
+    (value.ip as string | undefined) ??
+    (value.proxy_ip as string | undefined) ??
+    (value.proxyIp as string | undefined);
+  const directPort =
+    value.port ??
+    value.proxy_port ??
+    value.proxyPort;
   const directUsername =
     (value.username as string | undefined) ??
-    (value.user as string | undefined);
+    (value.user as string | undefined) ??
+    (value.proxy_username as string | undefined) ??
+    (value.proxyUsername as string | undefined);
   const directPassword =
     (value.password as string | undefined) ??
-    (value.pass as string | undefined);
+    (value.pass as string | undefined) ??
+    (value.proxy_password as string | undefined) ??
+    (value.proxyPassword as string | undefined);
   const directProtocol =
     (value.protocol as string | undefined) ?? 'socks5';
 
@@ -795,9 +925,32 @@ function extractProxyInfo(
 
   const nestedProxy =
     value.proxy as Record<string, unknown> | undefined;
+  const nestedCandidates = [
+    nestedProxy,
+    value.proxy_info,
+    value.proxyInfo,
+    value.orderInfo,
+    value.data,
+    value.instances,
+    (value.orderInfo as Record<string, unknown> | undefined)
+      ?.instances,
+  ];
+  for (const candidate of nestedCandidates) {
+    if (!candidate) continue;
+    const proxy = extractProxyInfo(candidate);
+    if (proxy) return proxy;
+  }
+
   const proxyList =
     (nestedProxy?.list as unknown[] | undefined) ??
     (value.list as unknown[] | undefined);
+  if (
+    Array.isArray(proxyList) &&
+    typeof proxyList[0] !== 'string'
+  ) {
+    const proxy = extractProxyInfo(proxyList);
+    if (proxy) return proxy;
+  }
   const proxyUrl =
     (nestedProxy?.url as string | undefined) ??
     (nestedProxy?.proxyUrl as string | undefined) ??
