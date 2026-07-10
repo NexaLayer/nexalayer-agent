@@ -17,9 +17,12 @@ pip install requests
 
 export NEXALAYER_BASE_URL=https://api.nexalayer.net/v1
 export NEXALAYER_API_KEY=agk_your_key
-export NEXALAYER_PRODUCT_NO=out_dynamic_1
 python main.py
 ```
+
+Set `NEXALAYER_PRODUCT_NO` only when you want to force a specific dynamic
+product. Otherwise the example lists `/products?type=dynamic` and picks one
+available product automatically.
 
 To register a new Agent from the example, set:
 

@@ -215,6 +215,9 @@ components:
         protocol: { type: string, enum: [socks5, http, https], default: socks5 }
         country_code: { type: string }
         city_code: { type: string }
+        project_id:
+          type: string
+          description: Static shared proxy project code. Required by some shared static products.
         rotation_mode: { type: string, enum: [fixed, timed, on_demand] }
         rotation_interval_sec: { type: integer }
     SessionResponse:

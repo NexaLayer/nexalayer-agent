@@ -2,11 +2,13 @@ import { chromium } from "playwright";
 
 const BASE_URL =
   process.env.NEXALAYER_BASE_URL ?? "https://api.nexalayer.net/v1";
-const API_KEY = process.env.NEXALAYER_API_KEY;
-const PRODUCT_NO = process.env.NEXALAYER_PRODUCT_NO ?? "out_dynamic_1";
+let apiKey = process.env.NEXALAYER_API_KEY;
+const PRODUCT_NO = process.env.NEXALAYER_PRODUCT_NO;
+const TARGET_URL =
+  process.env.NEXALAYER_TARGET_URL ?? "https://httpbin.org/ip";
 
-if (!API_KEY) {
-  throw new Error("NEXALAYER_API_KEY is required");
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function api(method, path, body, headers = {}) {
@@ -14,7 +16,7 @@ async function api(method, path, body, headers = {}) {
     method,
     headers: {
       "Content-Type": "application/json",
-      "X-API-Key": API_KEY,
+      ...(apiKey ? { "X-API-Key": apiKey } : {}),
       ...headers,
     },
     body: body ? JSON.stringify(body) : undefined,
@@ -26,16 +28,48 @@ async function api(method, path, body, headers = {}) {
   return json.data;
 }
 
+async function registerAgent() {
+  const name =
+    process.env.NEXALAYER_AGENT_NAME ??
+    `playwright-${Date.now().toString(36)}`;
+  const data = await api("POST", "/account/register", {
+    name,
+    contact_email: `${name}@example.com`,
+  });
+  if (!data.backend_ready) {
+    throw new Error(
+      `Agent registered but backend is not ready: ${
+        data.backend_sync_error ?? "unknown"
+      }`,
+    );
+  }
+  console.log("api_key:", data.api_key);
+  apiKey = data.api_key;
+}
+
+async function pickDynamicProduct() {
+  if (PRODUCT_NO) return PRODUCT_NO;
+  const products = await api("GET", "/products?type=dynamic");
+  const candidate = [...(products.items ?? [])]
+    .filter((item) => item.product_no)
+    .sort((a, b) => Number(a.price ?? 0) - Number(b.price ?? 0))[0];
+  if (!candidate) {
+    throw new Error("No dynamic product available");
+  }
+  console.log("selected_product:", candidate.product_no);
+  return candidate.product_no;
+}
+
 async function waitForActive(sessionId) {
-  for (let i = 0; i < 30; i += 1) {
+  for (let i = 0; i < 60; i += 1) {
     const session = await api("GET", `/sessions/${sessionId}`);
     if (session.status === "active") return session;
     if (session.status === "error") {
       throw new Error(`Session failed: ${JSON.stringify(session.health)}`);
     }
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await sleep(2000);
   }
-  throw new Error("Session did not become active within 60s");
+  throw new Error("Session did not become active within 120s");
 }
 
 function toPlaywrightProxy(proxy) {
@@ -49,39 +83,53 @@ function toPlaywrightProxy(proxy) {
   };
 }
 
-const created = await api(
-  "POST",
-  "/sessions",
-  {
-    session_type: "dynamic",
-    product_no: PRODUCT_NO,
-    quantity: 1,
-    protocol: "socks5",
-    rotation_mode: "on_demand",
-  },
-  { "Idempotency-Key": `playwright-${Date.now()}` },
-);
+if (!apiKey && process.env.NEXALAYER_REGISTER === "1") {
+  await registerAgent();
+}
+if (!apiKey) {
+  throw new Error("Set NEXALAYER_API_KEY or NEXALAYER_REGISTER=1");
+}
 
-const session = await waitForActive(created.session_id);
-console.log("proxy.full_url:", session.proxy?.full_url);
-
-const browser = await chromium.launch({
-  headless: true,
-  proxy: toPlaywrightProxy(session.proxy),
-});
-
+const productNo = await pickDynamicProduct();
+let sessionId;
+let browser;
 let event = {
   event_type: "success",
   status_code: 200,
-  target_host: "httpbin.org",
+  target_host: new URL(TARGET_URL).hostname,
 };
 
 try {
+  const created = await api(
+    "POST",
+    "/sessions",
+    {
+      session_type: "dynamic",
+      product_no: productNo,
+      quantity: 1,
+      protocol: "socks5",
+      rotation_mode: "on_demand",
+    },
+    { "Idempotency-Key": `playwright-${Date.now()}` },
+  );
+  sessionId = created.session_id;
+  console.log("session_id:", sessionId);
+
+  const session = await waitForActive(sessionId);
+  console.log("proxy.full_url:", session.proxy?.full_url);
+
+  browser = await chromium.launch({
+    headless: true,
+    proxy: toPlaywrightProxy(session.proxy),
+  });
+
   const page = await browser.newPage();
-  await page.goto("https://httpbin.org/ip", {
+  const response = await page.goto(TARGET_URL, {
     waitUntil: "domcontentloaded",
     timeout: 30000,
   });
+  event.status_code = response?.status() ?? 0;
+  event.event_type = response?.ok() ? "success" : "http_error";
   console.log(await page.textContent("body"));
 } catch (error) {
   event = {
@@ -90,21 +138,24 @@ try {
         ? "timeout"
         : "http_error",
     status_code: 0,
-    target_host: "httpbin.org",
+    target_host: new URL(TARGET_URL).hostname,
     error_message: String(error?.message ?? error).slice(0, 500),
   };
   throw error;
 } finally {
-  await api(
-    "POST",
-    `/sessions/${created.session_id}/report-event`,
-    event,
-  ).catch(() => {});
-  await browser.close().catch(() => {});
+  if (sessionId) {
+    await api("POST", `/sessions/${sessionId}/report-event`, event).catch(
+      () => {},
+    );
+  }
+  await browser?.close().catch(() => {});
+  if (sessionId) {
+    const health = await api("GET", `/sessions/${sessionId}/health`).catch(
+      () => null,
+    );
+    if (health) {
+      console.log("recommendation:", health.recommendation);
+    }
+    await api("DELETE", `/sessions/${sessionId}`).catch(() => {});
+  }
 }
-
-const health = await api(
-  "GET",
-  `/sessions/${created.session_id}/health`,
-);
-console.log("recommendation:", health.recommendation);
