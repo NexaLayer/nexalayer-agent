@@ -12,6 +12,9 @@ const SESSION_TIMEOUT_MS = Number(
   process.env.PHASE0_SESSION_TIMEOUT_MS ?? 90_000
 );
 const POLL_MS = Number(process.env.PHASE0_POLL_MS ?? 3_000);
+const REQUEST_TIMEOUT_MS = Number(
+  process.env.PHASE0_REQUEST_TIMEOUT_MS ?? 60_000
+);
 const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL;
 const BACKEND_AGENT_USERNAME =
   process.env.BACKEND_AGENT_USERNAME;
@@ -44,6 +47,11 @@ function log(label, data) {
 }
 
 async function api(method, path, body, headers = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(
+    () => controller.abort(),
+    REQUEST_TIMEOUT_MS
+  );
   const requestHeaders = {
     ...(apiKey ? { 'X-API-Key': apiKey } : {}),
     ...headers,
@@ -51,11 +59,17 @@ async function api(method, path, body, headers = {}) {
   if (body !== undefined) {
     requestHeaders['Content-Type'] = 'application/json';
   }
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method,
-    headers: requestHeaders,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  let res;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, {
+      method,
+      headers: requestHeaders,
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
   const text = await res.text();
   let json;
   try {
@@ -116,6 +130,11 @@ async function backendApi(method, path, body) {
   if (!BACKEND_BASE_URL) {
     throw new Error('BACKEND_BASE_URL is required for backend top-up');
   }
+  const controller = new AbortController();
+  const timer = setTimeout(
+    () => controller.abort(),
+    REQUEST_TIMEOUT_MS
+  );
   const headers = {};
   if (backendToken) {
     headers.Authorization = `Bearer ${backendToken}`;
@@ -123,11 +142,17 @@ async function backendApi(method, path, body) {
   if (body !== undefined) {
     headers['Content-Type'] = 'application/json';
   }
-  const res = await fetch(`${BACKEND_BASE_URL}${path}`, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  let res;
+  try {
+    res = await fetch(`${BACKEND_BASE_URL}${path}`, {
+      method,
+      headers,
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
   const text = await res.text();
   let json;
   try {
