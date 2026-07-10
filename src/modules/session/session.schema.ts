@@ -5,6 +5,7 @@ export const createSessionSchema = z.object({
   product_no: z.string().min(1),
   country_code: z.string().optional(),
   city_code: z.string().optional(),
+  project_id: z.string().min(1).optional(),
   isp_type: z.string().optional(),
   quantity: z.number().int().positive().default(1),
   duration: z.number().int().positive().optional(),

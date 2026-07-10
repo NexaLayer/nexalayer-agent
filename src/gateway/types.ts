@@ -104,6 +104,7 @@ export interface BackendStaticProductResponse {
   productId: string;
   name: string;
   proxyType: number;
+  productType?: number | string;
   price: number;
   stock: number;
   area?: string;
@@ -115,6 +116,7 @@ export interface BackendStaticProductResponse {
   supplierCode?: string;
   status: number;
   minAgentPrice?: number;
+  projectList?: Record<string, unknown>[];
 }
 
 export interface BackendBalanceAdjustResponse {

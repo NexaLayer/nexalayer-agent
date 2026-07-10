@@ -167,7 +167,37 @@ async function lookupProductInfo(
     flow: match.flow ?? 0,
     duration: match.duration ?? 30,
     unit: match.unit ?? 1,
+    projectId: chooseStaticProjectId(match),
   };
+}
+
+function chooseStaticProjectId(product: {
+  productType?: number | string;
+  projectList?: Record<string, unknown>[];
+}): string | undefined {
+  const projects = product.projectList ?? [];
+  if (!projects.length) return undefined;
+
+  const available =
+    projects.find((project) => {
+      const stock = Number(
+        project.inventory ??
+          project.stock ??
+          project.count ??
+          0
+      );
+      return !Number.isFinite(stock) || stock > 0;
+    }) ?? projects[0];
+
+  const projectId =
+    available.code ??
+    available.projectId ??
+    available.project_id ??
+    available.id ??
+    available.value;
+  return projectId === undefined
+    ? undefined
+    : String(projectId);
 }
 
 async function provisionSessionAsync(
@@ -289,6 +319,8 @@ async function provisionSessionAsync(
             cycleTimes: 1,
             countryCode: input.country_code,
             cityCode: input.city_code,
+            projectId:
+              input.project_id ?? product.projectId,
             remark: `Agent session ` +
               `(agentId=${agent.id})`,
           }

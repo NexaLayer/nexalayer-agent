@@ -46,6 +46,9 @@ export async function listProducts(
     stock?: number;
     country?: string;
     city?: string;
+    product_type?: number | string;
+    project_required?: boolean;
+    projects?: Record<string, unknown>[];
   }[] = [];
 
   if (type === 'all' || type === 'dynamic') {
@@ -91,11 +94,16 @@ export async function listProducts(
         name: p.name,
         type: 'static',
         proxy_type: p.proxyType,
+        product_type: p.productType,
         price: p.price,
         unit: 'piece',
         stock: p.stock,
         country: p.country,
         city: p.city,
+        project_required: Boolean(
+          p.projectList?.length
+        ),
+        projects: p.projectList,
       });
     }
   }

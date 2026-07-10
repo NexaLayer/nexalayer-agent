@@ -292,6 +292,7 @@ async function pickProduct(sessionType) {
       price: p.price,
       unit: p.unit,
       stock: p.stock,
+      project_required: p.project_required,
     })),
   });
   const configured =
@@ -321,6 +322,7 @@ async function pickProduct(sessionType) {
     product_no: sorted[0].product_no,
     price: sorted[0].price,
     stock: sorted[0].stock,
+    project_required: sorted[0].project_required,
   });
   return sorted[0].product_no;
 }
@@ -463,6 +465,9 @@ async function run() {
     createBody.duration = Number(
       process.env.PHASE0_STATIC_DURATION ?? 30
     );
+    if (process.env.PHASE0_PROJECT_ID) {
+      createBody.project_id = process.env.PHASE0_PROJECT_ID;
+    }
   }
   const created = await api(
     'POST',

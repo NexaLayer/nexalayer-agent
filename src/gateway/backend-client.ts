@@ -410,10 +410,17 @@ export async function getStaticProducts(
     const productId = String(
       p.productId ?? p.product_no ?? p.type ?? ''
     );
+    const projectList =
+      p.project_list ??
+      p.projects ??
+      p.projectList;
     return {
       productId,
       name: String(p.name ?? productId),
       proxyType: num(p.proxyType, 103),
+      productType:
+        (p.product_type as number | string | undefined) ??
+        (p.productType as number | string | undefined),
       price: num(p.price),
       stock: num(p.stock ?? p.inventory),
       area: String(p.area ?? p.areaCode ?? ''),
@@ -435,6 +442,9 @@ export async function getStaticProducts(
         p.minAgentPrice === undefined
           ? undefined
           : num(p.minAgentPrice),
+      projectList: Array.isArray(projectList)
+        ? (projectList as Record<string, unknown>[])
+        : undefined,
     };
   });
 }
