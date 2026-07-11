@@ -754,14 +754,14 @@ export async function getStaticOrders(
 
 export async function createUsdtRechargeOrder(
   userToken: string,
-  amount: number
+  amountUsd: number
 ): Promise<BackendUsdtOrderResponse> {
   const res = await fetchJson<
     BackendResponse<BackendUsdtOrderResponse>
   >('/api/usdt/create-order', {
     method: 'POST',
     headers: { Authorization: `Bearer ${userToken}` },
-    body: JSON.stringify({ amount_cny: amount }),
+    body: JSON.stringify({ amount_cny: amountUsd }),
   });
   return res.data;
 }

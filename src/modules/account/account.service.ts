@@ -1,5 +1,4 @@
 import { prisma } from '../../app';
-import { env } from '../../config/env';
 import {
   generateApiKey,
   generateApiSecret,
@@ -17,6 +16,10 @@ import { RegisterRequest } from './account.schema';
 import {
   decodeReferralCode,
 } from '../../utils/referral';
+import {
+  getBalance,
+  initializeWalletAndTrial,
+} from '../billing/billing.service';
 
 const OPEN_AGENT_ID = 1474;
 
@@ -50,10 +53,15 @@ export async function registerAgent(
       apiSecretHash,
       contactEmail: input.contact_email,
       webhookUrl: input.webhook_url,
-      trialBalance: env.TRIAL_BALANCE,
-      isTrial: true,
+      trialBalance: 0,
+      isTrial: false,
     },
   });
+
+  const trial = await initializeWalletAndTrial(
+    agent.id,
+    input.contact_email
+  );
 
   const backendPassword = generateBackendPassword();
   const backendUsername = generateBackendUsername(
@@ -107,11 +115,6 @@ export async function registerAgent(
     });
   }
 
-  const trialExpiresAt = new Date();
-  trialExpiresAt.setDate(
-    trialExpiresAt.getDate() + env.TRIAL_DURATION_DAYS
-  );
-
   return {
     agent_id: agent.id,
     name: agent.name,
@@ -126,11 +129,7 @@ export async function registerAgent(
           agent_name: referralInfo.agent_name,
         }
       : undefined,
-    trial: {
-      is_trial: true,
-      trial_balance: env.TRIAL_BALANCE,
-      trial_expires_at: trialExpiresAt.toISOString(),
-    },
+    trial,
     created_at: agent.createdAt.toISOString(),
   };
 }
@@ -161,17 +160,24 @@ export async function getAgentInfo(agentId: number) {
     },
   });
 
+  const balance = await getBalance(agent.id);
+
   return {
     agent_id: agent.id,
     name: agent.name,
     status: agent.status,
-    balance: Number(agent.balanceCache),
-    trial: agent.isTrial
-      ? {
-          is_trial: true,
-          trial_balance: Number(agent.trialBalance),
-        }
-      : undefined,
+    balance: balance.balance,
+    cash_balance: balance.cash_balance,
+    trial_balance: balance.trial_balance,
+    available_balance: balance.available_balance,
+    currency: balance.currency,
+    trial:
+      balance.trial_balance > 0
+        ? {
+            is_trial: true,
+            trial_balance: balance.trial_balance,
+          }
+        : undefined,
     total_sessions: agent._count.sessions,
     active_sessions: activeSessions,
     max_active_sessions: agent.maxActiveSessions,

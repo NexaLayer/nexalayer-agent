@@ -18,7 +18,7 @@ model AgentApp {
   backendPasswordEnc String?   @map("backend_password_enc") @db.VarChar(256)
   status             String    @default("active") @db.VarChar(20)
   balanceCache       Decimal   @default(0) @map("balance_cache") @db.Decimal(12, 2)
-  trialBalance       Decimal   @default(5.00) @map("trial_balance") @db.Decimal(12, 2)
+  trialBalance       Decimal   @default(1.00) @map("trial_balance") @db.Decimal(12, 2)
   isTrial            Boolean   @default(true) @map("is_trial")
   permissions        Json      @default("[\"proxy:read\",\"proxy:write\",\"session:manage\",\"billing:read\"]")
   rateLimitPerMin    Int       @default(60) @map("rate_limit_per_min")
@@ -37,6 +37,10 @@ model AgentApp {
   usageRecords    AgentUsageRecord[]
   events          AgentEvent[]
   telemetry       AgentTelemetry[]
+  wallet          AgentWallet?
+  trialClaims     AgentTrialClaim[]
+  billingLedger   BillingLedgerEntry[]
+  billingReservations BillingReservation[]
   idempotencyKeys AgentIdempotencyKey[]
   profiles        BrowserProfile[]
   proxies         AgentProxy[]
@@ -48,6 +52,104 @@ model AgentApp {
   @@index([status])
   @@index([backendUserId])
   @@map("agent_apps")
+}
+
+model AgentWallet {
+  id              Int      @id @default(autoincrement())
+  agentId         Int      @unique @map("agent_id")
+  cashBalanceUsd  Decimal  @default(0) @map("cash_balance_usd") @db.Decimal(12, 4)
+  trialBalanceUsd Decimal  @default(0) @map("trial_balance_usd") @db.Decimal(12, 4)
+  currency        String   @default("USD") @db.VarChar(10)
+  trialExpiresAt  DateTime? @map("trial_expires_at") @db.Timestamptz
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  agent AgentApp @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("agent_wallets")
+}
+
+model AgentTrialClaim {
+  id               BigInt   @id @default(autoincrement())
+  agentId          Int      @map("agent_id")
+  normalizedEmail  String   @map("normalized_email") @db.VarChar(200)
+  emailHash        String   @unique @map("email_hash") @db.VarChar(64)
+  claimedAmountUsd Decimal  @default(1.00) @map("claimed_amount_usd") @db.Decimal(12, 4)
+  claimedAt        DateTime @default(now()) @map("claimed_at") @db.Timestamptz
+
+  agent AgentApp @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@map("agent_trial_claims")
+}
+
+model BillingPriceRule {
+  id               Int      @id @default(autoincrement())
+  code             String   @unique @db.VarChar(80)
+  sessionType      String?  @map("session_type") @db.VarChar(20)
+  billingUnit      String   @map("billing_unit") @db.VarChar(40)
+  unitPriceUsd     Decimal  @map("unit_price_usd") @db.Decimal(12, 4)
+  minimumChargeUsd Decimal? @map("minimum_charge_usd") @db.Decimal(12, 4)
+  isActive         Boolean  @default(true) @map("is_active")
+  effectiveFrom    DateTime @default(now()) @map("effective_from") @db.Timestamptz
+  metadata         Json     @default("{}")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([isActive])
+  @@index([sessionType])
+  @@map("billing_price_rules")
+}
+
+model BillingLedgerEntry {
+  id                   BigInt   @id @default(autoincrement())
+  agentId              Int      @map("agent_id")
+  type                 String   @db.VarChar(50)
+  amountUsd            Decimal  @map("amount_usd") @db.Decimal(12, 4)
+  cashDeltaUsd         Decimal  @default(0) @map("cash_delta_usd") @db.Decimal(12, 4)
+  trialDeltaUsd        Decimal  @default(0) @map("trial_delta_usd") @db.Decimal(12, 4)
+  cashBalanceAfterUsd  Decimal  @map("cash_balance_after_usd") @db.Decimal(12, 4)
+  trialBalanceAfterUsd Decimal  @map("trial_balance_after_usd") @db.Decimal(12, 4)
+  sessionId            String?  @map("session_id") @db.VarChar(50)
+  backendOrderNo       String?  @map("backend_order_no") @db.VarChar(50)
+  reservationId        String?  @map("reservation_id") @db.VarChar(50)
+  externalRef          String?  @unique @map("external_ref") @db.VarChar(120)
+  idempotencyKey       String?  @map("idempotency_key") @db.VarChar(64)
+  status               String   @default("success") @db.VarChar(20)
+  priceSnapshot        Json     @default("{}") @map("price_snapshot")
+  metadata             Json     @default("{}")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  agent AgentApp @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, createdAt(sort: Desc)])
+  @@index([sessionId])
+  @@index([reservationId])
+  @@index([type])
+  @@map("billing_ledger_entries")
+}
+
+model BillingReservation {
+  id             BigInt   @id @default(autoincrement())
+  reservationId  String   @unique @map("reservation_id") @db.VarChar(50)
+  agentId        Int      @map("agent_id")
+  sessionId      String   @map("session_id") @db.VarChar(50)
+  amountUsd      Decimal  @map("amount_usd") @db.Decimal(12, 4)
+  cashAmountUsd  Decimal  @default(0) @map("cash_amount_usd") @db.Decimal(12, 4)
+  trialAmountUsd Decimal  @default(0) @map("trial_amount_usd") @db.Decimal(12, 4)
+  status         String   @default("reserved") @db.VarChar(20)
+  idempotencyKey String?  @map("idempotency_key") @db.VarChar(64)
+  priceSnapshot  Json     @default("{}") @map("price_snapshot")
+  metadata       Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  agent AgentApp @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, createdAt(sort: Desc)])
+  @@index([sessionId])
+  @@index([status])
+  @@map("billing_reservations")
 }
 
 model AgentSession {

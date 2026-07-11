@@ -3,6 +3,7 @@ import { decrypt } from '../../utils/crypto';
 import { AppError } from '../../utils/response';
 import { ERROR_CODES } from '../../config/constants';
 import * as backend from '../../gateway/backend-client';
+import { getPricing } from '../billing/billing.service';
 
 async function getAgentBackendToken(
   agentId: number
@@ -35,6 +36,7 @@ export async function listProducts(
 ) {
   const userToken =
     await getAgentBackendToken(agentId);
+  const pricing = await getPricing();
 
   const products: {
     product_no: string;
@@ -42,6 +44,7 @@ export async function listProducts(
     type: string;
     proxy_type?: number;
     price: number;
+    currency?: string;
     unit: string;
     stock?: number;
     country?: string;
@@ -54,29 +57,15 @@ export async function listProducts(
   if (type === 'all' || type === 'dynamic') {
     const dynamicProducts =
       await backend.getDynamicProducts(userToken);
-    const pricesByType = new Map<string, number>();
-    try {
-      const prices = await backend.getDynamicPrices();
-      for (const entry of prices) {
-        if (entry.type && entry.price > 0) {
-          pricesByType.set(entry.type, entry.price);
-        }
-      }
-    } catch {
-      // Product listing should still work if admin pricing lookup is temporarily unavailable.
-    }
     for (const p of dynamicProducts) {
-      const price =
-        p.price > 0
-          ? p.price
-          : pricesByType.get(p.type) ?? p.price;
       products.push({
         product_no: p.type,
         name: p.name || p.type,
         type: 'dynamic',
         proxy_type: p.proxyType,
-        price,
-        unit: p.flow > 0 ? 'MB' : 'request',
+        price: pricing.dynamic_usd_per_gb,
+        currency: pricing.currency,
+        unit: 'GB',
         country: p.country || undefined,
         city: p.city || undefined,
       });
@@ -95,8 +84,9 @@ export async function listProducts(
         type: 'static',
         proxy_type: p.proxyType,
         product_type: p.productType,
-        price: p.price,
-        unit: 'piece',
+        price: pricing.static_min_usd_per_month,
+        currency: pricing.currency,
+        unit: 'month',
         stock: p.stock,
         country: p.country,
         city: p.city,

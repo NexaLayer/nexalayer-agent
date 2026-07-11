@@ -33,7 +33,11 @@ export async function handleCreate(
   const body = createSessionSchema.parse(request.body);
   const result = await sessionService.createSession(
     ctx.agentId,
-    body
+    body,
+    typeof request.headers['idempotency-key'] ===
+      'string'
+      ? request.headers['idempotency-key']
+      : undefined
   );
   return sendSuccess(reply, result, 202, request.startTime);
 }
@@ -117,7 +121,11 @@ export async function handleRenew(
   const result = await sessionService.renewSession(
     ctx.agentId,
     request.params.session_id,
-    body.duration
+    body.duration,
+    typeof request.headers['idempotency-key'] ===
+      'string'
+      ? request.headers['idempotency-key']
+      : undefined
   );
   return sendSuccess(reply, result, 200, request.startTime);
 }

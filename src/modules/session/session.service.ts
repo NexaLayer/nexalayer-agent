@@ -8,6 +8,7 @@ import {
 import { generateSessionId } from '../../utils/id-generator';
 import { encrypt, decrypt } from '../../utils/crypto';
 import * as backend from '../../gateway/backend-client';
+import * as billing from '../billing/billing.service';
 import {
   CreateSessionRequest,
   ListSessionsQuery,
@@ -16,9 +17,19 @@ import {
 const STATIC_ORDER_READY_TIMEOUT_MS = 120_000;
 const STATIC_ORDER_POLL_MS = 3_000;
 
+type ProductInfo = {
+  price: number;
+  proxyType: number;
+  flow: number;
+  duration: number;
+  unit: number;
+  projectId?: string;
+};
+
 export async function createSession(
   agentId: number,
-  input: CreateSessionRequest
+  input: CreateSessionRequest,
+  idempotencyKey?: string
 ) {
   const agent = await prisma.agentApp.findUnique({
     where: { id: agentId },
@@ -59,24 +70,62 @@ export async function createSession(
   }
 
   const sessionId = generateSessionId();
-
-  const session = await prisma.agentSession.create({
-    data: {
-      sessionId,
+  const backendPassword = decrypt(
+    agent.backendPasswordEnc
+  );
+  const userToken = await backend.getUserToken(
+    agent.backendUsername,
+    backendPassword
+  );
+  const product = await lookupProductInfo(
+    userToken,
+    input.product_no,
+    input.session_type
+  );
+  const estimate =
+    await billing.estimateSessionCharge({
+      session_type: input.session_type,
+      quantity: input.quantity ?? 1,
+      duration: input.duration ?? product.duration,
+    });
+  const charge =
+    await billing.reserveSessionCharge({
       agentId,
-      sessionType: input.session_type,
-      status: SESSION_STATUS.CREATING,
-      proxyProtocol: input.protocol,
-      countryCode: input.country_code,
-      cityCode: input.city_code,
-      ispType: input.isp_type,
-      rotationMode: input.rotation_mode,
-      rotationIntervalSec: input.rotation_interval_sec,
-      identityId: input.identity_id,
-      identityPool: input.identity_pool,
-      backendProductNo: input.product_no,
-    },
-  });
+      sessionId,
+      estimate,
+      idempotencyKey,
+      metadata: {
+        product_no: input.product_no,
+        session_type: input.session_type,
+      },
+    });
+
+  let session;
+  try {
+    session = await prisma.agentSession.create({
+      data: {
+        sessionId,
+        agentId,
+        sessionType: input.session_type,
+        status: SESSION_STATUS.CREATING,
+        proxyProtocol: input.protocol,
+        countryCode: input.country_code,
+        cityCode: input.city_code,
+        ispType: input.isp_type,
+        rotationMode: input.rotation_mode,
+        rotationIntervalSec: input.rotation_interval_sec,
+        identityId: input.identity_id,
+        identityPool: input.identity_pool,
+        backendProductNo: input.product_no,
+      },
+    });
+  } catch (err) {
+    await billing.releaseSessionReservation(
+      charge.reservation_id,
+      'local_session_create_failed'
+    );
+    throw err;
+  }
 
   provisionSessionAsync(
     session.id,
@@ -86,7 +135,9 @@ export async function createSession(
       backendUsername: agent.backendUsername,
       backendPasswordEnc: agent.backendPasswordEnc,
     },
-    input
+    input,
+    charge.reservation_id,
+    product
   ).catch((err) => {
     console.error(
       `Async provision failed for ${sessionId}:`,
@@ -98,6 +149,17 @@ export async function createSession(
     session_id: sessionId,
     session_type: input.session_type,
     status: SESSION_STATUS.CREATING,
+    billing: {
+      estimated_charge_usd: charge.amount_usd,
+      currency: charge.currency,
+      reservation_id: charge.reservation_id,
+      session_management_fee_usd:
+        charge.session_management_fee_usd,
+      billing_unit: charge.billing_unit,
+      unit_price_usd: charge.unit_price_usd,
+      quantity: charge.quantity,
+      months: charge.months,
+    },
     message:
       'Session is being created. Poll GET /v1/sessions/:id for status.',
     created_at: session.createdAt.toISOString(),
@@ -108,7 +170,7 @@ async function lookupProductInfo(
   userToken: string,
   productNo: string,
   sessionType: string
-) {
+): Promise<ProductInfo> {
   if (sessionType === SESSION_TYPE.DYNAMIC) {
     const products =
       await backend.getDynamicProducts(userToken);
@@ -208,7 +270,9 @@ async function provisionSessionAsync(
     backendUsername: string | null;
     backendPasswordEnc: string | null;
   },
-  input: CreateSessionRequest
+  input: CreateSessionRequest,
+  reservationId: string,
+  product: ProductInfo
 ): Promise<void> {
   try {
     if (
@@ -231,12 +295,6 @@ async function provisionSessionAsync(
     const userToken = await backend.getUserToken(
       agent.backendUsername,
       backendPassword
-    );
-
-    const product = await lookupProductInfo(
-      userToken,
-      input.product_no,
-      input.session_type
     );
 
     const qty = input.quantity ?? 1;
@@ -361,6 +419,10 @@ async function provisionSessionAsync(
         expiresAt,
       },
     });
+    await billing.captureSessionReservation(
+      reservationId,
+      backendOrderNo
+    );
   } catch (err) {
     console.error(
       `[provision] session #${sessionDbId} failed:`,
@@ -376,6 +438,10 @@ async function provisionSessionAsync(
         ),
       },
     });
+    await billing.releaseSessionReservation(
+      reservationId,
+      (err as Error).message
+    );
   }
 }
 
@@ -689,7 +755,8 @@ export async function terminateSession(
 export async function renewSession(
   agentId: number,
   sessionId: string,
-  duration: number
+  duration: number,
+  idempotencyKey?: string
 ) {
   const session = await prisma.agentSession.findFirst({
     where: { sessionId, agentId },
@@ -729,14 +796,45 @@ export async function renewSession(
     );
   }
 
-  await backend.renewStaticOrder({
-    userId: agent.backendUserId,
-    orderNo: session.backendOrderNo,
-    productNo: session.backendProductNo ?? '',
-    duration,
-    country: session.countryCode ?? '',
-    city: session.cityCode ?? '',
-  });
+  const estimate =
+    await billing.estimateSessionCharge({
+      session_type: 'static',
+      quantity: 1,
+      duration,
+    });
+  const charge =
+    await billing.reserveSessionCharge({
+      agentId,
+      sessionId,
+      estimate,
+      idempotencyKey,
+      metadata: {
+        action: 'renew',
+        backend_order_no: session.backendOrderNo,
+        product_no: session.backendProductNo,
+      },
+    });
+
+  try {
+    await backend.renewStaticOrder({
+      userId: agent.backendUserId,
+      orderNo: session.backendOrderNo,
+      productNo: session.backendProductNo ?? '',
+      duration,
+      country: session.countryCode ?? '',
+      city: session.cityCode ?? '',
+    });
+    await billing.captureSessionReservation(
+      charge.reservation_id,
+      session.backendOrderNo
+    );
+  } catch (err) {
+    await billing.releaseSessionReservation(
+      charge.reservation_id,
+      (err as Error).message
+    );
+    throw err;
+  }
 
   const durationMs =
     duration * 30 * 24 * 60 * 60 * 1000;

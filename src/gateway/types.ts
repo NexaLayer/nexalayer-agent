@@ -96,6 +96,11 @@ export interface BackendAreaHierarchyResponse {
 export interface BackendUsdtOrderResponse {
   order_id: string;
   amount: number;
+  amount_usd?: number;
+  amount_usdt?: number;
+  confirmed_amount?: number;
+  transaction_id?: string;
+  wallet_address?: string;
   status: string;
   pay_url?: string;
 }

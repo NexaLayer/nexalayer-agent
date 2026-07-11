@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import {
   handleGetBalance,
+  handleGetPricing,
   handleRecharge,
   handleRechargeStatus,
   handleGetTransactions,
@@ -16,6 +17,7 @@ export async function billingRoutes(
   app.addHook('preHandler', authGuard);
 
   app.get('/balance', handleGetBalance);
+  app.get('/pricing', handleGetPricing);
   app.post(
     '/recharge',
     { preHandler: idempotencyGuard },

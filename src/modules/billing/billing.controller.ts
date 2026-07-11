@@ -33,6 +33,14 @@ export async function handleGetBalance(
   sendSuccess(reply, result, 200, request.startTime);
 }
 
+export async function handleGetPricing(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<void> {
+  const result = await billingService.getPricing();
+  sendSuccess(reply, result, 200, request.startTime);
+}
+
 export async function handleRecharge(
   request: FastifyRequest,
   reply: FastifyReply
@@ -41,7 +49,7 @@ export async function handleRecharge(
   const body = rechargeSchema.parse(request.body);
   const result = await billingService.createRecharge(
     ctx.agentId,
-    body.amount
+    body.amount_usd!
   );
   sendSuccess(reply, result, 201, request.startTime);
 }

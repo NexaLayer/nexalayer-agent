@@ -7,7 +7,7 @@ export const createSessionSchema = z.object({
   city_code: z.string().optional(),
   project_id: z.string().min(1).optional(),
   isp_type: z.string().optional(),
-  quantity: z.number().int().positive().default(1),
+  quantity: z.number().positive().default(1),
   duration: z.number().int().positive().optional(),
   protocol: z
     .enum(['socks5', 'http', 'https'])
@@ -22,6 +22,17 @@ export const createSessionSchema = z.object({
     .default(0),
   identity_id: z.string().uuid().optional(),
   identity_pool: z.string().max(50).optional(),
+}).superRefine((value, ctx) => {
+  if (
+    value.session_type === 'static' &&
+    !Number.isInteger(value.quantity)
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['quantity'],
+      message: 'Static session quantity must be an integer',
+    });
+  }
 });
 
 export const rotateSessionSchema = z.object({

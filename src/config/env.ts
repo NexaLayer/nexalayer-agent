@@ -36,7 +36,7 @@ const envSchema = z.object({
   RATE_LIMIT_PER_MIN: z.coerce.number().default(60),
   RATE_LIMIT_PER_DAY: z.coerce.number().default(10000),
 
-  TRIAL_BALANCE: z.coerce.number().default(5.0),
+  TRIAL_BALANCE: z.coerce.number().default(1.0),
   TRIAL_DURATION_DAYS: z.coerce.number().default(30),
 
   OPENAI_API_KEY: z.preprocess(
