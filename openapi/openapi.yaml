@@ -8,6 +8,27 @@ servers:
 security:
   - ApiKey: []
 paths:
+  /account/request-api-key:
+    post:
+      summary: Request an API Key by email and claim trial credit once per email.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+                referral_code: { type: string }
+      responses:
+        "200":
+          description: API Key email accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestApiKeyResponse"
   /account/register:
     post:
       summary: Register an Agent account and receive API credentials.
@@ -187,6 +208,23 @@ components:
       required: false
       schema: { type: string, maxLength: 64 }
   schemas:
+    RequestApiKeyResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [email_sent, email_recently_sent]
+            claim_status:
+              type: string
+              enum: [granted, already_claimed]
+            trial_balance: { type: number, example: 1 }
+            trial_expires_at: { type: string, format: date-time }
+            backend_ready: { type: boolean }
+            message: { type: string }
     RegisterResponse:
       type: object
       properties:

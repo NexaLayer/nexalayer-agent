@@ -39,6 +39,31 @@ const envSchema = z.object({
   TRIAL_BALANCE: z.coerce.number().default(1.0),
   TRIAL_DURATION_DAYS: z.coerce.number().default(30),
 
+  RESEND_API_KEY: z.preprocess(
+    (v) =>
+      typeof v === 'string' && v.trim()
+        ? v.trim()
+        : undefined,
+    z.string().optional()
+  ),
+  RESEND_FROM_EMAIL: z.preprocess(
+    (v) =>
+      typeof v === 'string' && v.trim()
+        ? v.trim()
+        : undefined,
+    z.string().email().optional()
+  ),
+  NEXALAYER_DOCS_URL: z
+    .string()
+    .url()
+    .default('https://docs.nexalayer.net'),
+  NEXALAYER_EXAMPLES_URL: z
+    .string()
+    .url()
+    .default(
+      'https://github.com/NexaLayer/nexalayer-examples'
+    ),
+
   OPENAI_API_KEY: z.preprocess(
     (v) =>
       typeof v === 'string'

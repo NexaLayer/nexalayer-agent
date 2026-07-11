@@ -38,6 +38,7 @@ model AgentApp {
   events          AgentEvent[]
   telemetry       AgentTelemetry[]
   wallet          AgentWallet?
+  emailIdentity   AgentEmailIdentity?
   trialClaims     AgentTrialClaim[]
   billingLedger   BillingLedgerEntry[]
   billingReservations BillingReservation[]
@@ -52,6 +53,21 @@ model AgentApp {
   @@index([status])
   @@index([backendUserId])
   @@map("agent_apps")
+}
+
+model AgentEmailIdentity {
+  id              BigInt    @id @default(autoincrement())
+  agentId         Int       @unique @map("agent_id")
+  normalizedEmail String    @map("normalized_email") @db.VarChar(200)
+  emailHash       String    @unique @map("email_hash") @db.VarChar(64)
+  firstClaimedAt  DateTime  @default(now()) @map("first_claimed_at") @db.Timestamptz
+  lastSentAt      DateTime? @map("last_sent_at") @db.Timestamptz
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  agent AgentApp @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("agent_email_identities")
 }
 
 model AgentWallet {

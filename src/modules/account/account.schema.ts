@@ -26,3 +26,15 @@ export const registerSchema = z.object({
 export type RegisterRequest = z.infer<
   typeof registerSchema
 >;
+
+export const requestApiKeySchema = z.object({
+  email: z.string().email(),
+  referral_code: z
+    .string()
+    .max(50)
+    .optional(),
+});
+
+export type RequestApiKeyRequest = z.infer<
+  typeof requestApiKeySchema
+>;

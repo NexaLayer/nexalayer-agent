@@ -1,8 +1,12 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { registerSchema } from './account.schema';
+import {
+  registerSchema,
+  requestApiKeySchema,
+} from './account.schema';
 import {
   registerAgent,
   getAgentInfo,
+  requestApiKeyByEmail,
 } from './account.service';
 import { sendSuccess } from '../../utils/response';
 import { AppError } from '../../utils/response';
@@ -15,6 +19,15 @@ export async function handleRegister(
   const body = registerSchema.parse(request.body);
   const result = await registerAgent(body);
   sendSuccess(reply, result, 201, request.startTime);
+}
+
+export async function handleRequestApiKey(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<void> {
+  const body = requestApiKeySchema.parse(request.body);
+  const result = await requestApiKeyByEmail(body);
+  sendSuccess(reply, result, 200, request.startTime);
 }
 
 export async function handleGetInfo(
