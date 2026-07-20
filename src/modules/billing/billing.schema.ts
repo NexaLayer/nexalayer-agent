@@ -2,28 +2,27 @@ import { z } from 'zod';
 
 export const rechargeSchema = z
   .object({
-    amount_cny: z.number().positive().optional(),
     amount_usd: z.number().positive().optional(),
     amount: z.number().positive().optional(),
     currency: z.string().default('USDT'),
   })
   .transform((value) => ({
-    amount_cny:
-      value.amount_cny ?? value.amount_usd ?? value.amount,
+    amount_usd:
+      value.amount_usd ?? value.amount,
     currency: value.currency,
   }))
   .refine(
-    (value) => value.amount_cny !== undefined,
+    (value) => value.amount_usd !== undefined,
     {
-      message: 'amount_cny is required',
-      path: ['amount_cny'],
+      message: 'amount_usd is required',
+      path: ['amount_usd'],
     }
   )
   .refine(
-    (value) => value.amount_cny! >= 10,
+    (value) => value.amount_usd! >= 10,
     {
-      message: 'Minimum recharge is 10 CNY',
-      path: ['amount_cny'],
+      message: 'Minimum recharge is 10 USD',
+      path: ['amount_usd'],
     }
   );
 

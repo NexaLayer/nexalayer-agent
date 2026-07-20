@@ -96,14 +96,26 @@ export interface BackendAreaHierarchyResponse {
 
 export interface BackendUsdtOrderResponse {
   order_id: string;
-  amount: number;
+  amount?: number;
+  amount_cny?: number;
   amount_usd?: number;
   amount_usdt?: number;
+  usdt_rate?: number;
+  network?: string;
+  currency?: string;
+  min_amount_usdt?: number;
+  wallet_explorer_url?: string;
+  created_at?: string;
   confirmed_amount?: number;
   transaction_id?: string;
   wallet_address?: string;
-  status: string;
+  status?: string;
   pay_url?: string;
+}
+
+export interface BackendUsdtRateResponse {
+  rate: number;
+  effective_rate?: number;
 }
 
 export interface BackendStaticProductResponse {

@@ -6,12 +6,14 @@ import { ERROR_CODES } from '../../config/constants';
 import * as backend from '../../gateway/backend-client';
 import { BackendUsdtOrderResponse } from '../../gateway/types';
 
-const CURRENCY = 'CNY';
-const DEFAULT_MIN_RECHARGE_CNY = 10;
+const CURRENCY = 'USD';
+const DEFAULT_MIN_RECHARGE_USD = 10;
 
 export type PricingSnapshot = {
-  currency: 'CNY';
+  currency: 'USD';
   source: 'backend';
+  exchange_rate: number;
+  exchange_rate_pair: 'USD/CNY';
   message: string;
 };
 
@@ -52,39 +54,73 @@ function roundUsd(value: number): number {
   return Math.round(value * 10_000) / 10_000;
 }
 
-export async function getPricing(): Promise<PricingSnapshot> {
+function roundCny(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function effectiveRate(rate: {
+  rate: number;
+  effective_rate?: number;
+}): number {
+  const value = Number(rate.effective_rate ?? rate.rate);
+  if (!Number.isFinite(value) || value <= 0) {
+    throw new AppError(
+      ERROR_CODES.BACKEND_ERROR,
+      'Backend exchange rate is unavailable'
+    );
+  }
+  return value;
+}
+
+export async function getPricing(
+  agentId: number
+): Promise<PricingSnapshot> {
+  const userToken = await getAgentBackendToken(agentId);
+  const exchangeRate = effectiveRate(
+    await backend.getUsdtRate(userToken)
+  );
   return {
-    currency: 'CNY',
+    currency: 'USD',
     source: 'backend',
+    exchange_rate: exchangeRate,
+    exchange_rate_pair: 'USD/CNY',
     message:
-      'Prices are account-specific. Read GET /products for current product prices.',
+      'Prices are account-specific USD conversions of backend CNY prices. Read GET /products for current prices.',
   };
 }
 
 export async function getBalance(agentId: number) {
   const userToken = await getAgentBackendToken(agentId);
-  const balance = await backend.getBalance(userToken);
+  const [balanceCny, rate] = await Promise.all([
+    backend.getBalance(userToken),
+    backend.getUsdtRate(userToken),
+  ]);
+  const exchangeRate = effectiveRate(rate);
+  const balanceUsd = roundUsd(balanceCny / exchangeRate);
 
   return {
-    cash_balance: balance,
-    available_balance: balance,
-    currency: 'CNY',
-    balance,
+    cash_balance: balanceUsd,
+    available_balance: balanceUsd,
+    currency: 'USD',
+    balance: balanceUsd,
     source: 'backend',
+    source_balance_cny: balanceCny,
+    exchange_rate: exchangeRate,
+    exchange_rate_pair: 'USD/CNY',
     updated_at: new Date().toISOString(),
   };
 }
 
 export async function createRecharge(
   agentId: number,
-  amountCny: number
+  amountUsd: number
 ) {
-  if (amountCny < DEFAULT_MIN_RECHARGE_CNY) {
+  if (amountUsd < DEFAULT_MIN_RECHARGE_USD) {
     throw new AppError(
       ERROR_CODES.INVALID_REQUEST,
-      `Minimum recharge is ${DEFAULT_MIN_RECHARGE_CNY} CNY`,
+      `Minimum recharge is ${DEFAULT_MIN_RECHARGE_USD} USD`,
       {
-        minimum_recharge_cny: DEFAULT_MIN_RECHARGE_CNY,
+        minimum_recharge_usd: DEFAULT_MIN_RECHARGE_USD,
         currency: CURRENCY,
       }
     );
@@ -92,6 +128,10 @@ export async function createRecharge(
 
   const userToken =
     await getAgentBackendToken(agentId);
+  const exchangeRate = effectiveRate(
+    await backend.getUsdtRate(userToken)
+  );
+  const amountCny = roundCny(amountUsd * exchangeRate);
   const order = await backend.createUsdtRechargeOrder(
     userToken,
     amountCny
@@ -104,6 +144,7 @@ export async function createRecharge(
       resourceType: 'billing',
       details: {
         order_id: order.order_id,
+        amount_usd: amountUsd,
         amount_cny: amountCny,
         currency: 'USDT',
       },
@@ -112,14 +153,22 @@ export async function createRecharge(
 
   return {
     order_id: order.order_id,
-    amount_cny: amountCny,
-    amount: amountCny,
+    amount_usd: amountUsd,
+    amount_cny: order.amount_cny ?? amountCny,
+    amount_usdt: order.amount_usdt,
+    amount: amountUsd,
     currency: CURRENCY,
     payment_currency: 'USDT',
-    status: order.status,
+    exchange_rate: order.usdt_rate ?? exchangeRate,
+    exchange_rate_pair: 'USD/CNY',
+    network: order.network,
+    status: order.status ?? 'pending',
     pay_url: order.pay_url,
     wallet_address: order.wallet_address,
-    created_at: new Date().toISOString(),
+    wallet_explorer_url: order.wallet_explorer_url,
+    min_amount_usdt: order.min_amount_usdt,
+    created_at:
+      order.created_at ?? new Date().toISOString(),
   };
 }
 
@@ -145,14 +194,26 @@ export async function checkRechargeStatus(
     orderId
   );
 
-  const amountCny = rechargeAmountCny(order);
+  const amountCny = Number(
+    order.amount_cny ?? rechargeAmountCny(order)
+  );
+  const exchangeRate = Number(order.usdt_rate ?? 0);
   return {
     order_id: order.order_id,
     amount_cny: amountCny,
-    amount: amountCny,
+    amount_usd:
+      exchangeRate > 0
+        ? roundUsd(amountCny / exchangeRate)
+        : undefined,
+    amount_usdt: order.amount_usdt,
     currency: CURRENCY,
     payment_currency: 'USDT',
-    status: order.status,
+    exchange_rate: order.usdt_rate,
+    exchange_rate_pair: 'USD/CNY',
+    network: order.network,
+    wallet_address: order.wallet_address,
+    wallet_explorer_url: order.wallet_explorer_url,
+    status: order.status ?? 'pending',
     tx_hash: order.transaction_id,
   };
 }
@@ -163,16 +224,26 @@ export async function getTransactions(
   pageSize: number
 ) {
   const userToken = await getAgentBackendToken(agentId);
-  const result = await backend.getTransactions(userToken, {
-    page,
-    page_size: pageSize,
-  });
+  const [result, rate] = await Promise.all([
+    backend.getTransactions(userToken, {
+      page,
+      page_size: pageSize,
+    }),
+    backend.getUsdtRate(userToken),
+  ]);
+  const exchangeRate = effectiveRate(rate);
 
   return {
     items: result.items.map((item) => ({
       ...item,
-      currency: 'CNY',
+      amount_cny: toNumber(item.amount),
+      amount_usd: roundUsd(
+        toNumber(item.amount) / exchangeRate
+      ),
+      currency: 'USD',
       source: 'backend',
+      exchange_rate: exchangeRate,
+      exchange_rate_pair: 'USD/CNY',
     })),
     total: result.total,
     page,

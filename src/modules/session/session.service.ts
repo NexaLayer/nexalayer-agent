@@ -125,8 +125,8 @@ export async function createSession(
       status: SESSION_STATUS.CREATING,
       provisioning_mode: 'existing',
       billing: {
-        estimated_charge_cny: 0,
-        currency: 'CNY',
+        estimated_charge_usd: 0,
+        currency: 'USD',
         resource_source: 'existing',
       },
       message:
@@ -139,6 +139,16 @@ export async function createSession(
     input.product_no,
     input.session_type
   );
+  const rate = await backend.getUsdtRate(userToken);
+  const exchangeRate = Number(
+    rate.effective_rate ?? rate.rate
+  );
+  if (!Number.isFinite(exchangeRate) || exchangeRate <= 0) {
+    throw new AppError(
+      ERROR_CODES.BACKEND_ERROR,
+      'Backend exchange rate is unavailable'
+    );
+  }
   const quantity = input.quantity ?? 1;
   const months =
     input.session_type === SESSION_TYPE.STATIC
@@ -149,8 +159,15 @@ export async function createSession(
           )
         )
       : undefined;
-  const estimatedAmount =
+  const estimatedAmountCny =
     product.price * quantity * (months ?? 1);
+  const estimatedAmountUsd =
+    Math.round(
+      (estimatedAmountCny / exchangeRate) * 10_000
+    ) / 10_000;
+  const unitPriceUsd =
+    Math.round((product.price / exchangeRate) * 10_000) /
+    10_000;
 
   const session = await prisma.agentSession.create({
       data: {
@@ -194,14 +211,16 @@ export async function createSession(
     status: SESSION_STATUS.CREATING,
     provisioning_mode: 'purchase',
     billing: {
-      estimated_charge_cny: estimatedAmount,
-      currency: 'CNY',
+      estimated_charge_usd: estimatedAmountUsd,
+      currency: 'USD',
       source: 'backend',
+      exchange_rate: exchangeRate,
+      exchange_rate_pair: 'USD/CNY',
       billing_unit:
         input.session_type === SESSION_TYPE.DYNAMIC
           ? 'GB'
           : 'month',
-      unit_price_cny: product.price,
+      unit_price_usd: unitPriceUsd,
       quantity,
       months,
     },

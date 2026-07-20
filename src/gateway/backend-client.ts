@@ -11,6 +11,7 @@ import {
   BackendBalanceAdjustResponse,
   BackendStaticOrderResponse,
   BackendUsdtOrderResponse,
+  BackendUsdtRateResponse,
 } from './types';
 import {
   toBackendDynamicProductNo,
@@ -763,14 +764,25 @@ export async function getStaticOrders(
 
 export async function createUsdtRechargeOrder(
   userToken: string,
-  amountUsd: number
+  amountCny: number
 ): Promise<BackendUsdtOrderResponse> {
   const res = await fetchJson<
     BackendResponse<BackendUsdtOrderResponse>
   >('/api/usdt/create-order', {
     method: 'POST',
     headers: { Authorization: `Bearer ${userToken}` },
-    body: JSON.stringify({ amount_cny: amountUsd }),
+    body: JSON.stringify({ amount_cny: amountCny }),
+  });
+  return res.data;
+}
+
+export async function getUsdtRate(
+  userToken: string
+): Promise<BackendUsdtRateResponse> {
+  const res = await fetchJson<
+    BackendResponse<BackendUsdtRateResponse>
+  >('/api/settings/usdt-rate', {
+    headers: { Authorization: `Bearer ${userToken}` },
   });
   return res.data;
 }

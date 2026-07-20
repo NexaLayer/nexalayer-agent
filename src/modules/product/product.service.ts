@@ -35,6 +35,19 @@ export async function listProducts(
 ) {
   const userToken =
     await getAgentBackendToken(agentId);
+  const rate = await backend.getUsdtRate(userToken);
+  const exchangeRate = Number(
+    rate.effective_rate ?? rate.rate
+  );
+  if (!Number.isFinite(exchangeRate) || exchangeRate <= 0) {
+    throw new AppError(
+      ERROR_CODES.BACKEND_ERROR,
+      'Backend exchange rate is unavailable'
+    );
+  }
+  const usd = (priceCny: number) =>
+    Math.round((priceCny / exchangeRate) * 10_000) /
+    10_000;
 
   const products: {
     product_no: string;
@@ -42,7 +55,9 @@ export async function listProducts(
     type: string;
     proxy_type?: number;
     price: number;
+    price_cny?: number;
     currency?: string;
+    exchange_rate?: number;
     unit: string;
     stock?: number;
     country?: string;
@@ -61,8 +76,10 @@ export async function listProducts(
         name: p.name || p.type,
         type: 'dynamic',
         proxy_type: p.proxyType,
-        price: p.price,
-        currency: 'CNY',
+        price: usd(p.price),
+        price_cny: p.price,
+        currency: 'USD',
+        exchange_rate: exchangeRate,
         unit: 'GB',
         country: p.country || undefined,
         city: p.city || undefined,
@@ -82,8 +99,10 @@ export async function listProducts(
         type: 'static',
         proxy_type: p.proxyType,
         product_type: p.productType,
-        price: p.price,
-        currency: 'CNY',
+        price: usd(p.price),
+        price_cny: p.price,
+        currency: 'USD',
+        exchange_rate: exchangeRate,
         unit: 'month',
         stock: p.stock,
         country: p.country,

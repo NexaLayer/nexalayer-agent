@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { createSessionSchema } from '../../src/modules/session/session.schema';
+import { rechargeSchema } from '../../src/modules/billing/billing.schema';
 import { shouldReleaseStaticResource } from '../../src/modules/session/session-lifecycle';
 import {
   toBackendDynamicProductNo,
@@ -8,6 +9,14 @@ import {
 } from '../../src/gateway/dynamic-product';
 
 describe('trial resource contract', () => {
+  it('accepts USD recharge amounts with a $10 minimum', () => {
+    expect(
+      rechargeSchema.parse({ amount_usd: 10 }).amount_usd
+    ).toBe(10);
+    expect(() =>
+      rechargeSchema.parse({ amount_usd: 9.99 })
+    ).toThrow();
+  });
   it('keeps purchase as the backward-compatible default', () => {
     const parsed = createSessionSchema.parse({
       session_type: 'dynamic',

@@ -37,7 +37,10 @@ export async function handleGetPricing(
   request: FastifyRequest,
   reply: FastifyReply
 ): Promise<void> {
-  const result = await billingService.getPricing();
+  const ctx = getCtx(request);
+  const result = await billingService.getPricing(
+    ctx.agentId
+  );
   sendSuccess(reply, result, 200, request.startTime);
 }
 
@@ -49,7 +52,7 @@ export async function handleRecharge(
   const body = rechargeSchema.parse(request.body);
   const result = await billingService.createRecharge(
     ctx.agentId,
-    body.amount_cny!
+    body.amount_usd!
   );
   sendSuccess(reply, result, 201, request.startTime);
 }

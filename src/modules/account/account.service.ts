@@ -440,6 +440,8 @@ export async function getAgentInfo(agentId: number) {
     cash_balance: balance.cash_balance,
     available_balance: balance.available_balance,
     currency: balance.currency,
+    exchange_rate: balance.exchange_rate,
+    exchange_rate_pair: balance.exchange_rate_pair,
     total_sessions: agent._count.sessions,
     active_sessions: activeSessions,
     max_active_sessions: agent.maxActiveSessions,

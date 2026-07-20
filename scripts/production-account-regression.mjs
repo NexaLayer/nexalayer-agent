@@ -42,7 +42,7 @@ regression: try {
   key = agent.apiKey;
 
   const before = await api('GET', '/billing/balance');
-  console.log(JSON.stringify({ step: 'balance_before', available: before.available_balance, cash: before.cash_balance }));
+  console.log(JSON.stringify({ step: 'balance_before', available: before.available_balance, cash: before.cash_balance, currency: before.currency, exchange_rate: before.exchange_rate }));
   const products = await api('GET', '/products?type=dynamic');
   const product = products.items?.find((item) => item.product_no);
   if (!product) throw new Error('No dynamic product available');
@@ -56,7 +56,7 @@ regression: try {
   }
   const expectedCharge = Number(product.price) * 0.25;
   if (provisioningMode === 'purchase' && Number(before.available_balance) < expectedCharge) {
-    throw new Error(`At least ${expectedCharge} CNY backend balance is required for purchase mode`);
+    throw new Error(`At least ${expectedCharge} USD displayed balance is required for purchase mode`);
   }
 
   const created = await api('POST', '/sessions', {
@@ -68,7 +68,7 @@ regression: try {
     rotation_mode: 'on_demand',
   }, { 'Idempotency-Key': `regression-${Date.now()}` });
   sessionId = created.session_id;
-  console.log(JSON.stringify({ step: 'created', session_id: sessionId, status: created.status, estimated_charge_cny: created.billing?.estimated_charge_cny }));
+  console.log(JSON.stringify({ step: 'created', session_id: sessionId, status: created.status, estimated_charge_usd: created.billing?.estimated_charge_usd }));
 
   let session;
   for (let attempt = 0; attempt < 60; attempt += 1) {
