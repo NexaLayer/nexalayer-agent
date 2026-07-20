@@ -30,6 +30,7 @@ export interface BackendBalanceResponse {
 export interface BackendProductResponse {
   id: number;
   type: string;
+  backendProductNo: string;
   name: string;
   proxyType: number;
   price: number;

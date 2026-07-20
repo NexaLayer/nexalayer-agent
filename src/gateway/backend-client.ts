@@ -12,6 +12,7 @@ import {
   BackendStaticOrderResponse,
   BackendUsdtOrderResponse,
 } from './types';
+import { toPublicDynamicProductNo } from './dynamic-product';
 
 const tokenCache = new NodeCache({
   stdTTL: 3000,
@@ -343,14 +344,18 @@ export async function getDynamicProducts(
   const items = await queryStandardProducts(userToken, {
     proxyType: 104,
   });
-  return items.map((p) => {
+  return items.flatMap((p) => {
     const productNo = String(
       p.productId ?? p.product_no ?? p.type ?? ''
     );
-    return {
+    const publicProductNo =
+      toPublicDynamicProductNo(productNo);
+    if (!publicProductNo) return [];
+    return [{
       id: num(p.id),
-      type: productNo,
-      name: String(p.name ?? productNo),
+      type: publicProductNo,
+      backendProductNo: productNo,
+      name: 'DYN3 Dynamic Proxy',
       proxyType: num(p.proxyType, 104),
       price: num(p.price),
       unit: num(p.unit, 1),
@@ -362,7 +367,7 @@ export async function getDynamicProducts(
       city: String(p.cityCode ?? p.city ?? ''),
       isGlobal: Boolean(p.isGlobal ?? p.is_global),
       stock: num(p.stock ?? p.inventory),
-    };
+    }];
   });
 }
 

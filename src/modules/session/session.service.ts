@@ -19,6 +19,7 @@ const STATIC_ORDER_READY_TIMEOUT_MS = 120_000;
 const STATIC_ORDER_POLL_MS = 3_000;
 
 type ProductInfo = {
+  backendProductNo: string;
   price: number;
   proxyType: number;
   flow: number;
@@ -251,7 +252,7 @@ async function provisionExistingSessionAsync(
         throw new Error('Dynamic product information is missing');
       }
       const result = await backend.extractDynamicProxy(userToken, {
-        productNo: input.product_no,
+        productNo: product.backendProductNo,
         proxyType: product.proxyType,
         username: undefined,
         protocol: input.protocol,
@@ -363,6 +364,7 @@ async function lookupProductInfo(
     }
 
     return {
+      backendProductNo: match.backendProductNo,
       price,
       proxyType: match.proxyType,
       flow: match.flow,
@@ -382,6 +384,7 @@ async function lookupProductInfo(
     );
   }
   return {
+    backendProductNo: match.productId,
     price: match.price,
     proxyType: match.proxyType,
     flow: match.flow ?? 0,
@@ -468,7 +471,7 @@ async function provisionSessionAsync(
       const dynOpen = await backend.openDynamicProxy(
         userToken,
         {
-          productNo: input.product_no,
+          productNo: product.backendProductNo,
           proxyType: product.proxyType,
           flow: qty,
           maxFlowLimit: qty,
@@ -487,7 +490,7 @@ async function provisionSessionAsync(
           await backend.extractDynamicProxy(
             userToken,
             {
-              productNo: input.product_no,
+              productNo: product.backendProductNo,
               proxyType: product.proxyType,
               username: undefined,
               protocol: input.protocol,
@@ -525,7 +528,7 @@ async function provisionSessionAsync(
           userToken,
           {
             orderType: 'static_proxy',
-            poolId: input.product_no,
+            poolId: product.backendProductNo,
             userId: agent.backendUserId,
             unitPrice: product.price,
             totalAmount,
@@ -814,7 +817,7 @@ export async function rotateSession(
     const result = await backend.extractDynamicProxy(
       userToken,
       {
-        productNo: session.backendProductNo,
+        productNo: product.backendProductNo,
         proxyType: product.proxyType,
         username: undefined,
         protocol: session.proxyProtocol,
