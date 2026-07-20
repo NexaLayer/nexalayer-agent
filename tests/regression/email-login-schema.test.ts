@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   requestEmailLoginCodeSchema,
   verifyEmailLoginCodeSchema,
+  emailPasswordLoginSchema,
+  setEmailPasswordSchema,
 } from '../../src/modules/account/account.schema';
 
 describe('email login input contract', () => {
@@ -30,5 +32,11 @@ describe('email login input contract', () => {
         code: '12A456',
       })
     ).toThrow();
+  });
+
+  it('requires account passwords between 8 and 72 characters', () => {
+    expect(emailPasswordLoginSchema.parse({ email: 'dev@nexalayer.net', password: 'secure-pass' }).password).toBe('secure-pass');
+    expect(() => setEmailPasswordSchema.parse({ password: 'short' })).toThrow();
+    expect(() => setEmailPasswordSchema.parse({ password: 'x'.repeat(73) })).toThrow();
   });
 });

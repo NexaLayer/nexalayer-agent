@@ -631,3 +631,53 @@ export async function regenerateApiKey(agentId: number) {
   });
   return { api_key: agent.apiKey, regenerated_at: new Date().toISOString() };
 }
+
+function issueEmailAccessToken(app: FastifyInstance, agent: {
+  id: number;
+  apiKey: string;
+  permissions: unknown;
+  name: string;
+}, email: string) {
+  const permissions = agent.permissions as string[];
+  return {
+    access_token: app.jwt.sign(
+      { agentId: agent.id, apiKey: agent.apiKey, permissions },
+      { expiresIn: env.JWT_EXPIRES_IN }
+    ),
+    token_type: 'Bearer',
+    expires_in: env.JWT_EXPIRES_IN,
+    account: { agent_id: agent.id, name: agent.name, email },
+  };
+}
+
+export async function loginWithEmailPassword(
+  app: FastifyInstance,
+  email: string,
+  password: string
+) {
+  const normalizedEmail = normalizeEmail(email);
+  const identity = await prisma.agentEmailIdentity.findUnique({
+    where: { emailHash: hashEmail(normalizedEmail) },
+    include: { agent: true },
+  });
+  if (
+    !identity?.passwordHash ||
+    identity.agent.status !== 'active' ||
+    !(await compare(password, identity.passwordHash))
+  ) {
+    throw new AppError(ERROR_CODES.AUTH_INVALID_KEY, 'Invalid email or password');
+  }
+  return issueEmailAccessToken(app, identity.agent, normalizedEmail);
+}
+
+export async function setEmailPassword(agentId: number, password: string) {
+  const passwordHash = await hash(password, 12);
+  const result = await prisma.agentEmailIdentity.updateMany({
+    where: { agentId },
+    data: { passwordHash },
+  });
+  if (!result.count) {
+    throw new AppError(ERROR_CODES.INVALID_REQUEST, 'Email identity not found');
+  }
+  return { status: 'password_set', updated_at: new Date().toISOString() };
+}

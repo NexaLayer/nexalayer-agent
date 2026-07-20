@@ -47,3 +47,17 @@ export const verifyEmailLoginCodeSchema = z.object({
   email: z.string().email(),
   code: z.string().regex(/^\d{6}$/),
 });
+
+const accountPasswordSchema = z
+  .string()
+  .min(8, 'Password must be at least 8 characters')
+  .max(72, 'Password must be at most 72 characters');
+
+export const emailPasswordLoginSchema = z.object({
+  email: z.string().email(),
+  password: accountPasswordSchema,
+});
+
+export const setEmailPasswordSchema = z.object({
+  password: accountPasswordSchema,
+});

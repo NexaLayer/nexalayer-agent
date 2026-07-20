@@ -77,6 +77,7 @@ model AgentEmailIdentity {
   agentId         Int       @unique @map("agent_id")
   normalizedEmail String    @map("normalized_email") @db.VarChar(200)
   emailHash       String    @unique @map("email_hash") @db.VarChar(64)
+  passwordHash    String?   @map("password_hash") @db.VarChar(256)
   firstClaimedAt  DateTime  @default(now()) @map("first_claimed_at") @db.Timestamptz
   lastSentAt      DateTime? @map("last_sent_at") @db.Timestamptz
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz

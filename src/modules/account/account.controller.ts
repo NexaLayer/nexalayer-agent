@@ -4,6 +4,8 @@ import {
   requestApiKeySchema,
   requestEmailLoginCodeSchema,
   verifyEmailLoginCodeSchema,
+  emailPasswordLoginSchema,
+  setEmailPasswordSchema,
 } from './account.schema';
 import {
   registerAgent,
@@ -12,6 +14,8 @@ import {
   requestEmailLoginCode,
   verifyEmailLoginCode,
   regenerateApiKey,
+  loginWithEmailPassword,
+  setEmailPassword,
 } from './account.service';
 import { sendSuccess } from '../../utils/response';
 import { AppError } from '../../utils/response';
@@ -24,6 +28,20 @@ export async function handleRegister(
   const body = registerSchema.parse(request.body);
   const result = await registerAgent(body);
   sendSuccess(reply, result, 201, request.startTime);
+}
+
+export async function handleEmailPasswordLogin(request: FastifyRequest, reply: FastifyReply) {
+  const body = emailPasswordLoginSchema.parse(request.body);
+  const result = await loginWithEmailPassword(request.server, body.email, body.password);
+  sendSuccess(reply, result, 200, request.startTime);
+}
+
+export async function handleSetEmailPassword(request: FastifyRequest, reply: FastifyReply) {
+  const body = setEmailPasswordSchema.parse(request.body);
+  const ctx = request.agentContext;
+  if (!ctx) throw new AppError(ERROR_CODES.AUTH_INVALID_KEY, 'Not authenticated');
+  const result = await setEmailPassword(ctx.agentId, body.password);
+  sendSuccess(reply, result, 200, request.startTime);
 }
 
 export async function handleRequestEmailLoginCode(request: FastifyRequest, reply: FastifyReply) {
