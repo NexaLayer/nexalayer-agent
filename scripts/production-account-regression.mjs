@@ -47,7 +47,13 @@ regression: try {
   const product = products.items?.find((item) => item.product_no);
   if (!product) throw new Error('No dynamic product available');
   console.log(JSON.stringify({ step: 'product', product_no: product.product_no, price: product.price, currency: product.currency }));
-  if (provisioningMode === 'inspect') break regression;
+  if (provisioningMode === 'inspect') {
+    const transactions = await api('GET', '/billing/transactions?page=1&page_size=5');
+    const items = Array.isArray(transactions) ? transactions : transactions.items ?? [];
+    const first = items[0];
+    console.log(JSON.stringify({ step: 'transactions', count: items.length, source: first?.source ?? null, currency: first?.currency ?? null }));
+    break regression;
+  }
   const expectedCharge = Number(product.price) * 0.25;
   if (provisioningMode === 'purchase' && Number(before.available_balance) < expectedCharge) {
     throw new Error(`At least ${expectedCharge} CNY backend balance is required for purchase mode`);
