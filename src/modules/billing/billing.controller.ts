@@ -49,7 +49,7 @@ export async function handleRecharge(
   const body = rechargeSchema.parse(request.body);
   const result = await billingService.createRecharge(
     ctx.agentId,
-    body.amount_usd!
+    body.amount_cny!
   );
   sendSuccess(reply, result, 201, request.startTime);
 }

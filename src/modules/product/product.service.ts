@@ -3,7 +3,6 @@ import { decrypt } from '../../utils/crypto';
 import { AppError } from '../../utils/response';
 import { ERROR_CODES } from '../../config/constants';
 import * as backend from '../../gateway/backend-client';
-import { getPricing } from '../billing/billing.service';
 
 async function getAgentBackendToken(
   agentId: number
@@ -36,7 +35,6 @@ export async function listProducts(
 ) {
   const userToken =
     await getAgentBackendToken(agentId);
-  const pricing = await getPricing();
 
   const products: {
     product_no: string;
@@ -63,8 +61,8 @@ export async function listProducts(
         name: p.name || p.type,
         type: 'dynamic',
         proxy_type: p.proxyType,
-        price: pricing.dynamic_usd_per_gb,
-        currency: pricing.currency,
+        price: p.price,
+        currency: 'CNY',
         unit: 'GB',
         country: p.country || undefined,
         city: p.city || undefined,
@@ -84,8 +82,8 @@ export async function listProducts(
         type: 'static',
         proxy_type: p.proxyType,
         product_type: p.productType,
-        price: pricing.static_min_usd_per_month,
-        currency: pricing.currency,
+        price: p.price,
+        currency: 'CNY',
         unit: 'month',
         stock: p.stock,
         country: p.country,

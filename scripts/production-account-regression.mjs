@@ -43,13 +43,13 @@ try {
 
   const before = await api('GET', '/billing/balance');
   console.log(JSON.stringify({ step: 'balance_before', available: before.available_balance, cash: before.cash_balance }));
-  if (provisioningMode === 'purchase' && Number(before.available_balance) < 1) {
-    throw new Error('At least $1 NexaLayer balance is required for purchase mode');
-  }
-
   const products = await api('GET', '/products?type=dynamic');
   const product = products.items?.find((item) => item.product_no);
   if (!product) throw new Error('No dynamic product available');
+  const expectedCharge = Number(product.price) * 0.25;
+  if (provisioningMode === 'purchase' && Number(before.available_balance) < expectedCharge) {
+    throw new Error(`At least ${expectedCharge} CNY backend balance is required for purchase mode`);
+  }
 
   const created = await api('POST', '/sessions', {
     session_type: 'dynamic',
@@ -60,7 +60,7 @@ try {
     rotation_mode: 'on_demand',
   }, { 'Idempotency-Key': `regression-${Date.now()}` });
   sessionId = created.session_id;
-  console.log(JSON.stringify({ step: 'created', session_id: sessionId, status: created.status, estimated_charge: created.billing?.estimated_charge_usd }));
+  console.log(JSON.stringify({ step: 'created', session_id: sessionId, status: created.status, estimated_charge_cny: created.billing?.estimated_charge_cny }));
 
   let session;
   for (let attempt = 0; attempt < 60; attempt += 1) {

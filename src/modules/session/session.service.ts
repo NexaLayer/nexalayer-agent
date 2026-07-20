@@ -8,7 +8,6 @@ import {
 import { generateSessionId } from '../../utils/id-generator';
 import { encrypt, decrypt } from '../../utils/crypto';
 import * as backend from '../../gateway/backend-client';
-import * as billing from '../billing/billing.service';
 import {
   CreateSessionRequest,
   ListSessionsQuery,
@@ -126,8 +125,8 @@ export async function createSession(
       status: SESSION_STATUS.CREATING,
       provisioning_mode: 'existing',
       billing: {
-        estimated_charge_usd: 0,
-        currency: 'USD',
+        estimated_charge_cny: 0,
+        currency: 'CNY',
         resource_source: 'existing',
       },
       message:
@@ -140,27 +139,20 @@ export async function createSession(
     input.product_no,
     input.session_type
   );
-  const estimate =
-    await billing.estimateSessionCharge({
-      session_type: input.session_type,
-      quantity: input.quantity ?? 1,
-      duration: input.duration ?? product.duration,
-    });
-  const charge =
-    await billing.reserveSessionCharge({
-      agentId,
-      sessionId,
-      estimate,
-      idempotencyKey,
-      metadata: {
-        product_no: input.product_no,
-        session_type: input.session_type,
-      },
-    });
+  const quantity = input.quantity ?? 1;
+  const months =
+    input.session_type === SESSION_TYPE.STATIC
+      ? Math.max(
+          1,
+          Math.ceil(
+            (input.duration ?? product.duration) / 30
+          )
+        )
+      : undefined;
+  const estimatedAmount =
+    product.price * quantity * (months ?? 1);
 
-  let session;
-  try {
-    session = await prisma.agentSession.create({
+  const session = await prisma.agentSession.create({
       data: {
         sessionId,
         agentId,
@@ -178,13 +170,6 @@ export async function createSession(
         provisioningMode: 'purchase',
       },
     });
-  } catch (err) {
-    await billing.releaseSessionReservation(
-      charge.reservation_id,
-      'local_session_create_failed'
-    );
-    throw err;
-  }
 
   provisionSessionAsync(
     session.id,
@@ -195,7 +180,6 @@ export async function createSession(
       backendPasswordEnc: agent.backendPasswordEnc,
     },
     input,
-    charge.reservation_id,
     product
   ).catch((err) => {
     console.error(
@@ -210,15 +194,16 @@ export async function createSession(
     status: SESSION_STATUS.CREATING,
     provisioning_mode: 'purchase',
     billing: {
-      estimated_charge_usd: charge.amount_usd,
-      currency: charge.currency,
-      reservation_id: charge.reservation_id,
-      session_management_fee_usd:
-        charge.session_management_fee_usd,
-      billing_unit: charge.billing_unit,
-      unit_price_usd: charge.unit_price_usd,
-      quantity: charge.quantity,
-      months: charge.months,
+      estimated_charge_cny: estimatedAmount,
+      currency: 'CNY',
+      source: 'backend',
+      billing_unit:
+        input.session_type === SESSION_TYPE.DYNAMIC
+          ? 'GB'
+          : 'month',
+      unit_price_cny: product.price,
+      quantity,
+      months,
     },
     message:
       'Session is being created. Poll GET /v1/sessions/:id for status.',
@@ -432,7 +417,6 @@ async function provisionSessionAsync(
     backendPasswordEnc: string | null;
   },
   input: CreateSessionRequest,
-  reservationId: string,
   product: ProductInfo
 ): Promise<void> {
   try {
@@ -580,10 +564,6 @@ async function provisionSessionAsync(
         expiresAt,
       },
     });
-    await billing.captureSessionReservation(
-      reservationId,
-      backendOrderNo
-    );
   } catch (err) {
     console.error(
       `[provision] session #${sessionDbId} failed:`,
@@ -599,10 +579,6 @@ async function provisionSessionAsync(
         ),
       },
     });
-    await billing.releaseSessionReservation(
-      reservationId,
-      (err as Error).message
-    );
   }
 }
 
@@ -960,45 +936,14 @@ export async function renewSession(
     );
   }
 
-  const estimate =
-    await billing.estimateSessionCharge({
-      session_type: 'static',
-      quantity: 1,
-      duration,
-    });
-  const charge =
-    await billing.reserveSessionCharge({
-      agentId,
-      sessionId,
-      estimate,
-      idempotencyKey,
-      metadata: {
-        action: 'renew',
-        backend_order_no: session.backendOrderNo,
-        product_no: session.backendProductNo,
-      },
-    });
-
-  try {
-    await backend.renewStaticOrder({
-      userId: agent.backendUserId,
-      orderNo: session.backendOrderNo,
-      productNo: session.backendProductNo ?? '',
-      duration,
-      country: session.countryCode ?? '',
-      city: session.cityCode ?? '',
-    });
-    await billing.captureSessionReservation(
-      charge.reservation_id,
-      session.backendOrderNo
-    );
-  } catch (err) {
-    await billing.releaseSessionReservation(
-      charge.reservation_id,
-      (err as Error).message
-    );
-    throw err;
-  }
+  await backend.renewStaticOrder({
+    userId: agent.backendUserId,
+    orderNo: session.backendOrderNo,
+    productNo: session.backendProductNo ?? '',
+    duration,
+    country: session.countryCode ?? '',
+    city: session.cityCode ?? '',
+  });
 
   const durationMs =
     duration * 30 * 24 * 60 * 60 * 1000;

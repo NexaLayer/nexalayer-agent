@@ -23,10 +23,7 @@ import {
 import {
   decodeReferralCode,
 } from '../../utils/referral';
-import {
-  getBalance,
-  initializeWallet,
-} from '../billing/billing.service';
+import { getBalance } from '../billing/billing.service';
 import { sendApiKeyEmail } from './email.service';
 import { sendLoginCodeEmail } from './email.service';
 import { env } from '../../config/env';
@@ -159,8 +156,6 @@ export async function registerAgent(
     },
   });
 
-  await initializeWallet(agent.id);
-
   const {
     backendReady,
     backendSyncError,
@@ -239,7 +234,6 @@ async function resendExistingApiKey(input: {
   };
   email: string;
 }) {
-  const wallet = await getBalance(input.agent.id);
   await sendApiKeyForAgent({
     agentId: input.agent.id,
     email: input.email,
@@ -254,7 +248,6 @@ async function resendExistingApiKey(input: {
 
   return {
     status: 'email_sent',
-    balance: wallet.available_balance,
     backend_ready: Boolean(
       input.agent.backendUserId &&
         input.agent.backendUsername &&
@@ -385,8 +378,6 @@ export async function requestApiKeyByEmail(
     throw err;
   }
 
-  const wallet = await initializeWallet(agent.id);
-
   const { backendReady, backendSyncError } =
     await syncBackendUserForAgent({
       agentId: agent.id,
@@ -405,7 +396,6 @@ export async function requestApiKeyByEmail(
 
   return {
     status: 'email_sent',
-    balance: wallet.available_balance,
     backend_ready: backendReady,
     backend_sync_error: backendSyncError,
     message:

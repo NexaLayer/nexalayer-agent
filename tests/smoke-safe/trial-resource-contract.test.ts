@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { createSessionSchema } from '../../src/modules/session/session.schema';
 import { shouldReleaseStaticResource } from '../../src/modules/session/session-lifecycle';
 import {
@@ -53,5 +54,15 @@ describe('trial resource contract', () => {
     expect(toBackendDynamicProductNo('dynamic_dyn3')).toBe('dynamic_ipweb');
     expect(toPublicDynamicProductNo('out_dynamic_1')).toBeNull();
     expect(toPublicDynamicProductNo('out_dynamic_ipweb')).toBeNull();
+  });
+
+  it('never performs a second local wallet debit for Session purchases', () => {
+    const source = readFileSync(
+      new URL('../../src/modules/session/session.service.ts', import.meta.url),
+      'utf8'
+    );
+    expect(source).not.toContain('reserveSessionCharge');
+    expect(source).not.toContain('captureSessionReservation');
+    expect(source).not.toContain('releaseSessionReservation');
   });
 });
