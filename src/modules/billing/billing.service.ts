@@ -51,7 +51,7 @@ function toNumber(value: unknown): number {
 }
 
 function roundUsd(value: number): number {
-  return Math.round(value * 10_000) / 10_000;
+  return Math.round(value * 100) / 100;
 }
 
 function roundCny(value: number): number {
@@ -234,17 +234,29 @@ export async function getTransactions(
   const exchangeRate = effectiveRate(rate);
 
   return {
-    items: result.items.map((item) => ({
-      ...item,
-      amount_cny: toNumber(item.amount),
-      amount_usd: roundUsd(
-        toNumber(item.amount) / exchangeRate
-      ),
-      currency: 'USD',
-      source: 'backend',
-      exchange_rate: exchangeRate,
-      exchange_rate_pair: 'USD/CNY',
-    })),
+    items: result.items.map((item) => {
+      const {
+        amount,
+        balance,
+        supplier_balance: _supplierBalance,
+        ...rest
+      } = item;
+      const amountUsd = roundUsd(
+        toNumber(amount) / exchangeRate
+      );
+      return {
+        ...rest,
+        amount: amountUsd,
+        amount_usd: amountUsd,
+        balance: roundUsd(
+          toNumber(balance) / exchangeRate
+        ),
+        currency: 'USD',
+        source: 'backend',
+        exchange_rate: exchangeRate,
+        exchange_rate_pair: 'USD/CNY',
+      };
+    }),
     total: result.total,
     page,
     page_size: pageSize,

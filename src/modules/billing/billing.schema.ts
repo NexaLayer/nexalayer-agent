@@ -2,8 +2,16 @@ import { z } from 'zod';
 
 export const rechargeSchema = z
   .object({
-    amount_usd: z.number().positive().optional(),
-    amount: z.number().positive().optional(),
+    amount_usd: z
+      .number()
+      .positive()
+      .multipleOf(0.01)
+      .optional(),
+    amount: z
+      .number()
+      .positive()
+      .multipleOf(0.01)
+      .optional(),
     currency: z.string().default('USDT'),
   })
   .transform((value) => ({

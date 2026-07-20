@@ -163,11 +163,11 @@ export async function createSession(
     product.price * quantity * (months ?? 1);
   const estimatedAmountUsd =
     Math.round(
-      (estimatedAmountCny / exchangeRate) * 10_000
-    ) / 10_000;
+      (estimatedAmountCny / exchangeRate) * 100
+    ) / 100;
   const unitPriceUsd =
-    Math.round((product.price / exchangeRate) * 10_000) /
-    10_000;
+    Math.round((product.price / exchangeRate) * 100) /
+    100;
 
   const session = await prisma.agentSession.create({
       data: {

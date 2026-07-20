@@ -46,8 +46,7 @@ export async function listProducts(
     );
   }
   const usd = (priceCny: number) =>
-    Math.round((priceCny / exchangeRate) * 10_000) /
-    10_000;
+    Math.round((priceCny / exchangeRate) * 100) / 100;
 
   const products: {
     product_no: string;

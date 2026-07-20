@@ -16,6 +16,9 @@ describe('trial resource contract', () => {
     expect(() =>
       rechargeSchema.parse({ amount_usd: 9.99 })
     ).toThrow();
+    expect(() =>
+      rechargeSchema.parse({ amount_usd: 10.001 })
+    ).toThrow();
   });
   it('keeps purchase as the backward-compatible default', () => {
     const parsed = createSessionSchema.parse({
