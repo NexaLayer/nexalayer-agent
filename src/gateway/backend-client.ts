@@ -12,7 +12,10 @@ import {
   BackendStaticOrderResponse,
   BackendUsdtOrderResponse,
 } from './types';
-import { toPublicDynamicProductNo } from './dynamic-product';
+import {
+  toBackendDynamicProductNo,
+  toPublicDynamicProductNo,
+} from './dynamic-product';
 
 const tokenCache = new NodeCache({
   stdTTL: 3000,
@@ -354,7 +357,8 @@ export async function getDynamicProducts(
     return [{
       id: num(p.id),
       type: publicProductNo,
-      backendProductNo: productNo,
+      backendProductNo:
+        toBackendDynamicProductNo(publicProductNo)!,
       name: 'DYN3 Dynamic Proxy',
       proxyType: num(p.proxyType, 104),
       price: num(p.price),

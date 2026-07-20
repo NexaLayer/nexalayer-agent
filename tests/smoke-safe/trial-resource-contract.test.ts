@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { createSessionSchema } from '../../src/modules/session/session.schema';
 import { shouldReleaseStaticResource } from '../../src/modules/session/session-lifecycle';
-import { toPublicDynamicProductNo } from '../../src/gateway/dynamic-product';
+import {
+  toBackendDynamicProductNo,
+  toPublicDynamicProductNo,
+} from '../../src/gateway/dynamic-product';
 
 describe('trial resource contract', () => {
   it('keeps purchase as the backward-compatible default', () => {
@@ -46,6 +49,8 @@ describe('trial resource contract', () => {
 
   it('exposes only the supported DYN3 product with a supplier-neutral id', () => {
     expect(toPublicDynamicProductNo('dynamic_ipweb')).toBe('dynamic_dyn3');
+    expect(toPublicDynamicProductNo('dynamic_dyn3')).toBe('dynamic_dyn3');
+    expect(toBackendDynamicProductNo('dynamic_dyn3')).toBe('dynamic_ipweb');
     expect(toPublicDynamicProductNo('out_dynamic_1')).toBeNull();
     expect(toPublicDynamicProductNo('out_dynamic_ipweb')).toBeNull();
   });
