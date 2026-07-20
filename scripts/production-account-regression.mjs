@@ -2,7 +2,11 @@ import { PrismaClient } from '@prisma/client';
 import { spawnSync } from 'node:child_process';
 
 const email = process.argv[2];
+const provisioningMode = process.argv[3] ?? 'purchase';
 if (!email) throw new Error('Usage: node scripts/production-account-regression.mjs <email>');
+if (!['purchase', 'existing'].includes(provisioningMode)) {
+  throw new Error('Provisioning mode must be purchase or existing');
+}
 
 const prisma = new PrismaClient();
 const base = 'http://127.0.0.1:3000/v1';
@@ -39,7 +43,9 @@ try {
 
   const before = await api('GET', '/billing/balance');
   console.log(JSON.stringify({ step: 'balance_before', available: before.available_balance, cash: before.cash_balance }));
-  if (Number(before.available_balance) < 1) throw new Error('At least $1 balance is required');
+  if (provisioningMode === 'purchase' && Number(before.available_balance) < 1) {
+    throw new Error('At least $1 NexaLayer balance is required for purchase mode');
+  }
 
   const products = await api('GET', '/products?type=dynamic');
   const product = products.items?.find((item) => item.product_no);
@@ -48,7 +54,7 @@ try {
   const created = await api('POST', '/sessions', {
     session_type: 'dynamic',
     product_no: product.product_no,
-    provisioning_mode: 'purchase',
+    provisioning_mode: provisioningMode,
     quantity: 0.25,
     protocol: 'socks5',
     rotation_mode: 'on_demand',
