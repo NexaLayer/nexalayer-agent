@@ -4,8 +4,8 @@ import { spawnSync } from 'node:child_process';
 const email = process.argv[2];
 const provisioningMode = process.argv[3] ?? 'purchase';
 if (!email) throw new Error('Usage: node scripts/production-account-regression.mjs <email>');
-if (!['purchase', 'existing'].includes(provisioningMode)) {
-  throw new Error('Provisioning mode must be purchase or existing');
+if (!['purchase', 'existing', 'inspect'].includes(provisioningMode)) {
+  throw new Error('Provisioning mode must be purchase, existing, or inspect');
 }
 
 const prisma = new PrismaClient();
@@ -30,7 +30,7 @@ async function api(method, path, body, headers = {}) {
   return payload.data ?? payload;
 }
 
-try {
+regression: try {
   const identity = await prisma.agentEmailIdentity.findFirst({
     where: { normalizedEmail: email.toLowerCase() },
     include: { agent: true },
@@ -46,6 +46,8 @@ try {
   const products = await api('GET', '/products?type=dynamic');
   const product = products.items?.find((item) => item.product_no);
   if (!product) throw new Error('No dynamic product available');
+  console.log(JSON.stringify({ step: 'product', product_no: product.product_no, price: product.price, currency: product.currency }));
+  if (provisioningMode === 'inspect') break regression;
   const expectedCharge = Number(product.price) * 0.25;
   if (provisioningMode === 'purchase' && Number(before.available_balance) < expectedCharge) {
     throw new Error(`At least ${expectedCharge} CNY backend balance is required for purchase mode`);
