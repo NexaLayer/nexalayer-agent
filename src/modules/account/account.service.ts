@@ -1,4 +1,6 @@
-import { createHash } from 'crypto';
+import { createHash, randomInt } from 'crypto';
+import { compare, hash } from 'bcryptjs';
+import { FastifyInstance } from 'fastify';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../app';
 import {
@@ -26,9 +28,14 @@ import {
   initializeWalletAndTrial,
 } from '../billing/billing.service';
 import { sendApiKeyEmail } from './email.service';
+import { sendLoginCodeEmail } from './email.service';
+import { env } from '../../config/env';
 
 const OPEN_AGENT_ID = 1474;
 const API_KEY_EMAIL_RESEND_COOLDOWN_MS = 10 * 60 * 1000;
+const LOGIN_CODE_TTL_MINUTES = 10;
+const LOGIN_CODE_RESEND_COOLDOWN_MS = 60 * 1000;
+const LOGIN_CODE_MAX_ATTEMPTS = 5;
 
 function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
@@ -458,6 +465,7 @@ export async function getAgentInfo(agentId: number) {
 
   return {
     agent_id: agent.id,
+    api_key: agent.apiKey,
     name: agent.name,
     status: agent.status,
     balance: balance.balance,
@@ -491,4 +499,135 @@ export async function getAgentInfo(agentId: number) {
     last_active_at: agent.lastActiveAt?.toISOString(),
     created_at: agent.createdAt.toISOString(),
   };
+}
+
+export async function requestEmailLoginCode(email: string) {
+  const normalizedEmail = normalizeEmail(email);
+  const identity = await prisma.agentEmailIdentity.findUnique({
+    where: { emailHash: hashEmail(normalizedEmail) },
+    include: { agent: true },
+  });
+
+  // Always return the same shape so this endpoint cannot enumerate accounts.
+  if (!identity || identity.agent.status !== 'active') {
+    return {
+      status: 'code_sent',
+      message: 'If the email is registered, a login code has been sent.',
+    };
+  }
+
+  const latest = await prisma.agentEmailLoginCode.findFirst({
+    where: { agentId: identity.agentId },
+    orderBy: { createdAt: 'desc' },
+  });
+  if (
+    latest &&
+    Date.now() - latest.createdAt.getTime() < LOGIN_CODE_RESEND_COOLDOWN_MS
+  ) {
+    return {
+      status: 'code_recently_sent',
+      message: 'A login code was sent recently. Please check your mailbox.',
+    };
+  }
+
+  const code = randomInt(0, 1_000_000).toString().padStart(6, '0');
+  const codeHash = await hash(code, 10);
+  await prisma.$transaction([
+    prisma.agentEmailLoginCode.updateMany({
+      where: { agentId: identity.agentId, usedAt: null },
+      data: { usedAt: new Date() },
+    }),
+    prisma.agentEmailLoginCode.create({
+      data: {
+        agentId: identity.agentId,
+        codeHash,
+        expiresAt: new Date(Date.now() + LOGIN_CODE_TTL_MINUTES * 60_000),
+      },
+    }),
+  ]);
+
+  try {
+    await sendLoginCodeEmail({
+      to: normalizedEmail,
+      code,
+      expiresInMinutes: LOGIN_CODE_TTL_MINUTES,
+    });
+  } catch (error) {
+    await prisma.agentEmailLoginCode.updateMany({
+      where: { agentId: identity.agentId, codeHash, usedAt: null },
+      data: { usedAt: new Date() },
+    });
+    throw error;
+  }
+
+  return {
+    status: 'code_sent',
+    message: 'If the email is registered, a login code has been sent.',
+  };
+}
+
+export async function verifyEmailLoginCode(
+  app: FastifyInstance,
+  email: string,
+  code: string
+) {
+  const normalizedEmail = normalizeEmail(email);
+  const identity = await prisma.agentEmailIdentity.findUnique({
+    where: { emailHash: hashEmail(normalizedEmail) },
+    include: { agent: true },
+  });
+  if (!identity || identity.agent.status !== 'active') {
+    throw new AppError(ERROR_CODES.AUTH_INVALID_KEY, 'Invalid or expired login code');
+  }
+
+  const loginCode = await prisma.agentEmailLoginCode.findFirst({
+    where: { agentId: identity.agentId, usedAt: null },
+    orderBy: { createdAt: 'desc' },
+  });
+  if (
+    !loginCode ||
+    loginCode.expiresAt.getTime() <= Date.now() ||
+    loginCode.attempts >= LOGIN_CODE_MAX_ATTEMPTS
+  ) {
+    throw new AppError(ERROR_CODES.AUTH_INVALID_KEY, 'Invalid or expired login code');
+  }
+
+  const valid = await compare(code, loginCode.codeHash);
+  if (!valid) {
+    await prisma.agentEmailLoginCode.update({
+      where: { id: loginCode.id },
+      data: { attempts: { increment: 1 } },
+    });
+    throw new AppError(ERROR_CODES.AUTH_INVALID_KEY, 'Invalid or expired login code');
+  }
+
+  await prisma.agentEmailLoginCode.update({
+    where: { id: loginCode.id },
+    data: { usedAt: new Date() },
+  });
+  const permissions = identity.agent.permissions as string[];
+  const accessToken = app.jwt.sign(
+    { agentId: identity.agent.id, apiKey: identity.agent.apiKey, permissions },
+    { expiresIn: env.JWT_EXPIRES_IN }
+  );
+  return {
+    access_token: accessToken,
+    token_type: 'Bearer',
+    expires_in: env.JWT_EXPIRES_IN,
+    account: {
+      agent_id: identity.agent.id,
+      name: identity.agent.name,
+      email: normalizedEmail,
+    },
+  };
+}
+
+export async function regenerateApiKey(agentId: number) {
+  const apiKey = generateApiKey();
+  const agent = await prisma.agentApp.update({
+    where: { id: agentId },
+    data: { apiKey },
+    select: { apiKey: true },
+  });
+  return { api_key: agent.apiKey, regenerated_at: new Date().toISOString() };
 }

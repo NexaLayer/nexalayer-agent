@@ -115,3 +115,46 @@ export async function sendApiKeyEmail(
     );
   }
 }
+
+export async function sendLoginCodeEmail(input: {
+  to: string;
+  code: string;
+  expiresInMinutes: number;
+}): Promise<void> {
+  if (!env.RESEND_API_KEY || !env.RESEND_FROM_EMAIL) {
+    throw new AppError(
+      ERROR_CODES.BACKEND_ERROR,
+      'Email service is not configured'
+    );
+  }
+
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: `NexaLayer <${env.RESEND_FROM_EMAIL}>`,
+      to: input.to,
+      subject: 'NexaLayer 登录验证码 / Sign-in code',
+      text: [
+        `你的 NexaLayer 登录验证码是：${input.code}`,
+        `验证码 ${input.expiresInMinutes} 分钟内有效，请勿转发。`,
+        '',
+        `Your NexaLayer sign-in code is: ${input.code}`,
+        `It expires in ${input.expiresInMinutes} minutes. Do not share it.`,
+      ].join('\n'),
+      html: `<div style="font-family:Inter,Arial,sans-serif;color:#0f172a;line-height:1.6"><h2>NexaLayer 登录验证码</h2><p>使用以下验证码登录控制台：</p><p style="font-size:30px;font-weight:700;letter-spacing:8px;margin:24px 0">${escapeHtml(input.code)}</p><p>${input.expiresInMinutes} 分钟内有效，请勿转发。</p><hr style="border:0;border-top:1px solid #e2e8f0"><p>Your NexaLayer sign-in code expires in ${input.expiresInMinutes} minutes.</p></div>`,
+    }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new AppError(ERROR_CODES.BACKEND_ERROR, 'Failed to send login code', {
+      provider: 'resend',
+      status: response.status,
+      detail: text.slice(0, 300),
+    });
+  }
+}

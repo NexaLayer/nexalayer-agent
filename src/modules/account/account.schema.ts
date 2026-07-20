@@ -38,3 +38,12 @@ export const requestApiKeySchema = z.object({
 export type RequestApiKeyRequest = z.infer<
   typeof requestApiKeySchema
 >;
+
+export const requestEmailLoginCodeSchema = z.object({
+  email: z.string().email(),
+});
+
+export const verifyEmailLoginCodeSchema = z.object({
+  email: z.string().email(),
+  code: z.string().regex(/^\d{6}$/),
+});

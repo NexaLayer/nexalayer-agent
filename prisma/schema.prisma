@@ -39,6 +39,7 @@ model AgentApp {
   telemetry       AgentTelemetry[]
   wallet          AgentWallet?
   emailIdentity   AgentEmailIdentity?
+  emailLoginCodes AgentEmailLoginCode[]
   trialClaims     AgentTrialClaim[]
   billingLedger   BillingLedgerEntry[]
   billingReservations BillingReservation[]
@@ -53,6 +54,22 @@ model AgentApp {
   @@index([status])
   @@index([backendUserId])
   @@map("agent_apps")
+}
+
+model AgentEmailLoginCode {
+  id        BigInt    @id @default(autoincrement())
+  agentId   Int       @map("agent_id")
+  codeHash  String    @map("code_hash") @db.VarChar(256)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz
+  attempts  Int       @default(0)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  agent AgentApp @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, createdAt(sort: Desc)])
+  @@index([expiresAt])
+  @@map("agent_email_login_codes")
 }
 
 model AgentEmailIdentity {
