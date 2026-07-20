@@ -3,6 +3,10 @@ import { z } from 'zod';
 export const createSessionSchema = z.object({
   session_type: z.enum(['static', 'dynamic']),
   product_no: z.string().min(1),
+  provisioning_mode: z
+    .enum(['purchase', 'existing'])
+    .default('purchase'),
+  resource_id: z.string().min(1).optional(),
   country_code: z.string().optional(),
   city_code: z.string().optional(),
   project_id: z.string().min(1).optional(),

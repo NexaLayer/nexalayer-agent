@@ -25,7 +25,7 @@ import {
 } from '../../utils/referral';
 import {
   getBalance,
-  initializeWalletAndTrial,
+  initializeWallet,
 } from '../billing/billing.service';
 import { sendApiKeyEmail } from './email.service';
 import { sendLoginCodeEmail } from './email.service';
@@ -159,10 +159,7 @@ export async function registerAgent(
     },
   });
 
-  const trial = await initializeWalletAndTrial(
-    agent.id,
-    input.contact_email
-  );
+  await initializeWallet(agent.id);
 
   const {
     backendReady,
@@ -189,7 +186,6 @@ export async function registerAgent(
           agent_name: referralInfo.agent_name,
         }
       : undefined,
-    trial,
     created_at: agent.createdAt.toISOString(),
   };
 }
@@ -199,8 +195,6 @@ async function sendApiKeyForAgent(input: {
   email: string;
   apiKey: string;
   status: string;
-  trialBalanceUsd: number;
-  claimStatus: string;
   backendReady: boolean;
 }) {
   if (input.status !== 'active') {
@@ -213,8 +207,6 @@ async function sendApiKeyForAgent(input: {
   await sendApiKeyEmail({
     to: input.email,
     apiKey: input.apiKey,
-    trialBalanceUsd: input.trialBalanceUsd,
-    claimStatus: input.claimStatus,
     backendReady: input.backendReady,
   });
 
@@ -230,7 +222,7 @@ async function sendApiKeyForAgent(input: {
       resourceType: 'account',
       details: {
         email_hash: hashEmail(input.email),
-        claim_status: input.claimStatus,
+        delivery: 'api_key',
       },
     },
   });
@@ -246,7 +238,6 @@ async function resendExistingApiKey(input: {
     backendPasswordEnc: string | null;
   };
   email: string;
-  claimStatus?: string;
 }) {
   const wallet = await getBalance(input.agent.id);
   await sendApiKeyForAgent({
@@ -254,8 +245,6 @@ async function resendExistingApiKey(input: {
     email: input.email,
     apiKey: input.agent.apiKey,
     status: input.agent.status,
-    trialBalanceUsd: wallet.trial_balance,
-    claimStatus: input.claimStatus ?? 'already_claimed',
     backendReady: Boolean(
       input.agent.backendUserId &&
         input.agent.backendUsername &&
@@ -265,8 +254,7 @@ async function resendExistingApiKey(input: {
 
   return {
     status: 'email_sent',
-    claim_status: input.claimStatus ?? 'already_claimed',
-    trial_balance: wallet.trial_balance,
+    balance: wallet.available_balance,
     backend_ready: Boolean(
       input.agent.backendUserId &&
         input.agent.backendUsername &&
@@ -299,8 +287,6 @@ export async function requestApiKeyByEmail(
     ) {
       return {
         status: 'email_recently_sent',
-        claim_status: 'already_claimed',
-        trial_balance: 0,
         backend_ready: Boolean(
           existingIdentity.agent.backendUserId &&
             existingIdentity.agent.backendUsername &&
@@ -338,7 +324,6 @@ export async function requestApiKeyByEmail(
     return resendExistingApiKey({
       agent: legacyClaim.agent,
       email: normalizedEmail,
-      claimStatus: 'already_claimed',
     });
   }
 
@@ -400,10 +385,7 @@ export async function requestApiKeyByEmail(
     throw err;
   }
 
-  const trial = await initializeWalletAndTrial(
-    agent.id,
-    normalizedEmail
-  );
+  const wallet = await initializeWallet(agent.id);
 
   const { backendReady, backendSyncError } =
     await syncBackendUserForAgent({
@@ -418,16 +400,12 @@ export async function requestApiKeyByEmail(
     email: normalizedEmail,
     apiKey,
     status: agent.status,
-    trialBalanceUsd: trial.trial_balance,
-    claimStatus: trial.claim_status,
     backendReady,
   });
 
   return {
     status: 'email_sent',
-    claim_status: trial.claim_status,
-    trial_balance: trial.trial_balance,
-    trial_expires_at: trial.trial_expires_at,
+    balance: wallet.available_balance,
     backend_ready: backendReady,
     backend_sync_error: backendSyncError,
     message:
@@ -470,16 +448,8 @@ export async function getAgentInfo(agentId: number) {
     status: agent.status,
     balance: balance.balance,
     cash_balance: balance.cash_balance,
-    trial_balance: balance.trial_balance,
     available_balance: balance.available_balance,
     currency: balance.currency,
-    trial:
-      balance.trial_balance > 0
-        ? {
-            is_trial: true,
-            trial_balance: balance.trial_balance,
-          }
-        : undefined,
     total_sessions: agent._count.sessions,
     active_sessions: activeSessions,
     max_active_sessions: agent.maxActiveSessions,

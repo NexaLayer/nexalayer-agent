@@ -6,32 +6,28 @@
 API Key -> 产品列表 -> 创建 Session -> 获取代理 URL -> 上报结果 -> 获取轮换建议 -> 清理 Session
 ```
 
-## 1. 注册 Agent 或使用已有 API Key
+## 1. 获取或使用已有 API Key
 
 如果你已经有 API Key，直接跳到下一步。
 
 ```bash
 BASE_URL="https://api.nexalayer.net/v1"
 
-curl -X POST "$BASE_URL/account/register" \
+curl -X POST "$BASE_URL/account/request-api-key" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "quickstart-demo",
-    "contact_email": "dev@example.com"
+    "email": "dev@example.com"
   }'
 ```
 
-响应重点看三个字段：
+API Key 会发送到邮箱，响应重点看 `backend_ready`：
 
 ```json
 {
   "data": {
-    "agent_id": 123,
-    "api_key": "agk_xxx",
-    "backend_ready": true,
-    "trial": {
-      "trial_balance": 5
-    }
+    "status": "email_sent",
+    "balance": 0,
+    "backend_ready": true
   }
 }
 ```
@@ -43,6 +39,9 @@ curl -X POST "$BASE_URL/account/register" \
 ```bash
 export NEXALAYER_API_KEY="agk_xxx"
 ```
+
+你可以自行充值后直接使用。如需试用，请联系 Telegram 售后
+https://t.me/ZTPROXY（@ztproxy），由售后为对应邮箱账号配置资源。
 
 ## 2. 查询产品
 

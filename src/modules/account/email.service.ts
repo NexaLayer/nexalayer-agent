@@ -5,8 +5,6 @@ import { AppError } from '../../utils/response';
 type ApiKeyEmailInput = {
   to: string;
   apiKey: string;
-  trialBalanceUsd: number;
-  claimStatus: string;
   backendReady: boolean;
 };
 
@@ -20,10 +18,6 @@ function escapeHtml(value: string): string {
 }
 
 function buildText(input: ApiKeyEmailInput): string {
-  const trialLine =
-    input.claimStatus === 'granted'
-      ? `You have received $${input.trialBalanceUsd} trial credit.`
-      : 'This email has already claimed trial credit before, so no new trial credit was added.';
   const readyLine = input.backendReady
     ? 'Your API key is ready to use.'
     : 'Your API key has been created, but backend resource provisioning is still pending. Please retry shortly or contact support if it does not become ready.';
@@ -34,7 +28,8 @@ function buildText(input: ApiKeyEmailInput): string {
     '',
     `API Key: ${input.apiKey}`,
     '',
-    trialLine,
+    'You can recharge and use NexaLayer directly. For a trial, contact Telegram support: https://t.me/ZTPROXY (@ztproxy).',
+    '你可以充值后直接使用 NexaLayer。如需试用，请联系 Telegram 售后：https://t.me/ZTPROXY（@ztproxy）。',
     readyLine,
     '',
     'Use this key in the X-API-Key header. Keep it private.',
@@ -46,10 +41,6 @@ function buildText(input: ApiKeyEmailInput): string {
 }
 
 function buildHtml(input: ApiKeyEmailInput): string {
-  const trialLine =
-    input.claimStatus === 'granted'
-      ? `You have received <strong>$${input.trialBalanceUsd}</strong> trial credit.`
-      : 'This email has already claimed trial credit before, so no new trial credit was added.';
   const readyLine = input.backendReady
     ? 'Your API key is ready to use.'
     : 'Your API key has been created, but backend resource provisioning is still pending. Please retry shortly or contact support if it does not become ready.';
@@ -61,7 +52,8 @@ function buildHtml(input: ApiKeyEmailInput): string {
       <p>${readyLine}</p>
       <p style="margin:16px 0 8px">API Key</p>
       <pre style="padding:14px;border-radius:8px;background:#0f172a;color:#e2e8f0;white-space:pre-wrap">${escapeHtml(input.apiKey)}</pre>
-      <p>${trialLine}</p>
+      <p>You can recharge and use NexaLayer directly. For a trial, contact <a href="https://t.me/ZTPROXY">Telegram support (@ztproxy)</a>.</p>
+      <p>你可以充值后直接使用 NexaLayer。如需试用，请联系 <a href="https://t.me/ZTPROXY">Telegram 售后（@ztproxy）</a>。</p>
       <p>Use this key in the <code>X-API-Key</code> header. Keep it private.</p>
       <p>请在 <code>X-API-Key</code> 请求头中使用该密钥，并妥善保管。</p>
       <p>

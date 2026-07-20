@@ -10,7 +10,7 @@ security:
 paths:
   /account/request-api-key:
     post:
-      summary: Request an API Key by email and claim trial credit once per email.
+      summary: Request an API Key by email.
       security: []
       requestBody:
         required: true
@@ -163,7 +163,7 @@ paths:
           description: Health metrics.
   /billing/balance:
     get:
-      summary: Get balance and trial credit.
+      summary: Get account balance.
       responses:
         "200":
           description: Balance.
@@ -218,11 +218,7 @@ components:
             status:
               type: string
               enum: [email_sent, email_recently_sent]
-            claim_status:
-              type: string
-              enum: [granted, already_claimed]
-            trial_balance: { type: number, example: 1 }
-            trial_expires_at: { type: string, format: date-time }
+            balance: { type: number, example: 0 }
             backend_ready: { type: boolean }
             message: { type: string }
     RegisterResponse:
@@ -237,18 +233,21 @@ components:
             api_secret: { type: string }
             backend_ready: { type: boolean }
             backend_sync_error: { type: string }
-            trial:
-              type: object
-              properties:
-                is_trial: { type: boolean }
-                trial_balance: { type: number, example: 5 }
     CreateSessionRequest:
       type: object
       required: [session_type, product_no]
       properties:
         session_type: { type: string, enum: [dynamic, static] }
         product_no: { type: string }
-        quantity: { type: integer, minimum: 1, default: 1 }
+        provisioning_mode:
+          type: string
+          enum: [purchase, existing]
+          default: purchase
+          description: Use existing for a resource already configured on the backend account; no NexaLayer purchase or charge is made.
+        resource_id:
+          type: string
+          description: Optional existing static order number. If omitted, NexaLayer selects a usable static resource on the account.
+        quantity: { type: number, exclusiveMinimum: 0, default: 1 }
         duration: { type: integer, minimum: 1 }
         protocol: { type: string, enum: [socks5, http, https], default: socks5 }
         country_code: { type: string }
@@ -268,6 +267,7 @@ components:
             session_id: { type: string }
             session_type: { type: string }
             status: { type: string }
+            provisioning_mode: { type: string, enum: [purchase, existing] }
             proxy:
               type: object
               properties:

@@ -13,6 +13,7 @@ import {
   CreateSessionRequest,
   ListSessionsQuery,
 } from './session.schema';
+import { shouldReleaseStaticResource } from './session-lifecycle';
 
 const STATIC_ORDER_READY_TIMEOUT_MS = 120_000;
 const STATIC_ORDER_POLL_MS = 3_000;
@@ -77,6 +78,62 @@ export async function createSession(
     agent.backendUsername,
     backendPassword
   );
+  if (input.provisioning_mode === 'existing') {
+    const product =
+      input.session_type === SESSION_TYPE.DYNAMIC
+        ? await lookupProductInfo(
+            userToken,
+            input.product_no,
+            input.session_type
+          )
+        : undefined;
+    const session = await prisma.agentSession.create({
+      data: {
+        sessionId,
+        agentId,
+        sessionType: input.session_type,
+        status: SESSION_STATUS.CREATING,
+        proxyProtocol: input.protocol,
+        countryCode: input.country_code,
+        cityCode: input.city_code,
+        ispType: input.isp_type,
+        rotationMode: input.rotation_mode,
+        rotationIntervalSec: input.rotation_interval_sec,
+        identityId: input.identity_id,
+        identityPool: input.identity_pool,
+        backendProductNo: input.product_no,
+        backendOrderNo: input.resource_id,
+        provisioningMode: 'existing',
+      },
+    });
+
+    provisionExistingSessionAsync(
+      session.id,
+      agent,
+      input,
+      product
+    ).catch((err) => {
+      console.error(
+        `Async existing-resource provision failed for ${sessionId}:`,
+        err
+      );
+    });
+
+    return {
+      session_id: sessionId,
+      session_type: input.session_type,
+      status: SESSION_STATUS.CREATING,
+      provisioning_mode: 'existing',
+      billing: {
+        estimated_charge_usd: 0,
+        currency: 'USD',
+        resource_source: 'existing',
+      },
+      message:
+        'Session is attaching an existing resource. Poll GET /v1/sessions/:id for status.',
+      created_at: session.createdAt.toISOString(),
+    };
+  }
   const product = await lookupProductInfo(
     userToken,
     input.product_no,
@@ -117,6 +174,7 @@ export async function createSession(
         identityId: input.identity_id,
         identityPool: input.identity_pool,
         backendProductNo: input.product_no,
+        provisioningMode: 'purchase',
       },
     });
   } catch (err) {
@@ -149,6 +207,7 @@ export async function createSession(
     session_id: sessionId,
     session_type: input.session_type,
     status: SESSION_STATUS.CREATING,
+    provisioning_mode: 'purchase',
     billing: {
       estimated_charge_usd: charge.amount_usd,
       currency: charge.currency,
@@ -164,6 +223,105 @@ export async function createSession(
       'Session is being created. Poll GET /v1/sessions/:id for status.',
     created_at: session.createdAt.toISOString(),
   };
+}
+
+async function provisionExistingSessionAsync(
+  sessionDbId: number,
+  agent: {
+    backendUsername: string | null;
+    backendPasswordEnc: string | null;
+  },
+  input: CreateSessionRequest,
+  product?: ProductInfo
+): Promise<void> {
+  try {
+    if (!agent.backendUsername || !agent.backendPasswordEnc) {
+      throw new Error('Backend credentials not configured');
+    }
+    const userToken = await backend.getUserToken(
+      agent.backendUsername,
+      decrypt(agent.backendPasswordEnc)
+    );
+
+    let backendOrderNo = input.resource_id;
+    let expiresAt: Date | undefined;
+    let proxy;
+    if (input.session_type === SESSION_TYPE.DYNAMIC) {
+      if (!product) {
+        throw new Error('Dynamic product information is missing');
+      }
+      const result = await backend.extractDynamicProxy(userToken, {
+        productNo: input.product_no,
+        proxyType: product.proxyType,
+        username: undefined,
+        protocol: input.protocol,
+        quantity: 1,
+        validTime: dynamicValidTimeMinutes(input),
+        countryCode: input.country_code,
+        cityCode: input.city_code,
+      });
+      proxy = extractProxyInfo(result);
+    } else {
+      const orders = await backend.getStaticOrders(userToken, {
+        page: 1,
+        page_size: 100,
+        search: input.resource_id,
+      });
+      const usable = orders.items.filter((item) => {
+        const status = String(item.status ?? '').toLowerCase();
+        return !['failed', 'cancelled', 'released', 'expired'].includes(status);
+      });
+      const selected = input.resource_id
+        ? usable.find((item) => item.order_no === input.resource_id)
+        : usable.find((item) => Boolean(extractProxyInfo(item)));
+      if (!selected) {
+        throw new Error(
+          input.resource_id
+            ? `Existing static resource not found: ${input.resource_id}`
+            : 'No usable existing static resource found. Recharge or contact Telegram support @ztproxy.'
+        );
+      }
+      backendOrderNo = selected.order_no;
+      proxy = extractProxyInfo(selected);
+      if (selected.expire_time) {
+        const parsed = new Date(selected.expire_time);
+        if (!Number.isNaN(parsed.getTime())) expiresAt = parsed;
+      }
+    }
+
+    if (!proxy) {
+      throw new Error(
+        'Existing resource returned no proxy endpoint. Recharge or contact Telegram support @ztproxy.'
+      );
+    }
+    await prisma.agentSession.update({
+      where: { id: sessionDbId },
+      data: {
+        status: SESSION_STATUS.ACTIVE,
+        backendOrderNo,
+        expiresAt,
+        proxyHost: proxy.host,
+        proxyPort: proxy.port,
+        proxyUsername: proxy.username,
+        proxyPasswordEnc: proxy.password
+          ? encrypt(proxy.password)
+          : undefined,
+        proxyProtocol: proxy.protocol,
+      },
+    });
+  } catch (err) {
+    console.error(
+      `[provision-existing] session #${sessionDbId} failed:`,
+      (err as Error).message
+    );
+    await prisma.agentSession.update({
+      where: { id: sessionDbId },
+      data: {
+        status: SESSION_STATUS.ERROR,
+        lastErrorType: (err as Error).message.slice(0, 50),
+      },
+    });
+  }
 }
 
 async function lookupProductInfo(
@@ -730,13 +888,9 @@ export async function terminateSession(
     );
   }
 
-  if (
-    session.sessionType === SESSION_TYPE.STATIC &&
-    session.backendOrderNo &&
-    session.status !== SESSION_STATUS.TERMINATED
-  ) {
+  if (shouldReleaseStaticResource(session)) {
     await backend.releaseZtProxyStaticOrder(
-      session.backendOrderNo
+      session.backendOrderNo!
     );
   }
 
@@ -783,6 +937,13 @@ export async function renewSession(
     throw new AppError(
       ERROR_CODES.BACKEND_ERROR,
       'No backend order associated'
+    );
+  }
+
+  if (session.provisioningMode === 'existing') {
+    throw new AppError(
+      ERROR_CODES.BACKEND_ERROR,
+      'Existing resources are managed outside NexaLayer and cannot be renewed here.'
     );
   }
 
@@ -928,6 +1089,7 @@ function formatSession(
     lastRotatedAt: Date | null;
     lastRotateReason: string | null;
     backendOrderNo: string | null;
+    provisioningMode: string;
     riskLevel: string;
     healthScore: number;
     successRate: unknown;
@@ -988,6 +1150,7 @@ function formatSession(
       requests_count: session.requestsCount,
     },
     backend_order_no: session.backendOrderNo,
+    provisioning_mode: session.provisioningMode,
     expires_at: session.expiresAt?.toISOString(),
     created_at: session.createdAt.toISOString(),
     updated_at: session.updatedAt.toISOString(),

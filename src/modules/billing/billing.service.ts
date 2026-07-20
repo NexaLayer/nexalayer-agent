@@ -1,15 +1,13 @@
-import { createHash, randomUUID } from 'crypto';
+import { randomUUID } from 'crypto';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../app';
 import { decrypt } from '../../utils/crypto';
 import { AppError } from '../../utils/response';
 import { ERROR_CODES, SESSION_TYPE } from '../../config/constants';
-import { env } from '../../config/env';
 import * as backend from '../../gateway/backend-client';
 import { BackendUsdtOrderResponse } from '../../gateway/types';
 
 const CURRENCY = 'USD';
-const DEFAULT_TRIAL_CREDIT_USD = 1;
 const DEFAULT_MIN_RECHARGE_USD = 10;
 const DEFAULT_DYNAMIC_USD_PER_GB = 4;
 const DEFAULT_STATIC_MIN_USD_PER_MONTH = 10;
@@ -26,7 +24,6 @@ type WalletSnapshot = {
 
 export type PricingSnapshot = {
   currency: 'USD';
-  trial_credit_usd: number;
   min_recharge_usd: number;
   dynamic_usd_per_gb: number;
   static_min_usd_per_month: number;
@@ -88,18 +85,6 @@ function roundUsd(value: number): number {
   return Math.round(value * 10_000) / 10_000;
 }
 
-function normalizeEmail(email?: string | null) {
-  const normalized = email?.trim().toLowerCase();
-  if (!normalized) return null;
-  return normalized;
-}
-
-function hashEmail(email: string) {
-  return createHash('sha256')
-    .update(email)
-    .digest('hex');
-}
-
 function walletSnapshot(wallet: {
   cashBalanceUsd: Prisma.Decimal;
   trialBalanceUsd: Prisma.Decimal;
@@ -119,18 +104,6 @@ async function ensureDefaultPriceRules(
   db: PrismaExecutor = prisma
 ): Promise<void> {
   const rules = [
-    {
-      code: 'trial_credit_usd',
-      sessionType: null,
-      billingUnit: 'account',
-      unitPriceUsd: DEFAULT_TRIAL_CREDIT_USD,
-      minimumChargeUsd: null,
-      metadata: {
-        public: true,
-        description:
-          'One-time trial credit per email address',
-      },
-    },
     {
       code: 'min_recharge_usd',
       sessionType: null,
@@ -224,25 +197,10 @@ async function getWalletOrCreate(
   });
   if (existing) return existing;
 
-  const agent = await db.agentApp.findUnique({
-    where: { id: agentId },
-    select: {
-      isTrial: true,
-      trialBalance: true,
-    },
-  });
-  const legacyTrial =
-    agent?.isTrial === true
-      ? Math.min(
-          DEFAULT_TRIAL_CREDIT_USD,
-          toNumber(agent.trialBalance)
-        )
-      : 0;
-
   return db.agentWallet.create({
     data: {
       agentId,
-      trialBalanceUsd: usd(legacyTrial),
+      trialBalanceUsd: usd(0),
       currency: CURRENCY,
     },
   });
@@ -297,119 +255,17 @@ async function addLedgerEntry(
   });
 }
 
-export async function initializeWalletAndTrial(
-  agentId: number,
-  email?: string | null
-) {
-  const normalizedEmail = normalizeEmail(email);
+export async function initializeWallet(agentId: number) {
   await ensureDefaultPriceRules();
-
-  return prisma.$transaction(
-    async (tx) => {
-      const wallet = await getWalletOrCreate(
-        tx,
-        agentId
-      );
-      const expiresAt = new Date();
-      expiresAt.setDate(
-        expiresAt.getDate() + env.TRIAL_DURATION_DAYS
-      );
-
-      if (!normalizedEmail) {
-        await tx.agentApp.update({
-          where: { id: agentId },
-          data: {
-            trialBalance: usd(0),
-            isTrial: false,
-          },
-        });
-        return {
-          is_trial: false,
-          trial_balance: 0,
-          trial_expires_at: undefined,
-          claim_status: 'email_required',
-        };
-      }
-
-      const emailHash = hashEmail(normalizedEmail);
-      const existing =
-        await tx.agentTrialClaim.findUnique({
-          where: { emailHash },
-        });
-      if (existing) {
-        await tx.agentApp.update({
-          where: { id: agentId },
-          data: {
-            trialBalance: usd(0),
-            isTrial: false,
-          },
-        });
-        return {
-          is_trial: false,
-          trial_balance: 0,
-          trial_expires_at: undefined,
-          claim_status: 'already_claimed',
-        };
-      }
-
-      const grantUsd = DEFAULT_TRIAL_CREDIT_USD;
-      const updated = await tx.agentWallet.update({
-        where: { agentId },
-        data: {
-          trialBalanceUsd: {
-            increment: grantUsd,
-          },
-          trialExpiresAt: expiresAt,
-        },
-      });
-
-      await tx.agentTrialClaim.create({
-        data: {
-          agentId,
-          normalizedEmail,
-          emailHash,
-          claimedAmountUsd: usd(grantUsd),
-        },
-      });
-
-      await addLedgerEntry(tx, {
-        agentId,
-        type: 'trial_grant',
-        amountUsd: grantUsd,
-        trialDeltaUsd: grantUsd,
-        cashBalanceAfterUsd: toNumber(
-          updated.cashBalanceUsd
-        ),
-        trialBalanceAfterUsd: toNumber(
-          updated.trialBalanceUsd
-        ),
-        externalRef: `trial:${emailHash}`,
-        metadata: {
-          normalized_email: normalizedEmail,
-          one_trial_per_email: true,
-        } as Prisma.InputJsonValue,
-      });
-
-      await tx.agentApp.update({
-        where: { id: agentId },
-        data: {
-          trialBalance: usd(grantUsd),
-          isTrial: true,
-        },
-      });
-
-      return {
-        is_trial: true,
-        trial_balance: grantUsd,
-        trial_expires_at: expiresAt.toISOString(),
-        claim_status: 'granted',
-      };
-    },
-    {
-      isolationLevel:
-        Prisma.TransactionIsolationLevel.Serializable,
-    }
-  );
+  const wallet = await prisma.$transaction(async (tx) => {
+    const created = await getWalletOrCreate(tx, agentId);
+    await tx.agentApp.update({
+      where: { id: agentId },
+      data: { trialBalance: usd(0), isTrial: false },
+    });
+    return created;
+  });
+  return walletSnapshot(wallet);
 }
 
 export async function getPricing(): Promise<PricingSnapshot> {
@@ -432,9 +288,6 @@ export async function getPricing(): Promise<PricingSnapshot> {
 
   return {
     currency: 'USD',
-    trial_credit_usd:
-      price.get('trial_credit_usd')?.unit ??
-      DEFAULT_TRIAL_CREDIT_USD,
     min_recharge_usd:
       price.get('min_recharge_usd')?.minimum ??
       DEFAULT_MIN_RECHARGE_USD,
@@ -459,11 +312,10 @@ export async function getBalance(agentId: number) {
   const snapshot = walletSnapshot(wallet);
 
   return {
-    ...snapshot,
+    cash_balance: snapshot.cash_balance,
+    available_balance: snapshot.available_balance,
+    currency: snapshot.currency,
     balance: snapshot.available_balance,
-    trial: snapshot.trial_balance > 0
-      ? { trial_balance: snapshot.trial_balance }
-      : undefined,
     updated_at: new Date().toISOString(),
   };
 }

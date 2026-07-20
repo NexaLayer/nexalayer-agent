@@ -43,13 +43,13 @@
 只需 3 步，即可让您的 AI Agent 使用代理 IP：
 
 ```
-Step 1: 注册 → 获取 API Key（自带 ¥5 试用额度）
+Step 1: 注册 → 获取 API Key
 Step 2: 创建 Session → 等待就绪
 Step 3: 使用代理 IP 发送请求
 ```
 
-> 💡 **无需充值即可体验**！新注册 Agent 默认获得
-> ¥5.00 试用额度，可直接创建 Session 体验。
+> 💡 你可以自行充值后直接使用。如需试用，请联系
+> Telegram 售后 https://t.me/ZTPROXY（@ztproxy），由售后为对应邮箱账号配置资源。
 
 ### 1.2 快速示例（Python）
 
@@ -292,9 +292,9 @@ curl -X POST \
 }
 ```
 
-> 💡 **试用模式**: 新注册 Agent 自动获得 ¥5.00 
-> 试用额度，有效期 30 天。无需充值即可创建 
-> Session 体验代理服务。
+> 💡 **试用资源**: 如需试用，请联系 Telegram 售后
+> https://t.me/ZTPROXY（@ztproxy）。售后配置完成后，
+> 使用 `provisioning_mode=existing` 创建 Session，避免重复下单或扣费。
 >
 > ⚠️ **重要**: 使用纯 API Key 模式时，只需保存
 > `api_key` 即可。`api_secret` 仅在 JWT 模式
@@ -2264,10 +2264,10 @@ curl -X POST \
 4. 静态代理：联系技术支持更换 IP
 5. 建议：适当降低请求频率，关注 health_score
 
-### Q10: 试用额度用完了怎么办？
+### Q10: 如何申请试用？
 
-**A**: 试用额度（¥5.00）用完后，需要通过 USDT 充值。
-试用额度不可重复领取，但正式充值后无功能限制。
+**A**: 联系 Telegram 售后 https://t.me/ZTPROXY（@ztproxy），
+由售后为对应邮箱账号配置资源；也可以自行通过 USDT 充值后直接使用。
 
 ### Q11: 为什么要上报 Telemetry？
 
