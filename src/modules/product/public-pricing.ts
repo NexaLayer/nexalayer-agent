@@ -1,5 +1,6 @@
-import { env } from '../../config/env';
 import pricing from '../../config/public-pricing.json';
+
+const EXACT_PRICING_URL = 'https://docs.nexalayer.net/en/api/products';
 
 export function getPublicPricing() {
   return {
@@ -21,6 +22,6 @@ export function getPublicPricing() {
         price_qualifier: 'starting_at',
       },
     ],
-    exact_pricing_url: `${env.NEXALAYER_DOCS_URL}/en/api/products`,
+    exact_pricing_url: EXACT_PRICING_URL,
   };
 }

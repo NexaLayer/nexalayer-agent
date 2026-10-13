@@ -1,5 +1,6 @@
 import { buildApp, prisma } from './app';
 import { env } from './config/env';
+import { startTrialClaimMonitor } from './modules/account/trial-monitor.service';
 
 async function main() {
   const app = await buildApp();
@@ -15,6 +16,11 @@ async function main() {
     app.log.info(
       `Agent Layer running on port ${env.PORT}`
     );
+    const stopTrialClaimMonitor = startTrialClaimMonitor(app.log);
+
+    app.addHook('onClose', async () => {
+      stopTrialClaimMonitor();
+    });
   } catch (err) {
     app.log.fatal(err, 'Failed to start server');
     process.exit(1);

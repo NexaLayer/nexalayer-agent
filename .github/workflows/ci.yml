@@ -18,3 +18,4 @@ jobs:
       - run: npm run build
       - run: npm run test:smoke:safe
       - run: node scripts/validate-public-pricing.mjs
+      - run: npm run trial:calibrate

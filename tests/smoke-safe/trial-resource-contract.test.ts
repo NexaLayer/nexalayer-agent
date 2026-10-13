@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { getPublicPricing } from '../../src/modules/product/public-pricing';
 import { readFileSync } from 'node:fs';
 import { createSessionSchema } from '../../src/modules/session/session.schema';
 import { rechargeSchema } from '../../src/modules/billing/billing.schema';
@@ -132,6 +133,29 @@ describe('trial resource contract', () => {
     );
   });
 
+  it('exposes only the public pricing field allowlist', () => {
+    const response = getPublicPricing();
+    expect(Object.keys(response).sort()).toEqual(
+      ['currency', 'exact_pricing_url', 'items', 'updated_at'].sort()
+    );
+    expect(response.items).toHaveLength(2);
+    for (const item of response.items) {
+      expect(Object.keys(item).sort()).toEqual(
+        ['name', 'price_qualifier', 'starting_price', 'type', 'unit'].sort()
+      );
+      expect(item).not.toHaveProperty('product_no');
+      expect(item).not.toHaveProperty('supplier');
+      expect(item).not.toHaveProperty('cost');
+      expect(item).not.toHaveProperty('stock');
+      expect(item).not.toHaveProperty('projects');
+      expect(item).not.toHaveProperty('product_type');
+    }
+    expect(response.items.map((item) => item.type).sort()).toEqual([
+      'dynamic',
+      'static',
+    ]);
+  });
+
   it('guards automatic trial credit by email provider, IP, and installation', () => {
     const source = readFileSync(
       new URL('../../src/modules/account/account.service.ts', import.meta.url),
@@ -141,5 +165,17 @@ describe('trial resource contract', () => {
     expect(source).toContain('TRIAL_MAX_CLAIMS_PER_IP_PER_DAY');
     expect(source).toContain('TRIAL_MAX_CLAIMS_PER_DEVICE');
     expect(source).toContain("createHmac('sha256', env.ENCRYPTION_KEY)");
+  });
+
+  it('calibrates trial credit and alerts operators on claim surges', () => {
+    const envSource = readFileSync('src/config/env.ts', 'utf8');
+    const monitorSource = readFileSync(
+      'src/modules/account/trial-monitor.service.ts',
+      'utf8'
+    );
+    expect(envSource).toContain('TRIAL_BALANCE: z.coerce.number().positive().default(5.0)');
+    expect(monitorSource).toContain("event: 'TRIAL_CLAIM_SURGE'");
+    expect(monitorSource).toContain('TRIAL_ALERT_WEBHOOK_URL');
+    expect(monitorSource).toContain('agentTrialClaim.count');
   });
 });

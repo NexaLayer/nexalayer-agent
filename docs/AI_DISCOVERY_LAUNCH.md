@@ -6,9 +6,11 @@ This file separates repository-ready work from account-owner actions. Do not cla
 
 1. Confirm the npm organization owns `@nexalayer` and the package name `@nexalayer/mcp` is available.
 2. Add `NPM_TOKEN` to the GitHub repository or configure npm trusted publishing.
-3. Publish a GitHub Release for MCP version `0.1.0`. The workflow builds, publishes npm, validates `server.json`, authenticates with GitHub OIDC, and publishes to the official MCP Registry.
-4. Verify `npx -y @nexalayer/mcp` from a clean machine, then verify `initialize`, `tools/list`, a read-only product call, an owner-approved paid call, and a denied paid call.
-5. Confirm the official Registry entry before announcing downstream indexing.
+3. Make `NexaLayer/nexalayer-agent` public only after a full working-tree and Git-history secret scan passes. Confirm the source and issue URLs return HTTP 200 while signed out.
+4. Run both release workflows with `dry_run=true`. `mcp-publisher` does not provide a publish dry-run: metadata validation plus GitHub OIDC login are the last non-mutating checks, so the first `publish` is the real Registry write.
+5. Publish a GitHub Release for MCP version `0.1.0`. The workflow builds, publishes npm with `--access public`, verifies `npm view @nexalayer/mcp version`, validates `server.json`, authenticates with GitHub OIDC, and publishes to the official MCP Registry.
+6. Verify `npx -y @nexalayer/mcp` from a clean machine, then verify `initialize`, `tools/list`, a read-only product call, an owner-approved paid call, and a denied paid call.
+7. Confirm the official Registry entry before announcing downstream indexing. Patch/hotfix releases use this same workflow and all the same gates; do not publish them manually.
 
 ## Directory submissions
 
@@ -31,7 +33,9 @@ Do not claim “first” without a documented competitive review. Describe x402 
 
 ## Benchmark specification
 
-Publish data, not adjectives. Pre-register target sites/categories, geography, concurrency, timeout, retries, protocol, run count, and failure taxonomy. Report success rate, median and p95 latency, blocks, CAPTCHA rate, bytes, cost per successful task, and confidence intervals. Redact credentials and respect target terms. Keep raw anonymized results and runner code in a public repository.
+Publish data, not adjectives. Pre-register target sites/categories, geography, concurrency, timeout, retries, protocol, run count, and failure taxonomy. Report success rate, median and p95 latency, blocks, CAPTCHA rate, bytes, cost per successful task, and confidence intervals. Redact credentials and respect target terms. Keep raw anonymized results and the complete test harness in a public repository; screenshots alone are not benchmark evidence.
+
+Schedule the Show HN post for Tuesday through Thursday morning in US Pacific time, after every release gate and public URL is green.
 
 ## Measurement
 

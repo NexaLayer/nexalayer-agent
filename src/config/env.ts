@@ -37,11 +37,20 @@ const envSchema = z.object({
   RATE_LIMIT_PER_DAY: z.coerce.number().default(10000),
   TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(1),
 
-  TRIAL_BALANCE: z.coerce.number().default(1.0),
+  // $5 covers five 0.25 GB dynamic test sessions at the public $4/GB
+  // starting price. Keep this aligned with scripts/calibrate-trial-credit.mjs.
+  TRIAL_BALANCE: z.coerce.number().positive().default(5.0),
   TRIAL_DURATION_DAYS: z.coerce.number().default(30),
   TRIAL_MAX_CLAIMS_PER_IP_PER_DAY: z.coerce.number().int().positive().default(3),
   TRIAL_MAX_CLAIMS_PER_DEVICE: z.coerce.number().int().positive().default(1),
   TRIAL_DISPOSABLE_EMAIL_DOMAINS: z.string().default(''),
+  TRIAL_ALERT_WINDOW_MINUTES: z.coerce.number().int().positive().default(60),
+  TRIAL_ALERT_CLAIM_THRESHOLD: z.coerce.number().int().positive().default(20),
+  TRIAL_ALERT_CHECK_INTERVAL_SECONDS: z.coerce.number().int().min(60).default(300),
+  TRIAL_ALERT_WEBHOOK_URL: z.preprocess(
+    (v) => typeof v === 'string' && v.trim() ? v.trim() : undefined,
+    z.string().url().optional()
+  ),
 
   RESEND_API_KEY: z.preprocess(
     (v) =>

@@ -46,6 +46,16 @@ jobs:
         working-directory: mcp
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Verify public scoped npm package
+        if: github.event_name == 'release' || !inputs.dry_run
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          for attempt in 1 2 3 4 5; do
+            [ "$(npm view @nexalayer/mcp version)" = "$VERSION" ] && exit 0
+            sleep 15
+          done
+          exit 1
+        working-directory: mcp
       - name: Install MCP publisher
         working-directory: mcp
         run: |
@@ -63,3 +73,6 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && inputs.dry_run
         working-directory: mcp
         run: ./mcp-publisher login github-oidc
+      - name: Explain MCP dry-run boundary
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run
+        run: echo "mcp-publisher has no publish dry-run; validate and OIDC login are the final non-mutating checks."

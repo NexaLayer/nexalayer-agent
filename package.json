@@ -18,6 +18,7 @@
     "test:phase0": "node scripts/phase0-smoke.mjs",
     "test:phase0:real": "PHASE0_ALLOW_PAID=1 node scripts/phase0-smoke.mjs",
     "test:phase0:static": "PHASE0_ALLOW_PAID=1 PHASE0_SESSION_TYPE=static PHASE0_STATIC_ZT_ONLY=1 PHASE0_TOPUP_CNY=40 node scripts/phase0-smoke.mjs",
+    "trial:calibrate": "node scripts/calibrate-trial-credit.mjs",
     "test:smoke": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
