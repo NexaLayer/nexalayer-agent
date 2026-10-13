@@ -8,8 +8,12 @@ import {
   handleRegenerateApiKey,
   handleEmailPasswordLogin,
   handleSetEmailPassword,
+  handleGetBudget,
+  handleUpdateBudget,
+  handleGetUsageAlerts,
 } from './account.controller';
 import { authGuard } from '../../middleware/auth.middleware';
+import { idempotencyGuard } from '../../middleware/idempotency';
 
 export async function accountRoutes(
   app: FastifyInstance
@@ -27,4 +31,7 @@ export async function accountRoutes(
   );
   app.post('/api-key/regenerate', { preHandler: [authGuard] }, handleRegenerateApiKey);
   app.post('/password', { preHandler: [authGuard] }, handleSetEmailPassword);
+  app.get('/budget', { preHandler: [authGuard] }, handleGetBudget);
+  app.put('/budget', { preHandler: [authGuard, idempotencyGuard] }, handleUpdateBudget);
+  app.get('/usage-alerts', { preHandler: [authGuard] }, handleGetUsageAlerts);
 }

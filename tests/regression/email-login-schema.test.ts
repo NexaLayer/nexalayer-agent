@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  requestApiKeySchema,
   requestEmailLoginCodeSchema,
   verifyEmailLoginCodeSchema,
   emailPasswordLoginSchema,
@@ -7,6 +8,24 @@ import {
 } from '../../src/modules/account/account.schema';
 
 describe('email login input contract', () => {
+  it('accepts a bounded acquisition source for attribution', () => {
+    expect(
+      requestApiKeySchema.parse({
+        email: 'agent@example.com',
+        acquisition_source: 'mcp-registry',
+      }).acquisition_source
+    ).toBe('mcp-registry');
+  });
+
+  it('rejects acquisition source values that could pollute analytics', () => {
+    expect(() =>
+      requestApiKeySchema.parse({
+        email: 'agent@example.com',
+        acquisition_source: '<script>',
+      })
+    ).toThrow();
+  });
+
   it('accepts a normalized email login request shape', () => {
     expect(
       requestEmailLoginCodeSchema.parse({ email: 'dev@nexalayer.net' })

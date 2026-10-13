@@ -72,6 +72,7 @@ async function syncBackendUserForAgent(input: {
   agentName: string;
   email?: string | null;
   backendAgentId: number;
+  trialBalanceUsd?: number;
 }) {
   const backendPassword = generateBackendPassword();
   const backendUsername = generateBackendUsername(
@@ -91,7 +92,8 @@ async function syncBackendUserForAgent(input: {
       backendUsername,
       backendPassword,
       input.email ?? undefined,
-      input.backendAgentId
+      input.backendAgentId,
+      input.trialBalanceUsd ?? 0
     );
 
     referralInfo = {
@@ -165,6 +167,7 @@ export async function registerAgent(
     agentName: input.name,
     email: input.contact_email,
     backendAgentId,
+    trialBalanceUsd: 0,
   });
 
   return {
@@ -327,6 +330,10 @@ export async function requestApiKeyByEmail(
   const apiKey = generateApiKey();
   const apiSecret = generateApiSecret();
   const apiSecretHash = await hashSecret(apiSecret);
+  const trialBalanceUsd = env.TRIAL_BALANCE;
+  const trialExpiresAt = new Date(
+    Date.now() + env.TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000
+  );
 
   let agent;
   try {
@@ -340,10 +347,12 @@ export async function requestApiKeyByEmail(
             apiKey,
             apiSecretHash,
             contactEmail: normalizedEmail,
-            trialBalance: 0,
-            isTrial: false,
+            trialBalance: trialBalanceUsd,
+            isTrial: trialBalanceUsd > 0,
             metadata: {
               signup_source: 'email_api_key',
+              acquisition_source:
+                input.acquisition_source ?? 'direct',
             },
           },
         });
@@ -355,6 +364,24 @@ export async function requestApiKeyByEmail(
             emailHash,
           },
         });
+
+        if (trialBalanceUsd > 0) {
+          await tx.agentWallet.create({
+            data: {
+              agentId: created.id,
+              trialBalanceUsd,
+              trialExpiresAt,
+            },
+          });
+          await tx.agentTrialClaim.create({
+            data: {
+              agentId: created.id,
+              normalizedEmail,
+              emailHash,
+              claimedAmountUsd: trialBalanceUsd,
+            },
+          });
+        }
 
         return created;
       },
@@ -384,6 +411,7 @@ export async function requestApiKeyByEmail(
       agentName: name,
       email: normalizedEmail,
       backendAgentId,
+      trialBalanceUsd,
     });
 
   await sendApiKeyForAgent({
@@ -398,6 +426,11 @@ export async function requestApiKeyByEmail(
     status: 'email_sent',
     backend_ready: backendReady,
     backend_sync_error: backendSyncError,
+    trial: {
+      granted: trialBalanceUsd > 0 && backendReady,
+      amount_usd: trialBalanceUsd,
+      expires_at: trialExpiresAt.toISOString(),
+    },
     message:
       'If the email address is valid, the API key has been sent.',
   };
@@ -407,6 +440,7 @@ export async function getAgentInfo(agentId: number) {
   const agent = await prisma.agentApp.findUnique({
     where: { id: agentId },
     include: {
+      wallet: true,
       _count: {
         select: {
           sessions: true,
@@ -451,6 +485,19 @@ export async function getAgentInfo(agentId: number) {
       per_day: agent.rateLimitPerDay,
     },
     auth_mode: agent.authMode,
+    trial: agent.wallet
+      ? {
+          is_trial:
+            Number(agent.wallet.trialBalanceUsd) > 0 &&
+            (!agent.wallet.trialExpiresAt || agent.wallet.trialExpiresAt > new Date()),
+          trial_balance: Number(agent.wallet.trialBalanceUsd),
+          trial_expires_at: agent.wallet.trialExpiresAt?.toISOString() ?? null,
+        }
+      : {
+          is_trial: false,
+          trial_balance: 0,
+          trial_expires_at: null,
+        },
     backend_ready: Boolean(
       agent.backendUserId &&
         agent.backendUsername &&

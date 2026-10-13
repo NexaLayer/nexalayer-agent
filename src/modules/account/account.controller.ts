@@ -6,6 +6,7 @@ import {
   verifyEmailLoginCodeSchema,
   emailPasswordLoginSchema,
   setEmailPasswordSchema,
+  updateBudgetSchema,
 } from './account.schema';
 import {
   registerAgent,
@@ -17,6 +18,7 @@ import {
   loginWithEmailPassword,
   setEmailPassword,
 } from './account.service';
+import { getBudget, getUsageAlerts, updateBudget } from './budget.service';
 import { sendSuccess } from '../../utils/response';
 import { AppError } from '../../utils/response';
 import { ERROR_CODES } from '../../config/constants';
@@ -85,4 +87,23 @@ export async function handleGetInfo(
   }
   const result = await getAgentInfo(ctx.agentId);
   sendSuccess(reply, result, 200, request.startTime);
+}
+
+export async function handleGetBudget(request: FastifyRequest, reply: FastifyReply) {
+  const ctx = request.agentContext;
+  if (!ctx) throw new AppError(ERROR_CODES.AUTH_INVALID_KEY, 'Not authenticated');
+  sendSuccess(reply, await getBudget(ctx.agentId), 200, request.startTime);
+}
+
+export async function handleUpdateBudget(request: FastifyRequest, reply: FastifyReply) {
+  const ctx = request.agentContext;
+  if (!ctx) throw new AppError(ERROR_CODES.AUTH_INVALID_KEY, 'Not authenticated');
+  const body = updateBudgetSchema.parse(request.body);
+  sendSuccess(reply, await updateBudget(ctx.agentId, body), 200, request.startTime);
+}
+
+export async function handleGetUsageAlerts(request: FastifyRequest, reply: FastifyReply) {
+  const ctx = request.agentContext;
+  if (!ctx) throw new AppError(ERROR_CODES.AUTH_INVALID_KEY, 'Not authenticated');
+  sendSuccess(reply, await getUsageAlerts(ctx.agentId), 200, request.startTime);
 }

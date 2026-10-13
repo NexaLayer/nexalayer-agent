@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.nexalayer/nexalayer",
+  "title": "NexaLayer",
+  "description": "Managed proxy sessions, health, rotation, usage, and spend controls for AI agents.",
+  "websiteUrl": "https://nexalayer.net/agents",
+  "repository": { "url": "https://github.com/NexaLayer/nexalayer-agent", "source": "github", "subfolder": "mcp" },
+  "version": "0.1.0",
+  "packages": [{
+    "registryType": "npm",
+    "registryBaseUrl": "https://registry.npmjs.org",
+    "identifier": "@nexalayer/mcp",
+    "version": "0.1.0",
+    "transport": { "type": "stdio" },
+    "environmentVariables": [
+      { "name": "NEXALAYER_API_KEY", "description": "NexaLayer API key requested at https://nexalayer.net/agents?source=mcp-registry", "isRequired": true, "isSecret": true },
+      { "name": "NEXALAYER_BASE_URL", "description": "Optional API base URL. Defaults to https://api.nexalayer.net/v1", "isRequired": false, "isSecret": false }
+    ]
+  }]
+}

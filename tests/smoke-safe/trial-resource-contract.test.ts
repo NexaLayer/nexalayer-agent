@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { createSessionSchema } from '../../src/modules/session/session.schema';
 import { rechargeSchema } from '../../src/modules/billing/billing.schema';
+import { updateBudgetSchema } from '../../src/modules/account/account.schema';
 import { shouldReleaseStaticResource } from '../../src/modules/session/session-lifecycle';
 import {
   toBackendDynamicProductNo,
@@ -76,5 +77,37 @@ describe('trial resource contract', () => {
     expect(source).not.toContain('reserveSessionCharge');
     expect(source).not.toContain('captureSessionReservation');
     expect(source).not.toContain('releaseSessionReservation');
+  });
+
+  it('accepts bounded key and daily spend policies', () => {
+    const policy = updateBudgetSchema.parse({
+      key_limit_usd: 50,
+      daily_limit_usd: 10,
+      pause_on_exceed: true,
+      alert_thresholds: [50, 80, 100],
+    });
+    expect(policy.daily_limit_usd).toBe(10);
+    expect(policy.pause_on_exceed).toBe(true);
+  });
+
+  it('serializes simultaneous budget reservations for one key', () => {
+    const source = readFileSync(
+      new URL('../../src/modules/account/budget.service.ts', import.meta.url),
+      'utf8'
+    );
+    expect(source).toContain('pg_advisory_xact_lock');
+    expect(source).toContain('projected_daily_spend_usd');
+  });
+
+  it('grants trial credit only on first email-account creation', () => {
+    const source = readFileSync(
+      new URL('../../src/modules/account/account.service.ts', import.meta.url),
+      'utf8'
+    );
+    expect(source).toContain('trialBalanceUsd = env.TRIAL_BALANCE');
+    expect(source).toContain('agentTrialClaim.create');
+    expect(source.indexOf('existingIdentity')).toBeLessThan(
+      source.indexOf('trialBalanceUsd = env.TRIAL_BALANCE')
+    );
   });
 });

@@ -244,14 +244,36 @@ export async function createBackendUser(
   username: string,
   password: string,
   email?: string,
-  agentId?: number
+  agentId?: number,
+  initialBalanceUsd = 0
 ): Promise<BackendUserSummary> {
   const headers = await authHeaders();
+  const adminToken = await getAdminToken();
+  const rate = initialBalanceUsd > 0
+    ? await getUsdtRate(adminToken)
+    : undefined;
+  const usdCnyRate = Number(
+    rate?.effective_rate ?? rate?.rate ?? 0
+  );
+  if (
+    initialBalanceUsd > 0 &&
+    (!Number.isFinite(usdCnyRate) || usdCnyRate <= 0)
+  ) {
+    throw new Error(
+      'Cannot create trial account: exchange rate is unavailable'
+    );
+  }
+  const initialBalanceCny = initialBalanceUsd > 0
+    ? Math.round(initialBalanceUsd * usdCnyRate * 100) / 100
+    : 0;
   const payload: Record<string, unknown> = {
     username,
     password,
     email,
-    balance: 0,
+    // Initial trial credit is applied as part of the unique backend-user
+    // creation call. Retrying an API-key request only resends the same key and
+    // therefore cannot grant credit twice.
+    balance: initialBalanceCny,
   };
   if (agentId !== undefined) {
     payload.agent_id = agentId;

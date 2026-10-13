@@ -28,8 +28,8 @@ function buildText(input: ApiKeyEmailInput): string {
     '',
     `API Key: ${input.apiKey}`,
     '',
-    'You can recharge and use NexaLayer directly. For a trial, contact Telegram support: https://t.me/ZTPROXY (@ztproxy).',
-    '你可以充值后直接使用 NexaLayer。如需试用，请联系 Telegram 售后：https://t.me/ZTPROXY（@ztproxy）。',
+    'New accounts receive a small one-time trial credit automatically; no support request is required.',
+    '新账号会自动获得一次性小额试用金，无需联系人工。',
     readyLine,
     '',
     'Use this key in the X-API-Key header. Keep it private.',
@@ -52,8 +52,8 @@ function buildHtml(input: ApiKeyEmailInput): string {
       <p>${readyLine}</p>
       <p style="margin:16px 0 8px">API Key</p>
       <pre style="padding:14px;border-radius:8px;background:#0f172a;color:#e2e8f0;white-space:pre-wrap">${escapeHtml(input.apiKey)}</pre>
-      <p>You can recharge and use NexaLayer directly. For a trial, contact <a href="https://t.me/ZTPROXY">Telegram support (@ztproxy)</a>.</p>
-      <p>你可以充值后直接使用 NexaLayer。如需试用，请联系 <a href="https://t.me/ZTPROXY">Telegram 售后（@ztproxy）</a>。</p>
+      <p>New accounts receive a small one-time trial credit automatically; no support request is required.</p>
+      <p>新账号会自动获得一次性小额试用金，无需联系人工。</p>
       <p>Use this key in the <code>X-API-Key</code> header. Keep it private.</p>
       <p>请在 <code>X-API-Key</code> 请求头中使用该密钥，并妥善保管。</p>
       <p>

@@ -57,6 +57,28 @@ paths:
       responses:
         "200":
           description: Account info.
+  /account/budget:
+    get:
+      summary: Read API-Key and daily spend guardrails.
+      responses:
+        "200": { description: Budget policy and current spend. }
+    put:
+      summary: Configure spend limits, alerts, and automatic pause.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBudgetRequest"
+      responses:
+        "200": { description: Updated budget policy. }
+  /account/usage-alerts:
+    get:
+      summary: Read crossed budget thresholds and pause state.
+      responses:
+        "200": { description: Usage alerts. }
   /products:
     get:
       summary: List dynamic and static proxy products.
@@ -221,6 +243,12 @@ components:
             balance: { type: number, example: 0 }
             backend_ready: { type: boolean }
             message: { type: string }
+            trial:
+              type: object
+              properties:
+                granted: { type: boolean }
+                amount_usd: { type: number }
+                expires_at: { type: string, format: date-time }
     RegisterResponse:
       type: object
       properties:
@@ -257,6 +285,16 @@ components:
           description: Static shared proxy project code. Required by some shared static products.
         rotation_mode: { type: string, enum: [fixed, timed, on_demand] }
         rotation_interval_sec: { type: integer }
+    UpdateBudgetRequest:
+      type: object
+      properties:
+        key_limit_usd: { type: number, minimum: 0, nullable: true }
+        daily_limit_usd: { type: number, minimum: 0, nullable: true }
+        pause_on_exceed: { type: boolean, default: true }
+        alert_thresholds:
+          type: array
+          items: { type: integer, minimum: 1, maximum: 100 }
+        paused: { type: boolean }
     SessionResponse:
       type: object
       properties:

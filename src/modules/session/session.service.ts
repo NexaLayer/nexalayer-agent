@@ -13,6 +13,7 @@ import {
   ListSessionsQuery,
 } from './session.schema';
 import { shouldReleaseStaticResource } from './session-lifecycle';
+import { createBudgetedSession } from '../account/budget.service';
 
 const STATIC_ORDER_READY_TIMEOUT_MS = 120_000;
 const STATIC_ORDER_POLL_MS = 3_000;
@@ -169,8 +170,10 @@ export async function createSession(
     Math.round((product.price / exchangeRate) * 100) /
     100;
 
-  const session = await prisma.agentSession.create({
-      data: {
+  const session = await createBudgetedSession(
+    agentId,
+    estimatedAmountUsd,
+    {
         sessionId,
         agentId,
         sessionType: input.session_type,
@@ -185,8 +188,9 @@ export async function createSession(
         identityPool: input.identity_pool,
         backendProductNo: input.product_no,
         provisioningMode: 'purchase',
-      },
-    });
+        estimatedChargeUsd: estimatedAmountUsd,
+    }
+  );
 
   provisionSessionAsync(
     session.id,
