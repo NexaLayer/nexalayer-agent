@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/NexaLayer/nexalayer-agent.git",
+    "url": "git+https://github.com/NexaLayer/nexalayer-agent.git",
     "directory": "mcp"
   },
   "homepage": "https://docs.nexalayer.net/en/agents",
