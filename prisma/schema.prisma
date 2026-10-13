@@ -127,11 +127,15 @@ model AgentTrialClaim {
   normalizedEmail  String   @map("normalized_email") @db.VarChar(200)
   emailHash        String   @unique @map("email_hash") @db.VarChar(64)
   claimedAmountUsd Decimal  @default(1.00) @map("claimed_amount_usd") @db.Decimal(12, 4)
+  ipHash           String?  @map("ip_hash") @db.VarChar(64)
+  deviceHash       String?  @map("device_hash") @db.VarChar(64)
   claimedAt        DateTime @default(now()) @map("claimed_at") @db.Timestamptz
 
   agent AgentApp @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
+  @@index([ipHash, claimedAt])
+  @@index([deviceHash, claimedAt])
   @@map("agent_trial_claims")
 }
 

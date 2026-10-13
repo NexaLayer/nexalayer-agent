@@ -1,4 +1,4 @@
-import { createHash, randomInt } from 'crypto';
+import { createHash, createHmac, randomInt } from 'crypto';
 import { compare, hash } from 'bcryptjs';
 import { FastifyInstance } from 'fastify';
 import { Prisma } from '@prisma/client';
@@ -34,6 +34,24 @@ const LOGIN_CODE_TTL_MINUTES = 10;
 const LOGIN_CODE_RESEND_COOLDOWN_MS = 60 * 1000;
 const LOGIN_CODE_MAX_ATTEMPTS = 5;
 
+const DEFAULT_DISPOSABLE_EMAIL_DOMAINS = new Set([
+  '10minutemail.com',
+  'dispostable.com',
+  'guerrillamail.com',
+  'guerrillamailblock.com',
+  'maildrop.cc',
+  'mailinator.com',
+  'sharklasers.com',
+  'temp-mail.org',
+  'tempmail.com',
+  'yopmail.com',
+]);
+
+type TrialRequestContext = {
+  ip: string;
+  installationId?: string;
+};
+
 function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
@@ -42,6 +60,75 @@ function hashEmail(email: string): string {
   return createHash('sha256')
     .update(email)
     .digest('hex');
+}
+
+function keyedHash(value: string): string {
+  return createHmac('sha256', env.ENCRYPTION_KEY)
+    .update(value)
+    .digest('hex');
+}
+
+function disposableEmailDomains(): Set<string> {
+  const configured = env.TRIAL_DISPOSABLE_EMAIL_DOMAINS
+    .split(',')
+    .map((domain) => domain.trim().toLowerCase())
+    .filter(Boolean);
+  return new Set([...DEFAULT_DISPOSABLE_EMAIL_DOMAINS, ...configured]);
+}
+
+function assertEmailAllowsTrial(email: string): void {
+  const domain = email.split('@')[1];
+  if (domain && disposableEmailDomains().has(domain)) {
+    throw new AppError(
+      ERROR_CODES.TRIAL_NOT_ELIGIBLE,
+      'This email provider is not eligible for automatic trial credit'
+    );
+  }
+}
+
+async function assertClaimLimits(
+  tx: Prisma.TransactionClient,
+  context: TrialRequestContext
+): Promise<{ ipHash: string; deviceHash?: string }> {
+  const ipHash = keyedHash(`ip:${context.ip}`);
+  const deviceHash = context.installationId
+    ? keyedHash(`device:${context.installationId}`)
+    : undefined;
+  const startOfUtcDay = new Date();
+  startOfUtcDay.setUTCHours(0, 0, 0, 0);
+
+  await tx.$executeRaw(
+    Prisma.sql`SELECT pg_advisory_xact_lock(hashtextextended(${ipHash}, 0))`
+  );
+  if (deviceHash) {
+    await tx.$executeRaw(
+      Prisma.sql`SELECT pg_advisory_xact_lock(hashtextextended(${deviceHash}, 0))`
+    );
+  }
+
+  const [ipClaims, deviceClaims] = await Promise.all([
+    tx.agentTrialClaim.count({
+      where: { ipHash, claimedAt: { gte: startOfUtcDay } },
+    }),
+    deviceHash
+      ? tx.agentTrialClaim.count({ where: { deviceHash } })
+      : Promise.resolve(0),
+  ]);
+
+  if (ipClaims >= env.TRIAL_MAX_CLAIMS_PER_IP_PER_DAY) {
+    throw new AppError(
+      ERROR_CODES.TRIAL_NOT_ELIGIBLE,
+      'The daily automatic trial limit has been reached for this network'
+    );
+  }
+  if (deviceHash && deviceClaims >= env.TRIAL_MAX_CLAIMS_PER_DEVICE) {
+    throw new AppError(
+      ERROR_CODES.TRIAL_NOT_ELIGIBLE,
+      'The automatic trial limit has been reached for this installation'
+    );
+  }
+
+  return { ipHash, deviceHash };
 }
 
 function agentNameFromEmail(email: string): string {
@@ -262,7 +349,8 @@ async function resendExistingApiKey(input: {
 }
 
 export async function requestApiKeyByEmail(
-  input: RequestApiKeyRequest
+  input: RequestApiKeyRequest,
+  context: TrialRequestContext
 ) {
   const normalizedEmail = normalizeEmail(input.email);
   const emailHash = hashEmail(normalizedEmail);
@@ -323,6 +411,8 @@ export async function requestApiKeyByEmail(
     });
   }
 
+  assertEmailAllowsTrial(normalizedEmail);
+
   const backendAgentId = resolveBackendAgentId(
     input.referral_code
   );
@@ -339,6 +429,9 @@ export async function requestApiKeyByEmail(
   try {
     agent = await prisma.$transaction(
       async (tx) => {
+        const claimContext = trialBalanceUsd > 0
+          ? await assertClaimLimits(tx, context)
+          : { ipHash: undefined, deviceHash: undefined };
         const created = await tx.agentApp.create({
           data: {
             name,
@@ -379,6 +472,8 @@ export async function requestApiKeyByEmail(
               normalizedEmail,
               emailHash,
               claimedAmountUsd: trialBalanceUsd,
+              ipHash: claimContext.ipHash,
+              deviceHash: claimContext.deviceHash,
             },
           });
         }

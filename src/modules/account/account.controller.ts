@@ -70,7 +70,12 @@ export async function handleRequestApiKey(
   reply: FastifyReply
 ): Promise<void> {
   const body = requestApiKeySchema.parse(request.body);
-  const result = await requestApiKeyByEmail(body);
+  const installationId = request.headers['x-client-installation-id'];
+  const result = await requestApiKeyByEmail(body, {
+    ip: request.ip,
+    installationId:
+      typeof installationId === 'string' ? installationId : undefined,
+  });
   sendSuccess(reply, result, 200, request.startTime);
 }
 

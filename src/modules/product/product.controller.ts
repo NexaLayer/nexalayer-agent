@@ -6,6 +6,7 @@ import {
   AppError,
 } from '../../utils/response';
 import { ERROR_CODES } from '../../config/constants';
+import { getPublicPricing } from './public-pricing';
 
 function getCtx(request: FastifyRequest) {
   const ctx = request.agentContext;
@@ -43,4 +44,12 @@ export async function handleListRegions(
     ctx.agentId
   );
   sendSuccess(reply, result, 200, request.startTime);
+}
+
+export async function handlePublicPricing(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<void> {
+  reply.header('Cache-Control', 'public, max-age=300, s-maxage=3600');
+  sendSuccess(reply, getPublicPricing(), 200, request.startTime);
 }

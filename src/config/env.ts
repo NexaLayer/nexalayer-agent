@@ -35,9 +35,13 @@ const envSchema = z.object({
 
   RATE_LIMIT_PER_MIN: z.coerce.number().default(60),
   RATE_LIMIT_PER_DAY: z.coerce.number().default(10000),
+  TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(1),
 
   TRIAL_BALANCE: z.coerce.number().default(1.0),
   TRIAL_DURATION_DAYS: z.coerce.number().default(30),
+  TRIAL_MAX_CLAIMS_PER_IP_PER_DAY: z.coerce.number().int().positive().default(3),
+  TRIAL_MAX_CLAIMS_PER_DEVICE: z.coerce.number().int().positive().default(1),
+  TRIAL_DISPOSABLE_EMAIL_DOMAINS: z.string().default(''),
 
   RESEND_API_KEY: z.preprocess(
     (v) =>

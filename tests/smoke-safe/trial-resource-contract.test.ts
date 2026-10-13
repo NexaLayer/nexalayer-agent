@@ -110,4 +110,36 @@ describe('trial resource contract', () => {
       source.indexOf('trialBalanceUsd = env.TRIAL_BALANCE')
     );
   });
+
+  it('publishes unauthenticated starting prices', () => {
+    const pricingSource = readFileSync(
+      new URL('../../src/modules/product/public-pricing.ts', import.meta.url),
+      'utf8'
+    );
+    const pricing = JSON.parse(
+      readFileSync('src/config/public-pricing.json', 'utf8')
+    );
+    expect(pricingSource).toContain('currency: pricing.currency');
+    expect(pricingSource).toContain('pricing.products.dynamic.unit');
+    expect(pricingSource).toContain('pricing.products.static.unit');
+    expect(pricing.currency).toBe('USD');
+    expect(pricing.products.dynamic.unit).toBe('GB');
+    expect(pricing.products.static.unit).toBe('month');
+    expect(pricing.products.dynamic.starting_price).toBe(4);
+    expect(pricing.products.static.starting_price).toBe(10);
+    expect(readFileSync('openapi/openapi.yaml', 'utf8')).toContain(
+      '/public/products:'
+    );
+  });
+
+  it('guards automatic trial credit by email provider, IP, and installation', () => {
+    const source = readFileSync(
+      new URL('../../src/modules/account/account.service.ts', import.meta.url),
+      'utf8'
+    );
+    expect(source).toContain('DEFAULT_DISPOSABLE_EMAIL_DOMAINS');
+    expect(source).toContain('TRIAL_MAX_CLAIMS_PER_IP_PER_DAY');
+    expect(source).toContain('TRIAL_MAX_CLAIMS_PER_DEVICE');
+    expect(source).toContain("createHmac('sha256', env.ENCRYPTION_KEY)");
+  });
 });

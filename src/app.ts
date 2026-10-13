@@ -15,6 +15,7 @@ import { accountRoutes } from './modules/account/account.routes';
 import { sessionRoutes } from './modules/session/session.routes';
 import { billingRoutes } from './modules/billing/billing.routes';
 import { productRoutes } from './modules/product/product.routes';
+import { handlePublicPricing } from './modules/product/product.controller';
 import { telemetryRoutes } from './modules/telemetry/telemetry.routes';
 import { statsRoutes } from './modules/stats/stats.routes';
 import { nlRoutes } from './modules/nl-agent/nl.routes';
@@ -35,6 +36,7 @@ export const prisma = new PrismaClient();
 
 export async function buildApp() {
   const app = Fastify({
+    trustProxy: env.TRUST_PROXY_HOPS,
     logger: {
       level: env.LOG_LEVEL,
       transport:
@@ -54,6 +56,19 @@ export async function buildApp() {
   registerErrorHandler(app);
   registerLogger(app);
   registerIdempotencyPersistence(app);
+
+  app.get(
+    `${API_PREFIX}/public/products`,
+    {
+      config: {
+        rateLimit: {
+          max: 120,
+          timeWindow: '1 minute',
+        },
+      },
+    },
+    handlePublicPricing
+  );
 
   app.get(
     `${API_PREFIX}/health`,

@@ -2,6 +2,11 @@ name: Publish MCP Server
 
 on:
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Validate credentials and package without publishing
+        type: boolean
+        default: true
   release:
     types: [published]
 
@@ -24,7 +29,20 @@ jobs:
         working-directory: mcp
       - run: npm run build
         working-directory: mcp
-      - run: npm publish --access public --provenance
+      - name: Verify npm credentials
+        run: npm whoami
+        working-directory: mcp
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Dry-run npm package
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run
+        run: npm publish --access public --dry-run
+        working-directory: mcp
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish npm package
+        if: github.event_name == 'release' || !inputs.dry_run
+        run: npm publish --access public --provenance
         working-directory: mcp
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -36,7 +54,12 @@ jobs:
         working-directory: mcp
         run: ./mcp-publisher validate server.json
       - name: Publish to the official MCP Registry
+        if: github.event_name == 'release' || !inputs.dry_run
         working-directory: mcp
         run: |
           ./mcp-publisher login github-oidc
           ./mcp-publisher publish server.json
+      - name: Verify MCP Registry authentication
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run
+        working-directory: mcp
+        run: ./mcp-publisher login github-oidc

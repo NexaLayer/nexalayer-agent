@@ -1,0 +1,14 @@
+{
+  "currency": "USD",
+  "updated_at": "2026-10-13",
+  "products": {
+    "dynamic": {
+      "starting_price": 4,
+      "unit": "GB"
+    },
+    "static": {
+      "starting_price": 10,
+      "unit": "month"
+    }
+  }
+}

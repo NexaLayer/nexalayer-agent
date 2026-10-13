@@ -8,10 +8,23 @@ servers:
 security:
   - ApiKey: []
 paths:
+  /public/products:
+    get:
+      summary: Read public starting prices without an API key.
+      security: []
+      responses:
+        "200":
+          description: Public starting prices. Exact authenticated product pricing may vary.
   /account/request-api-key:
     post:
       summary: Request an API Key by email.
       security: []
+      parameters:
+        - in: header
+          name: X-Client-Installation-Id
+          required: false
+          schema: { type: string, format: uuid }
+          description: Stable first-party installation identifier used only for trial abuse prevention.
       requestBody:
         required: true
         content:
