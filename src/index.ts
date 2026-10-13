@@ -9,6 +9,11 @@ async function main() {
     await prisma.$connect();
     app.log.info('Database connected');
 
+    const stopTrialClaimMonitor = startTrialClaimMonitor(app.log);
+    app.addHook('onClose', async () => {
+      stopTrialClaimMonitor();
+    });
+
     await app.listen({
       port: env.PORT,
       host: '0.0.0.0',
@@ -16,11 +21,6 @@ async function main() {
     app.log.info(
       `Agent Layer running on port ${env.PORT}`
     );
-    const stopTrialClaimMonitor = startTrialClaimMonitor(app.log);
-
-    app.addHook('onClose', async () => {
-      stopTrialClaimMonitor();
-    });
   } catch (err) {
     app.log.fatal(err, 'Failed to start server');
     process.exit(1);
