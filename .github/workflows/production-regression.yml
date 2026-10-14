@@ -39,6 +39,8 @@ jobs:
           PHASE0_SESSION_TYPE: dynamic
           # Dynamic Pool 2's first sale tier starts at 3 GB.
           PHASE0_QUANTITY: "3"
-          PHASE0_TOPUP_CNY: "20"
+          # 3 GB costs about CNY 48 at the current public price. Keep enough
+          # headroom for exchange-rate and pricing changes during regression.
+          PHASE0_TOPUP_CNY: "60"
           PHASE0_PRINT_PROXY_URL: "0"
           PHASE0_TEST_PROXY: "1"
