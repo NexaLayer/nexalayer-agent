@@ -6,6 +6,7 @@ import { rechargeSchema } from '../../src/modules/billing/billing.schema';
 import { updateBudgetSchema } from '../../src/modules/account/account.schema';
 import { shouldReleaseStaticResource } from '../../src/modules/session/session-lifecycle';
 import {
+  dynamicProductName,
   toBackendDynamicProductNo,
   toPublicDynamicProductNo,
 } from '../../src/gateway/dynamic-product';
@@ -66,8 +67,22 @@ describe('trial resource contract', () => {
     expect(toPublicDynamicProductNo('dynamic_ipweb')).toBe('dynamic_dyn3');
     expect(toPublicDynamicProductNo('dynamic_dyn3')).toBe('dynamic_dyn3');
     expect(toBackendDynamicProductNo('dynamic_dyn3')).toBe('dynamic_ipweb');
+    expect(toPublicDynamicProductNo('out_dynamic_ipweb')).toBe('dynamic_2');
+    expect(toPublicDynamicProductNo('dynamic_2')).toBe('dynamic_2');
+    expect(toBackendDynamicProductNo('dynamic_2')).toBe('out_dynamic_ipweb');
+    expect(dynamicProductName('dynamic_2')).toBe('Dynamic Proxy Pool 2');
+    expect(dynamicProductName('dynamic_dyn3')).toBe('Dynamic Proxy Pool 3');
     expect(toPublicDynamicProductNo('out_dynamic_1')).toBeNull();
-    expect(toPublicDynamicProductNo('out_dynamic_ipweb')).toBeNull();
+  });
+
+  it('does not synthesize disabled dynamic products', () => {
+    const source = readFileSync(
+      new URL('../../src/gateway/backend-client.ts', import.meta.url),
+      'utf8'
+    );
+    expect(source).toContain('return items.flatMap((p) =>');
+    expect(source).not.toContain("PUBLIC_DYN3_PRODUCT_NO,");
+    expect(source).not.toContain("type: 'dynamic_dyn3'");
   });
 
   it('never performs a second local wallet debit for Session purchases', () => {

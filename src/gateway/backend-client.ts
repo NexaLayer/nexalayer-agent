@@ -14,6 +14,7 @@ import {
   BackendUsdtRateResponse,
 } from './types';
 import {
+  dynamicProductName,
   toBackendDynamicProductNo,
   toPublicDynamicProductNo,
 } from './dynamic-product';
@@ -382,7 +383,7 @@ export async function getDynamicProducts(
       type: publicProductNo,
       backendProductNo:
         toBackendDynamicProductNo(publicProductNo)!,
-      name: 'DYN3 Dynamic Proxy',
+      name: dynamicProductName(publicProductNo),
       proxyType: num(p.proxyType, 104),
       price: num(p.price),
       unit: num(p.unit, 1),

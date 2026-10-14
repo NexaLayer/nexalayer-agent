@@ -37,7 +37,8 @@ jobs:
           PHASE0_REGISTER: "1"
           PHASE0_ALLOW_PAID: "1"
           PHASE0_SESSION_TYPE: dynamic
-          PHASE0_QUANTITY: "0.25"
+          # Dynamic Pool 2's first sale tier starts at 3 GB.
+          PHASE0_QUANTITY: "3"
           PHASE0_TOPUP_CNY: "20"
           PHASE0_PRINT_PROXY_URL: "0"
           PHASE0_TEST_PROXY: "1"
