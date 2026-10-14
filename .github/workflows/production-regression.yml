@@ -1,0 +1,43 @@
+name: Production regression
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_paid_test:
+        description: Type RUN_PAID_REGRESSION to allow a real production purchase and cleanup
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-regression
+  cancel-in-progress: false
+
+jobs:
+  dynamic-session:
+    if: inputs.confirm_paid_test == 'RUN_PAID_REGRESSION'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - name: Run paid production regression
+        run: npm run test:phase0:real
+        env:
+          NEXALAYER_BASE_URL: https://api.nexalayer.net/v1
+          BACKEND_BASE_URL: https://backend-production-127a.up.railway.app
+          BACKEND_ADMIN_USERNAME: admin
+          BACKEND_ADMIN_PASSWORD: ${{ secrets.REGRESSION_ADMIN_PASSWORD }}
+          PHASE0_REGISTER: "1"
+          PHASE0_ALLOW_PAID: "1"
+          PHASE0_SESSION_TYPE: dynamic
+          PHASE0_QUANTITY: "0.25"
+          PHASE0_TOPUP_CNY: "20"
+          PHASE0_PRINT_PROXY_URL: "0"
+          PHASE0_TEST_PROXY: "1"
