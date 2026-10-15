@@ -37,9 +37,9 @@ jobs:
           PHASE0_REGISTER: "1"
           PHASE0_ALLOW_PAID: "1"
           PHASE0_SESSION_TYPE: dynamic
-          # ZTProxy accepts any positive GB quantity. A 0.25 GB smoke mirrors
-          # the trial-credit calibration without creating excess paid traffic.
-          PHASE0_QUANTITY: "0.25"
+          # Fractional orders can be accepted but yield no usable data-plane
+          # quota. One GB is the smallest production smoke we validate.
+          PHASE0_QUANTITY: "1"
           PHASE0_TOPUP_CNY: "20"
           PHASE0_PRINT_PROXY_URL: "0"
           PHASE0_TEST_PROXY: "1"
