@@ -51,6 +51,14 @@ const envSchema = z.object({
     (v) => typeof v === 'string' && v.trim() ? v.trim() : undefined,
     z.string().url().optional()
   ),
+  TRIAL_ALERT_TELEGRAM_BOT_TOKEN: z.preprocess(
+    (v) => typeof v === 'string' && v.trim() ? v.trim() : undefined,
+    z.string().min(20).optional()
+  ),
+  TRIAL_ALERT_TELEGRAM_CHAT_ID: z.preprocess(
+    (v) => typeof v === 'string' && v.trim() ? v.trim() : undefined,
+    z.string().regex(/^-?\d+$/).optional()
+  ),
 
   RESEND_API_KEY: z.preprocess(
     (v) =>

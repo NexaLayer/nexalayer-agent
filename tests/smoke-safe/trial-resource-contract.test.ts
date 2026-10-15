@@ -191,6 +191,9 @@ describe('trial resource contract', () => {
     expect(envSource).toContain('TRIAL_BALANCE: z.coerce.number().positive().default(5.0)');
     expect(monitorSource).toContain("event: 'TRIAL_CLAIM_SURGE'");
     expect(monitorSource).toContain('TRIAL_ALERT_WEBHOOK_URL');
+    expect(monitorSource).toContain('TRIAL_ALERT_TELEGRAM_BOT_TOKEN');
+    expect(monitorSource).toContain('TRIAL_ALERT_TELEGRAM_CHAT_ID');
+    expect(monitorSource).toContain('api.telegram.org');
     expect(monitorSource).toContain('agentTrialClaim.count');
   });
 });

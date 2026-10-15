@@ -8,6 +8,16 @@ type MonitorLogger = {
 
 let lastAlertWindow = '';
 
+type TrialAlertPayload = {
+  event: string;
+  severity: string;
+  claim_count: number;
+  threshold: number;
+  window_minutes: number;
+  observed_at: string;
+  runbook: string;
+};
+
 function windowKey(now: Date): string {
   const windowMs = env.TRIAL_ALERT_WINDOW_MINUTES * 60_000;
   return String(Math.floor(now.getTime() / windowMs));
@@ -39,29 +49,78 @@ export async function checkTrialClaimSurge(logger: MonitorLogger): Promise<void>
   };
   logger.warn(payload, 'Trial claim volume exceeded the alert threshold');
 
-  if (!env.TRIAL_ALERT_WEBHOOK_URL) {
+  const hasTelegram = Boolean(
+    env.TRIAL_ALERT_TELEGRAM_BOT_TOKEN &&
+    env.TRIAL_ALERT_TELEGRAM_CHAT_ID
+  );
+  if (!env.TRIAL_ALERT_WEBHOOK_URL && !hasTelegram) {
     logger.error(
       payload,
-      'TRIAL_ALERT_WEBHOOK_URL is not configured; no operator notification was sent'
+      'No trial alert notification channel is configured'
     );
     return;
   }
 
-  try {
-    const response = await fetch(env.TRIAL_ALERT_WEBHOOK_URL, {
+  if (hasTelegram) {
+    try {
+      await sendTelegramAlert(payload);
+    } catch (error) {
+      logger.error(
+        { ...payload, error: error instanceof Error ? error.message : String(error) },
+        'Failed to send Telegram trial claim alert'
+      );
+    }
+  }
+
+  if (env.TRIAL_ALERT_WEBHOOK_URL) {
+    try {
+      const response = await fetch(env.TRIAL_ALERT_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(10_000),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      logger.error(
+        { ...payload, error: error instanceof Error ? error.message : String(error) },
+        'Failed to notify operator webhook about trial claim surge'
+      );
+    }
+  }
+}
+
+async function sendTelegramAlert(payload: TrialAlertPayload): Promise<void> {
+  const token = env.TRIAL_ALERT_TELEGRAM_BOT_TOKEN;
+  const chatId = env.TRIAL_ALERT_TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;
+
+  const text = [
+    'NexaLayer alert: trial claim surge',
+    `Severity: ${payload.severity}`,
+    `Claims: ${payload.claim_count} (threshold ${payload.threshold})`,
+    `Window: ${payload.window_minutes} minutes`,
+    `Observed: ${payload.observed_at}`,
+    `Runbook: ${payload.runbook}`,
+  ].join('\n');
+
+  const response = await fetch(
+    `https://api.telegram.org/bot${token}/sendMessage`,
+    {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        disable_web_page_preview: true,
+      }),
       signal: AbortSignal.timeout(10_000),
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
     }
-  } catch (error) {
-    logger.error(
-      { ...payload, error: error instanceof Error ? error.message : String(error) },
-      'Failed to notify operator about trial claim surge'
-    );
+  );
+  if (!response.ok) {
+    throw new Error(`Telegram API HTTP ${response.status}`);
   }
 }
 
