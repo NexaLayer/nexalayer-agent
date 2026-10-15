@@ -1,19 +1,25 @@
 {
   "name": "@nexalayer/mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server for NexaLayer managed network sessions",
-  "mcpName": "io.github.nexalayer/nexalayer",
+  "mcpName": "io.github.NexaLayer/nexalayer",
   "type": "module",
   "bin": {
     "nexalayer-mcp": "dist/index.js"
   },
-  "files": ["dist", "README.md", "server.json"],
+  "files": [
+    "dist",
+    "README.md",
+    "server.json"
+  ],
   "scripts": {
     "build": "tsc",
     "check": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -22,7 +28,13 @@
   },
   "homepage": "https://docs.nexalayer.net/en/agents",
   "bugs": "https://github.com/NexaLayer/nexalayer-agent/issues",
-  "keywords": ["mcp", "ai-agent", "proxy", "playwright", "browser-automation"],
+  "keywords": [
+    "mcp",
+    "ai-agent",
+    "proxy",
+    "playwright",
+    "browser-automation"
+  ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.20.0",
     "zod": "^3.24.2"
