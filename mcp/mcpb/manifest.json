@@ -29,7 +29,41 @@
       }
     }
   },
-  "tools_generated": true,
+  "tools": [
+    {
+      "name": "nexalayer_list_products",
+      "description": "List current NexaLayer products and exact prices before purchasing."
+    },
+    {
+      "name": "nexalayer_create_session",
+      "description": "Create an owner-approved paid network Session with an idempotency key."
+    },
+    {
+      "name": "nexalayer_rotate_session",
+      "description": "Rotate a dynamic Session when health or telemetry recommends it."
+    },
+    {
+      "name": "nexalayer_session_health",
+      "description": "Read Session health score and rotation recommendation."
+    },
+    {
+      "name": "nexalayer_session_usage",
+      "description": "Read traffic and request usage for a Session."
+    },
+    {
+      "name": "nexalayer_get_budget",
+      "description": "Read current spend limits, spend, pause state, and daily reset."
+    },
+    {
+      "name": "nexalayer_set_budget",
+      "description": "Set owner-controlled key and daily spend limits with an idempotency key."
+    },
+    {
+      "name": "nexalayer_usage_alerts",
+      "description": "Read actionable budget threshold alerts."
+    }
+  ],
+  "tools_generated": false,
   "keywords": ["proxy", "network sessions", "browser automation", "AI agents", "spend controls"],
   "license": "MIT",
   "privacy_policies": ["https://nexalayer.net/privacy.html"],
