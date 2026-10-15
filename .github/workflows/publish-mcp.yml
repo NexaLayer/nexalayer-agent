@@ -29,6 +29,14 @@ jobs:
         working-directory: mcp
       - run: npm run build
         working-directory: mcp
+      - name: Build and validate Smithery MCPB bundle
+        run: npm run mcpb:build
+        working-directory: mcp
+      - name: Upload MCPB bundle artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: nexalayer-mcpb
+          path: mcp/nexalayer-*.mcpb
       - name: Verify npm credentials
         run: npm whoami
         working-directory: mcp

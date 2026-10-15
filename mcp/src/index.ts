@@ -31,7 +31,7 @@ const result = (value: unknown) => ({
   content: [{ type: 'text' as const, text: JSON.stringify(value, null, 2) }],
 });
 
-const server = new McpServer({ name: 'nexalayer', version: '0.1.0' });
+const server = new McpServer({ name: 'nexalayer', version: '0.1.2' });
 
 server.tool('nexalayer_list_products', 'List current products and prices before purchasing.', {
   type: z.enum(['all', 'dynamic', 'static']).default('all'),

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/mcpb/main/schemas/mcpb-manifest-v0.3.schema.json",
+  "manifest_version": "0.3",
+  "name": "nexalayer",
+  "display_name": "NexaLayer",
+  "version": "0.1.2",
+  "description": "Managed proxy sessions, health, rotation, usage, and spend controls for AI agents.",
+  "long_description": "Connect AI agents and browser automation to NexaLayer managed network Sessions. Discover current products and prices, create and rotate Sessions, inspect health and usage, and enforce owner-controlled spend limits.",
+  "author": {
+    "name": "NexaLayer",
+    "url": "https://github.com/NexaLayer"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NexaLayer/nexalayer-agent"
+  },
+  "homepage": "https://nexalayer.net/agents",
+  "documentation": "https://docs.nexalayer.net/en/agents",
+  "support": "https://github.com/NexaLayer/nexalayer-agent/issues",
+  "server": {
+    "type": "node",
+    "entry_point": "server/dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/dist/index.js"],
+      "env": {
+        "NEXALAYER_API_KEY": "${user_config.api_key}",
+        "NEXALAYER_BASE_URL": "${user_config.base_url}"
+      }
+    }
+  },
+  "tools_generated": true,
+  "keywords": ["proxy", "network sessions", "browser automation", "AI agents", "spend controls"],
+  "license": "MIT",
+  "privacy_policies": ["https://nexalayer.net/privacy.html"],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=20"
+    }
+  },
+  "user_config": {
+    "api_key": {
+      "type": "string",
+      "title": "NexaLayer API Key",
+      "description": "Request an API key and one-time trial at https://nexalayer.net/agents?source=smithery",
+      "sensitive": true,
+      "required": true
+    },
+    "base_url": {
+      "type": "string",
+      "title": "API Base URL",
+      "description": "Override only for a private or test NexaLayer deployment.",
+      "default": "https://api.nexalayer.net/v1",
+      "required": false
+    }
+  }
+}
