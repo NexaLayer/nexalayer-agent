@@ -15,6 +15,7 @@ jobs:
           node-version: "20"
           cache: npm
       - run: npm ci
+      - run: npm audit --omit=dev --audit-level=high
       - run: npm run build
       - run: npm run test:smoke:safe
       - run: node scripts/validate-public-pricing.mjs

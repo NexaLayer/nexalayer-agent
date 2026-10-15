@@ -36,7 +36,8 @@ export const prisma = new PrismaClient();
 
 export async function buildApp() {
   const app = Fastify({
-    trustProxy: env.TRUST_PROXY_HOPS,
+    trustProxy: (_address, hop) =>
+      hop < env.TRUST_PROXY_HOPS,
     logger: {
       level: env.LOG_LEVEL,
       transport:
