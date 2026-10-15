@@ -82,7 +82,7 @@ export async function assertBudgetAllowsSpend(agentId: number, amountUsd: number
   const policy = await prisma.agentBudgetPolicy.findUnique({ where: { agentId } });
   if (!policy) return;
   if (policy.pausedAt) {
-    throw new AppError(ERROR_CODES.INVALID_REQUEST, 'API key spending is paused', {
+    throw new AppError(ERROR_CODES.BUDGET_EXCEEDED, 'API key spending is paused', {
       reason: policy.pauseReason,
     });
   }
@@ -103,7 +103,7 @@ export async function assertBudgetAllowsSpend(agentId: number, amountUsd: number
       data: { pausedAt: new Date(), pauseReason: reason },
     });
   }
-  throw new AppError(ERROR_CODES.INVALID_REQUEST, 'Spend limit would be exceeded', {
+  throw new AppError(ERROR_CODES.BUDGET_EXCEEDED, 'Spend limit would be exceeded', {
     reason,
     requested_usd: amountUsd,
     projected_key_spend_usd: projectedKey,
@@ -126,7 +126,7 @@ export async function createBudgetedSession(
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(${agentId})`;
     const policy = await tx.agentBudgetPolicy.findUnique({ where: { agentId } });
     if (policy?.pausedAt) {
-      throw new AppError(ERROR_CODES.INVALID_REQUEST, 'API key spending is paused', {
+      throw new AppError(ERROR_CODES.BUDGET_EXCEEDED, 'API key spending is paused', {
         reason: policy.pauseReason,
       });
     }
@@ -164,7 +164,7 @@ export async function createBudgetedSession(
   });
   if (!session) {
     throw new AppError(
-      ERROR_CODES.INVALID_REQUEST,
+      ERROR_CODES.BUDGET_EXCEEDED,
       'Spend limit would be exceeded',
       blockedDetails ?? undefined
     );

@@ -75,6 +75,7 @@ paths:
       summary: Read API-Key and daily spend guardrails.
       responses:
         "200": { description: Budget policy and current spend. }
+        "401": { $ref: "#/components/responses/Unauthorized" }
     put:
       summary: Configure spend limits, alerts, and automatic pause.
       parameters:
@@ -87,6 +88,10 @@ paths:
               $ref: "#/components/schemas/UpdateBudgetRequest"
       responses:
         "200": { description: Updated budget policy. }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
   /account/usage-alerts:
     get:
       summary: Read crossed budget thresholds and pause state.
@@ -105,6 +110,8 @@ paths:
       responses:
         "200":
           description: Product list.
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
   /sessions:
     post:
       summary: Create a dynamic or static proxy session asynchronously.
@@ -119,6 +126,13 @@ paths:
       responses:
         "202":
           description: Session creation accepted. Poll GET /sessions/{session_id}.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+        "402": { $ref: "#/components/responses/InsufficientBalance" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
   /sessions/{session_id}:
     get:
       summary: Get session status, proxy config, health, and usage.
@@ -131,6 +145,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SessionResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
     delete:
       summary: Terminate a session.
       parameters:
@@ -138,6 +154,8 @@ paths:
       responses:
         "200":
           description: Terminated.
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /sessions/{session_id}/rotate:
     post:
       summary: Rotate a session proxy and record the reason.
@@ -156,6 +174,10 @@ paths:
       responses:
         "200":
           description: Rotated session.
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
   /sessions/{session_id}/renew:
     post:
       summary: Renew a static session.
@@ -202,6 +224,7 @@ paths:
       responses:
         "200":
           description: Balance.
+        "401": { $ref: "#/components/responses/Unauthorized" }
   /billing/recharge:
     post:
       summary: Create a recharge order.
@@ -213,18 +236,29 @@ paths:
           application/json:
             schema:
               type: object
-              required: [amount]
+              anyOf:
+                - required: [amount]
+                - required: [amount_usd]
               properties:
-                amount: { type: number, minimum: 1 }
+                amount: { type: number, minimum: 10 }
+                amount_usd: { type: number, minimum: 10 }
+                currency: { type: string, enum: [USDT], default: USDT }
       responses:
         "201":
           description: Recharge order created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RechargeResponse"
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
   /billing/transactions:
     get:
       summary: List billing transactions.
       responses:
         "200":
           description: Transaction list.
+        "401": { $ref: "#/components/responses/Unauthorized" }
 components:
   securitySchemes:
     ApiKey:
@@ -242,7 +276,76 @@ components:
       name: Idempotency-Key
       required: false
       schema: { type: string, maxLength: 64 }
+  responses:
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Unauthorized:
+      description: API key is missing or invalid.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    NotFound:
+      description: The requested route, product, or session was not found.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    InsufficientBalance:
+      description: Account balance is insufficient for the requested operation.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Conflict:
+      description: Product state or idempotency key conflicts with the request.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    RateLimited:
+      description: Request or trial limit exceeded.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
   schemas:
+    ErrorResponse:
+      type: object
+      required: [success, data, error, meta]
+      properties:
+        success: { type: boolean, enum: [false] }
+        data: { nullable: true }
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [AUTH_INVALID_KEY, AUTH_EXPIRED_TOKEN, AUTH_INSUFFICIENT_PERMISSION, ACCOUNT_DISABLED, INVALID_REQUEST, ROUTE_NOT_FOUND, INSUFFICIENT_BALANCE, BUDGET_EXCEEDED, IDEMPOTENCY_CONFLICT, RATE_LIMIT_EXCEEDED, TRIAL_NOT_ELIGIBLE, PRODUCT_NOT_FOUND, PRODUCT_OUT_OF_STOCK, SESSION_NOT_FOUND, SESSION_EXPIRED, SESSION_LIMIT_REACHED, BACKEND_ERROR, BACKEND_TIMEOUT, INTERNAL_ERROR]
+            message: { type: string }
+            details: { type: object, additionalProperties: true }
+        meta:
+          type: object
+          required: [request_id, timestamp]
+          properties:
+            request_id: { type: string }
+            timestamp: { type: string, format: date-time }
+            latency_ms: { type: integer }
+    RechargeResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:
+          type: object
+          properties:
+            order_id: { type: string }
+            amount_usd: { type: number }
+            amount_usdt: { type: number }
+            amount_cny: { type: number }
+            exchange_rate: { type: number }
+            network: { type: string, example: TRC20 }
+            wallet_address: { type: string }
+            wallet_explorer_url: { type: string, format: uri }
+            status: { type: string }
     RequestApiKeyResponse:
       type: object
       properties:

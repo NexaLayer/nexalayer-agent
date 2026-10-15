@@ -31,12 +31,17 @@ const result = (value: unknown) => ({
   content: [{ type: 'text' as const, text: JSON.stringify(value, null, 2) }],
 });
 
-const server = new McpServer({ name: 'nexalayer', version: '0.1.2' });
+const server = new McpServer({ name: 'nexalayer', version: '0.1.3' });
+
+const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } as const;
+const paidWrite = { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true } as const;
+const policyWrite = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false } as const;
+const destructiveWrite = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true } as const;
 
 server.tool('nexalayer_list_products', 'List current products and prices before purchasing.', {
   type: z.enum(['all', 'dynamic', 'static']).default('all'),
   country_code: z.string().optional(),
-}, async ({ type, country_code }) => {
+}, readOnly, async ({ type, country_code }) => {
   const query = new URLSearchParams({ type });
   if (country_code) query.set('country_code', country_code);
   return result(await api('GET', `/products?${query}`));
@@ -50,23 +55,27 @@ server.tool('nexalayer_create_session', 'Create a paid network session. Configur
   country_code: z.string().optional(),
   duration: z.number().int().positive().optional(),
   idempotency_key: z.string().min(1).max(64),
-}, async ({ idempotency_key, ...body }) => result(await api('POST', '/sessions', body, idempotency_key)));
+}, paidWrite, async ({ idempotency_key, ...body }) => result(await api('POST', '/sessions', body, idempotency_key)));
 
 server.tool('nexalayer_rotate_session', 'Rotate a dynamic session after health or telemetry recommends rotation.', {
   session_id: z.string(),
   reason: z.string().optional(),
   idempotency_key: z.string().min(1).max(64),
-}, async ({ session_id, reason, idempotency_key }) => result(await api('POST', `/sessions/${encodeURIComponent(session_id)}/rotate`, { reason }, idempotency_key)));
+}, paidWrite, async ({ session_id, reason, idempotency_key }) => result(await api('POST', `/sessions/${encodeURIComponent(session_id)}/rotate`, { reason }, idempotency_key)));
+
+server.tool('nexalayer_terminate_session', 'Terminate a session and release its underlying network resource. Early termination does not imply a refund.', {
+  session_id: z.string(),
+}, destructiveWrite, async ({ session_id }) => result(await api('DELETE', `/sessions/${encodeURIComponent(session_id)}`)));
 
 server.tool('nexalayer_session_health', 'Read health score and rotation recommendation for a session.', {
   session_id: z.string(),
-}, async ({ session_id }) => result(await api('GET', `/sessions/${encodeURIComponent(session_id)}/health`)));
+}, readOnly, async ({ session_id }) => result(await api('GET', `/sessions/${encodeURIComponent(session_id)}/health`)));
 
 server.tool('nexalayer_session_usage', 'Read traffic and request usage for a session.', {
   session_id: z.string(),
-}, async ({ session_id }) => result(await api('GET', `/sessions/${encodeURIComponent(session_id)}/usage`)));
+}, readOnly, async ({ session_id }) => result(await api('GET', `/sessions/${encodeURIComponent(session_id)}/usage`)));
 
-server.tool('nexalayer_get_budget', 'Read spend limits, current spend, pause state, and next daily reset.', {},
+server.tool('nexalayer_get_budget', 'Read spend limits, current spend, pause state, and next daily reset.', {}, readOnly,
   async () => result(await api('GET', '/account/budget')));
 
 server.tool('nexalayer_set_budget', 'Set key and daily spend limits. This is a consequential write and should require owner approval.', {
@@ -76,9 +85,20 @@ server.tool('nexalayer_set_budget', 'Set key and daily spend limits. This is a c
   alert_thresholds: z.array(z.number().int().min(1).max(100)).default([50, 80, 100]),
   paused: z.boolean().optional(),
   idempotency_key: z.string().min(1).max(64),
-}, async ({ idempotency_key, ...body }) => result(await api('PUT', '/account/budget', body, idempotency_key)));
+}, policyWrite, async ({ idempotency_key, ...body }) => result(await api('PUT', '/account/budget', body, idempotency_key)));
 
-server.tool('nexalayer_usage_alerts', 'Read actionable budget threshold alerts.', {},
+server.tool('nexalayer_usage_alerts', 'Read actionable budget threshold alerts.', {}, readOnly,
   async () => result(await api('GET', '/account/usage-alerts')));
+
+server.tool('nexalayer_get_balance', 'Read the current account balance and trial-credit state.', {}, readOnly,
+  async () => result(await api('GET', '/billing/balance')));
+
+server.tool('nexalayer_list_transactions', 'List billing transactions for audit and reconciliation.', {
+  page: z.number().int().positive().default(1),
+  page_size: z.number().int().min(1).max(100).default(20),
+}, readOnly, async ({ page, page_size }) => {
+  const query = new URLSearchParams({ page: String(page), page_size: String(page_size) });
+  return result(await api('GET', `/billing/transactions?${query}`));
+});
 
 await server.connect(new StdioServerTransport());

@@ -3,7 +3,7 @@ import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import { PrismaClient } from '@prisma/client';
 import { env } from './config/env';
-import { API_PREFIX } from './config/constants';
+import { API_PREFIX, ERROR_CODES } from './config/constants';
 import { registerErrorHandler } from './middleware/error-handler';
 import { registerRateLimit } from './middleware/rate-limit';
 import { registerLogger } from './middleware/logger';
@@ -30,7 +30,7 @@ import { workspaceRoutes } from './modules/workspace/workspace.routes';
 import { workflowRoutes } from './modules/workflow/workflow.routes';
 import { systemRoutes } from './modules/system/system.routes';
 import { proxyPoolRoutes } from './modules/profile/proxy-pool.routes';
-import { sendSuccess } from './utils/response';
+import { sendError, sendSuccess } from './utils/response';
 
 export const prisma = new PrismaClient();
 
@@ -76,26 +76,6 @@ export async function buildApp() {
     async (_req, reply) => {
       let backendReachable = false;
       let backendError = '';
-      let dnsResolved = false;
-      try {
-        const url = new URL(env.BACKEND_BASE_URL);
-        const dns = await import('dns');
-        const { promisify } = await import('util');
-        const lookup = promisify(dns.lookup);
-        try {
-          const addr = await lookup(
-            url.hostname
-          );
-          dnsResolved = true;
-          backendError =
-            `dns=${addr.address}:${url.port}`;
-        } catch (dnsErr) {
-          backendError =
-            `dns_fail: ${(dnsErr as Error).message}`;
-        }
-      } catch {
-        /* ignore parse errors */
-      }
 
       try {
         const ctrl = new AbortController();
@@ -135,10 +115,7 @@ export async function buildApp() {
         status: 'ok',
         version: '1.0.0',
         timestamp: new Date().toISOString(),
-        backend_url: env.BACKEND_BASE_URL,
         backend_reachable: backendReachable,
-        dns_resolved: dnsResolved,
-        backend_error: backendError || undefined,
       });
     }
   );
@@ -194,6 +171,16 @@ export async function buildApp() {
   await app.register(proxyPoolRoutes, {
     prefix: `${API_PREFIX}/proxy-pools`,
   });
+
+  app.setNotFoundHandler((request, reply) =>
+    sendError(
+      reply,
+      ERROR_CODES.ROUTE_NOT_FOUND,
+      'Route not found',
+      { method: request.method, path: request.url.split('?')[0] },
+      request.startTime
+    )
+  );
 
   return app;
 }

@@ -25,6 +25,33 @@ describe('safe smoke: static MVP contract', () => {
     expect(openapi).toContain('full_url');
   });
 
+  it('keeps health responses and unknown routes agent-safe', () => {
+    const app = read('src/app.ts');
+    expect(app).toContain('setNotFoundHandler');
+    expect(app).toContain('ROUTE_NOT_FOUND');
+    expect(app).not.toContain('backend_url: env.BACKEND_BASE_URL');
+    expect(app).not.toContain('backend_error: backendError');
+  });
+
+  it('publishes a closed MCP lifecycle with tool safety annotations', () => {
+    const mcp = read('mcp/src/index.ts');
+    expect(mcp).toContain("server.tool('nexalayer_terminate_session'");
+    expect(mcp).toContain("server.tool('nexalayer_get_balance'");
+    expect(mcp).toContain("server.tool('nexalayer_list_transactions'");
+    expect(mcp).toContain('readOnlyHint: true');
+    expect(mcp).toContain('destructiveHint: true');
+    expect(mcp).toContain('idempotentHint: true');
+  });
+
+  it('documents the unified error envelope and recharge minimum', () => {
+    const openapi = read('openapi/openapi.yaml');
+    expect(openapi).toContain('ErrorResponse:');
+    expect(openapi).toContain('ROUTE_NOT_FOUND');
+    expect(openapi).toContain('BUDGET_EXCEEDED');
+    expect(openapi).toContain('amount_usd: { type: number, minimum: 10 }');
+    expect(openapi).toContain('RechargeResponse:');
+  });
+
   it('treats timeout as a health-affecting failure signal', () => {
     const telemetry = read('src/modules/telemetry/telemetry.service.ts');
     expect(telemetry).toMatch(/'timeout'/);
