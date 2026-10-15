@@ -188,7 +188,8 @@ describe('trial resource contract', () => {
       'src/modules/account/trial-monitor.service.ts',
       'utf8'
     );
-    expect(envSource).toContain('TRIAL_BALANCE: z.coerce.number().positive().default(5.0)');
+    expect(envSource).toContain('TRIAL_BALANCE: z.coerce.number().positive().default(20.0)');
+    expect(envSource).toContain('TRIAL_ALERT_CLAIM_THRESHOLD: z.coerce.number().int().positive().default(5)');
     expect(monitorSource).toContain("event: 'TRIAL_CLAIM_SURGE'");
     expect(monitorSource).toContain('TRIAL_ALERT_WEBHOOK_URL');
     expect(monitorSource).toContain('TRIAL_ALERT_TELEGRAM_BOT_TOKEN');

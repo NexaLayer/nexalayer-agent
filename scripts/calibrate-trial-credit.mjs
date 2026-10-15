@@ -3,7 +3,10 @@ import { readFile } from 'node:fs/promises';
 const pricing = JSON.parse(
   await readFile(new URL('../src/config/public-pricing.json', import.meta.url), 'utf8')
 );
-const testQuantityGb = 0.25;
+// Fractional orders are accepted by the control plane but do not yield usable
+// Dynamic Pool 2 quota. Production regression verifies 1 GB as the minimum
+// useful test Session.
+const testQuantityGb = 1;
 const targetSessions = { minimum: 5, maximum: 10 };
 const perSessionUsd = pricing.products.dynamic.starting_price * testQuantityGb;
 const recommended = {
