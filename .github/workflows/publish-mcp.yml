@@ -50,8 +50,8 @@ jobs:
         if: github.event_name == 'release' || !inputs.dry_run
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          for attempt in 1 2 3 4 5; do
-            [ "$(npm view @nexalayer/mcp version)" = "$VERSION" ] && exit 0
+          for attempt in $(seq 1 12); do
+            [ "$(npm view @nexalayer/mcp version --prefer-online)" = "$VERSION" ] && exit 0
             sleep 15
           done
           exit 1
