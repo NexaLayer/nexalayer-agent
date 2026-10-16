@@ -28,7 +28,7 @@ describe('public API and MCP contracts', () => {
     );
     expect(account).toContain('api_key_prefix: maskApiKey(agent.apiKey)');
     expect(accountInfo).not.toContain('api_key: agent.apiKey');
-    expect(session).toContain('Dynamic product has no available traffic');
+    expect(session).toContain('Dynamic product is out of stock');
     expect(session).toContain('refundUserBalance');
     expect(session).toContain('estimatedChargeUsd: refundedCny > 0 ? 0 : undefined');
   });

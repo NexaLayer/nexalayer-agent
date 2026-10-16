@@ -38,6 +38,7 @@ type ProductInfo = {
   price: number;
   proxyType: number;
   flow: number;
+  stock: number;
   duration: number;
   unit: number;
   projectId?: string;
@@ -378,20 +379,22 @@ export async function lookupProductInfo(
       );
     }
 
-    if (match.flow <= 0) {
+    if (match.stock <= 0) {
       throw new AppError(
         ERROR_CODES.PRODUCT_OUT_OF_STOCK,
-        'Dynamic product has no available traffic'
+        'Dynamic product is out of stock'
       );
     }
 
     const price = getOpenAgentDynamicPrice();
+    assertPriceMatches(price, match.price);
 
     return {
       backendProductNo: match.backendProductNo,
       price,
       proxyType: match.proxyType,
       flow: match.flow,
+      stock: match.stock,
       duration: match.duration || 1,
       unit: match.unit || 1,
     };
@@ -425,6 +428,7 @@ export async function lookupProductInfo(
     ),
     proxyType: match.proxyType,
     flow: match.flow ?? 0,
+    stock: match.stock,
     duration: match.duration ?? 30,
     unit: match.unit ?? 1,
     projectId: chooseStaticProjectId(match),

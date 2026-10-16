@@ -37,6 +37,39 @@ export type ProductListItem = {
   projects?: Record<string, unknown>[];
 };
 
+type SafeProductListItem = Pick<
+  ProductListItem,
+  | 'product_no'
+  | 'name'
+  | 'type'
+  | 'sharing'
+  | 'available'
+  | 'price'
+  | 'currency'
+  | 'unit'
+  | 'country'
+  | 'city'
+  | 'stock'
+>;
+
+function toSafeProductListItem(
+  product: ProductListItem
+): SafeProductListItem {
+  return {
+    product_no: product.product_no,
+    name: product.name,
+    type: product.type,
+    sharing: product.sharing,
+    available: product.available,
+    price: product.price,
+    currency: product.currency,
+    unit: product.unit,
+    country: product.country,
+    city: product.city,
+    stock: product.stock,
+  };
+}
+
 async function getPricingToken(): Promise<string> {
   const cached = productCache.get<string>('pricing-token');
   if (cached) return cached;
@@ -117,17 +150,22 @@ async function loadCatalog(
   const items: ProductListItem[] = [
     ...dynamicProducts.flatMap((product) => {
       const price = getOpenAgentDynamicPrice();
+      // IPProxy recalculates the user's dynamic price at order time. Do not
+      // advertise a configured NexaLayer price unless the authenticated
+      // pricing account sees the same upstream unit price.
+      if (Math.abs(product.price - price) > 0.0001) return [];
       return [{
       product_no: product.type,
       name: product.name,
       type: 'dynamic' as const,
       sharing: 'shared' as const,
-      available: product.flow > 0,
+      available: product.stock > 0,
       price: usd(price),
       currency: 'USD' as const,
       unit: 'GB',
       country: product.country || undefined,
       city: product.city || undefined,
+      stock: product.stock,
       proxy_type: product.proxyType,
       }];
     }),
@@ -193,7 +231,9 @@ export async function listProducts(query: ListProductsQuery) {
     return true;
   });
   const offset = decodeCursor(query.cursor);
-  const items = filtered.slice(offset, offset + query.limit);
+  const items = filtered
+    .slice(offset, offset + query.limit)
+    .map(toSafeProductListItem);
   const nextOffset = offset + items.length;
   return {
     items,
@@ -203,30 +243,11 @@ export async function listProducts(query: ListProductsQuery) {
         : null,
     total: filtered.length,
     cache_ttl_seconds: env.PRODUCT_CACHE_TTL_SECONDS,
-    pricing_owner_agent_id: env.PRICING_OWNER_AGENT_ID,
   };
 }
 
 export async function listPublicProducts(query: ListProductsQuery) {
-  const result = await listProducts(query);
-  return {
-    items: result.items.map((product) => ({
-      product_no: product.product_no,
-      name: product.name,
-      type: product.type,
-      sharing: product.sharing,
-      available: product.available,
-      price: product.price,
-      currency: product.currency,
-      unit: product.unit,
-      country: product.country,
-      city: product.city,
-      stock: product.stock,
-    })),
-    next_cursor: result.next_cursor,
-    total: result.total,
-    cache_ttl_seconds: result.cache_ttl_seconds,
-  };
+  return listProducts(query);
 }
 
 export async function listRegions(_agentId: number) {

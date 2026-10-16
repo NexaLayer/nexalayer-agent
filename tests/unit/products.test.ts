@@ -38,8 +38,8 @@ describe('openAgent product catalog', () => {
     getUserIdentity.mockResolvedValue({ token: 'token', agentId: 1474 });
     getUsdtRate.mockResolvedValue({ effective_rate: 7 });
     getDynamicProducts.mockResolvedValue([
-      { id: 1, type: 'DYN-1', name: 'Dynamic Proxy', proxyType: 104, price: 28, flow: 10, country: 'US', city: '' },
-      { id: 2, type: 'DYN-EMPTY', name: 'Empty Dynamic', proxyType: 104, price: 28, flow: 0, country: 'US', city: '' },
+      { id: 1, type: 'DYN-1', name: 'Dynamic Proxy', proxyType: 104, price: 1.5, flow: 0, stock: 10, country: 'US', city: '' },
+      { id: 2, type: 'DYN-EMPTY', name: 'Empty Dynamic', proxyType: 104, price: 1.5, flow: 999, stock: 0, country: 'US', city: '' },
     ]);
     getStaticProducts.mockResolvedValue([
       { id: 0, productId: 'STATIC-SHARED', proxyType: 103, productType: 2, price: 5, stock: 2, status: 1, country: 'US', city: 'New York' },
@@ -64,12 +64,12 @@ describe('openAgent product catalog', () => {
     expect(getDynamicProducts).toHaveBeenCalledTimes(1);
     expect(getUsdtRate).toHaveBeenCalledTimes(1);
     expect(first).toEqual(second);
-    expect(first.pricing_owner_agent_id).toBe(1474);
+    expect(first).not.toHaveProperty('pricing_owner_agent_id');
     expect(first.cache_ttl_seconds).toBe(60);
     expect(first.items.every((item) => /^[\x20-\x7E]+$/.test(item.name))).toBe(true);
   });
 
-  it('uses real dynamic flow for availability and applies filters/cursors', async () => {
+  it('uses real dynamic stock for availability and applies filters/cursors', async () => {
     const service = await import('../../src/modules/product/product.service');
     const all = await service.listProducts({ type: 'dynamic', in_stock: false, limit: 20 });
     expect(all.items.find((item) => item.product_no === 'DYN-EMPTY')?.available).toBe(false);
@@ -94,14 +94,26 @@ describe('openAgent product catalog', () => {
     expect(result.items.some((item) => item.product_no === 'STATIC-PRICE-MISMATCH')).toBe(false);
   });
 
-  it('whitelists public fields and does not expose internal pricing metadata', async () => {
+  it.each(['listProducts', 'listPublicProducts'] as const)(
+    '%s whitelists fields and does not expose internal pricing metadata',
+    async (method) => {
     const service = await import('../../src/modules/product/product.service');
-    const result = await service.listPublicProducts({ type: 'static', in_stock: true, limit: 20 });
+    const result = await service[method]({ type: 'static', in_stock: true, limit: 20 });
     expect(result).not.toHaveProperty('pricing_owner_agent_id');
     expect(result.items[0]).not.toHaveProperty('proxy_type');
     expect(result.items[0]).not.toHaveProperty('product_type');
     expect(result.items[0]).not.toHaveProperty('projects');
     expect(result.items[0]).not.toHaveProperty('project_required');
+    }
+  );
+
+  it('hides a dynamic product when the upstream user price differs from the advertised price', async () => {
+    getDynamicProducts.mockResolvedValueOnce([
+      { id: 1, type: 'DYN-EXPENSIVE', name: 'Dynamic Proxy', proxyType: 104, price: 15, flow: 0, stock: 1000, country: 'US', city: '' },
+    ]);
+    const service = await import('../../src/modules/product/product.service');
+    const result = await service.listProducts({ type: 'dynamic', in_stock: false, limit: 20 });
+    expect(result.items).toEqual([]);
   });
 
   it('uses the ZT product number as the canonical location label', async () => {
