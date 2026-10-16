@@ -60,6 +60,7 @@ describe('openAgent product catalog', () => {
     expect(findUnique).toHaveBeenCalledWith({ where: { id: 139 } });
     expect(getUserIdentity).toHaveBeenCalledTimes(1);
     expect(getDynamicProducts).toHaveBeenCalledTimes(1);
+    expect(getUsdtRate).toHaveBeenCalledTimes(1);
     expect(first).toEqual(second);
     expect(first.pricing_owner_agent_id).toBe(1474);
     expect(first.cache_ttl_seconds).toBe(60);

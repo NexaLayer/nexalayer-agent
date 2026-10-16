@@ -37,6 +37,8 @@ export type ProductListItem = {
 };
 
 async function getPricingToken(): Promise<string> {
+  const cached = productCache.get<string>('pricing-token');
+  if (cached) return cached;
   const agent = await prisma.agentApp.findUnique({
     where: { id: env.PRICING_AGENT_APP_ID },
   });
@@ -56,7 +58,20 @@ async function getPricingToken(): Promise<string> {
       'Pricing account owner does not match the configured reseller'
     );
   }
+  productCache.set('pricing-token', identity.token, 300);
   return identity.token;
+}
+
+async function getExchangeRate(userToken: string): Promise<number> {
+  const cached = productCache.get<number>('usd-cny-rate');
+  if (cached) return cached;
+  const rate = await backend.getUsdtRate(userToken);
+  const exchangeRate = Number(rate.effective_rate ?? rate.rate);
+  if (!Number.isFinite(exchangeRate) || exchangeRate <= 0) {
+    throw new AppError(ERROR_CODES.BACKEND_ERROR, 'Backend exchange rate is unavailable');
+  }
+  productCache.set('usd-cny-rate', exchangeRate, 300);
+  return exchangeRate;
 }
 
 function englishStaticName(product: {
@@ -89,16 +104,12 @@ async function loadCatalog(
   const userToken = await getPricingToken();
   const includeDynamic = type !== 'static';
   const includeStatic = type !== 'dynamic';
-  const [rate, dynamicProducts, staticProducts, agentPrices] = await Promise.all([
-    backend.getUsdtRate(userToken),
+  const [exchangeRate, dynamicProducts, staticProducts, agentPrices] = await Promise.all([
+    getExchangeRate(userToken),
     includeDynamic ? backend.getDynamicProducts(userToken) : Promise.resolve([]),
     includeStatic ? backend.getStaticProducts(userToken) : Promise.resolve([]),
     includeStatic ? getOpenAgentPriceMap([103]) : Promise.resolve(new Map()),
   ]);
-  const exchangeRate = Number(rate.effective_rate ?? rate.rate);
-  if (!Number.isFinite(exchangeRate) || exchangeRate <= 0) {
-    throw new AppError(ERROR_CODES.BACKEND_ERROR, 'Backend exchange rate is unavailable');
-  }
   const usd = (priceCny: number) =>
     Math.round((priceCny / exchangeRate) * 100) / 100;
 
