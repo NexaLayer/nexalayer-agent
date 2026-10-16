@@ -4,6 +4,11 @@ NexaLayer MCP Server — a Model Context Protocol (MCP) server that lets AI agen
 
 The MCP implementation is in [`mcp/`](./mcp/), with its source entry point at [`mcp/src/index.ts`](./mcp/src/index.ts). The published package builds that file to the runtime entry path `mcp/dist/index.js`.
 
+Current public starting prices are **$0.23/GB** for dynamic proxy sessions and
+**$1.05/month** for shared static proxy sessions. Query
+`GET /v1/public/products` or the authenticated product catalog for the current,
+authoritative quote and availability before creating a paid session.
+
 ## MCP Server
 
 ### Install
@@ -104,7 +109,8 @@ API key auth, product listing, balance, and transactions without creating a
 paid proxy session.
 
 `npm run test:phase0:real` sets `PHASE0_ALLOW_PAID=1` and creates one low-volume
-dynamic session, polls until active, checks `proxy.full_url`, reports telemetry,
+dynamic session, polls until active, explicitly requests credentials with
+`include_credentials=true`, checks `proxy.full_url`, reports telemetry,
 reads health and billing, then terminates the session in a cleanup step. Use
 `NEXALAYER_PRODUCT_NO`, `PHASE0_QUANTITY`, and `PHASE0_PRINT_PROXY_URL=1` when
 you need a specific product or need to inspect the returned proxy URL.
@@ -117,6 +123,13 @@ only be used in controlled environments.
 The broader `npm run test:smoke` suite may create real Agent accounts, proxy
 sessions, orders, or billing records depending on environment configuration.
 Review `docs/agentTest.md` and the target environment before running it.
+
+Session detail and rotation responses hide `proxy.full_url` by default. Send
+`include_credentials=true` only when the caller needs to connect, and never log
+the returned credentials. Read measured traffic from
+`GET /v1/sessions/{session_id}/usage`. Unknown product numbers return HTTP 404
+with `PRODUCT_NOT_FOUND`; a quote/upstream charge discrepancy is rejected before
+charging with HTTP 409 and `PRICE_MISMATCH`.
 
 ## Chinese Docs and Examples
 
