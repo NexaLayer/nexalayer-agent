@@ -987,7 +987,7 @@ export async function renewStaticOrder(
 
 export async function getTransactions(
   userToken: string,
-  params: { page?: number; page_size?: number }
+  params: { page?: number; page_size?: number; order_no?: string }
 ): Promise<{
   items: Record<string, unknown>[];
   total: number;
@@ -997,6 +997,7 @@ export async function getTransactions(
   if (params.page_size) {
     qs.set('page_size', String(params.page_size));
   }
+  if (params.order_no) qs.set('order_no', params.order_no);
   const res = await fetchJson<
     BackendResponse<{
       items: Record<string, unknown>[];

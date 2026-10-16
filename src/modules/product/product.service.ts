@@ -11,6 +11,7 @@ import {
   getOpenAgentDynamicPrice,
   findOpenAgentPrice,
 } from './agent-pricing';
+import { canonicalStaticCity } from '../session/session-policy';
 
 const productCache = new NodeCache({
   stdTTL: env.PRODUCT_CACHE_TTL_SECONDS,
@@ -121,7 +122,7 @@ async function loadCatalog(
       name: product.name,
       type: 'dynamic' as const,
       sharing: 'shared' as const,
-      available: true,
+      available: product.flow > 0,
       price: usd(price),
       currency: 'USD' as const,
       unit: 'GB',
@@ -150,7 +151,7 @@ async function loadCatalog(
       unit: 'month',
       stock: product.stock,
       country: product.country || undefined,
-      city: product.city || undefined,
+      city: canonicalStaticCity(product.productId, product.city) || undefined,
       proxy_type: product.proxyType,
       product_type: product.productType,
       project_required: Boolean(product.projectList?.length),

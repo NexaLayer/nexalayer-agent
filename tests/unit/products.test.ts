@@ -67,10 +67,10 @@ describe('openAgent product catalog', () => {
     expect(first.items.every((item) => /^[\x20-\x7E]+$/.test(item.name))).toBe(true);
   });
 
-  it('keeps dynamic products purchasable and applies filters/cursors', async () => {
+  it('uses real dynamic flow for availability and applies filters/cursors', async () => {
     const service = await import('../../src/modules/product/product.service');
     const all = await service.listProducts({ type: 'dynamic', in_stock: false, limit: 20 });
-    expect(all.items.find((item) => item.product_no === 'DYN-EMPTY')?.available).toBe(true);
+    expect(all.items.find((item) => item.product_no === 'DYN-EMPTY')?.available).toBe(false);
     expect(getStaticProducts).not.toHaveBeenCalled();
     expect(getAgentProductPrices).not.toHaveBeenCalled();
     const available = await service.listProducts({ type: 'all', country: 'US', in_stock: true, limit: 1 });
@@ -113,6 +113,7 @@ describe('openAgent product catalog', () => {
     expect(result.items[0]).toMatchObject({
       product_no: 'ZT_US_Englewood_5',
       name: 'ENGLEWOOD, US Shared Static Proxy',
+      city: 'ENGLEWOOD',
     });
   });
 });

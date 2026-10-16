@@ -20,6 +20,15 @@ import {
   getOpenAgentDynamicPrice,
   resolveOpenAgentPrice,
 } from '../product/agent-pricing';
+import {
+  assertPriceMatches,
+  assertProjectSelection,
+  assertProtocolSupported,
+  projectIds,
+  staticMonths,
+  transactionDebitCny,
+} from './session-policy';
+import { probeProxyEndpoint } from './proxy-probe';
 
 const STATIC_ORDER_READY_TIMEOUT_MS = 120_000;
 const STATIC_ORDER_POLL_MS = 3_000;
@@ -32,6 +41,9 @@ type ProductInfo = {
   duration: number;
   unit: number;
   projectId?: string;
+  projectRequired?: boolean;
+  validProjectIds?: string[];
+  upstreamPrice?: number;
 };
 
 export async function createSession(
@@ -39,6 +51,7 @@ export async function createSession(
   input: CreateSessionRequest,
   idempotencyKey?: string
 ) {
+  assertProtocolSupported(input.session_type, input.protocol);
   const agent = await prisma.agentApp.findUnique({
     where: { id: agentId },
   });
@@ -146,6 +159,14 @@ export async function createSession(
     input.product_no,
     input.session_type
   );
+  assertProjectSelection(
+    Boolean(product.projectRequired),
+    product.validProjectIds ?? [],
+    input.project_id
+  );
+  if (input.session_type === SESSION_TYPE.STATIC) {
+    assertPriceMatches(product.price, product.upstreamPrice ?? product.price);
+  }
   const rate = await backend.getUsdtRate(userToken);
   const exchangeRate = Number(
     rate.effective_rate ?? rate.rate
@@ -159,12 +180,7 @@ export async function createSession(
   const quantity = input.quantity ?? 1;
   const months =
     input.session_type === SESSION_TYPE.STATIC
-      ? Math.max(
-          1,
-          Math.ceil(
-            (input.duration ?? product.duration) / 30
-          )
-        )
+      ? staticMonths(input.duration ?? product.duration)
       : undefined;
   const estimatedAmountCny =
     product.price * quantity * (months ?? 1);
@@ -207,7 +223,8 @@ export async function createSession(
       backendPasswordEnc: agent.backendPasswordEnc,
     },
     input,
-    product
+    product,
+    exchangeRate
   ).catch((err) => {
     console.error(
       `Async provision failed for ${sessionId}:`,
@@ -309,6 +326,11 @@ async function provisionExistingSessionAsync(
         'Existing resource returned no proxy endpoint. Recharge or contact Telegram support @ztproxy.'
       );
     }
+    assertProtocolSupported(input.session_type, input.protocol);
+    if (proxy.protocol !== input.protocol) {
+      throw new AppError(ERROR_CODES.INVALID_REQUEST, `Requested protocol ${input.protocol} was not returned by the resource`);
+    }
+    await probeProxyEndpoint(proxy);
     await prisma.agentSession.update({
       where: { id: sessionDbId },
       data: {
@@ -339,7 +361,7 @@ async function provisionExistingSessionAsync(
   }
 }
 
-async function lookupProductInfo(
+export async function lookupProductInfo(
   userToken: string,
   productNo: string,
   sessionType: string
@@ -351,7 +373,7 @@ async function lookupProductInfo(
       (p) => p.type === productNo
     );
     if (!match) {
-      throw new Error(
+      throw new AppError(ERROR_CODES.PRODUCT_NOT_FOUND,
         `Dynamic product not found: ${productNo}`
       );
     }
@@ -381,7 +403,7 @@ async function lookupProductInfo(
     (p) => p.productId === productNo
   );
   if (!match) {
-    throw new Error(
+    throw new AppError(ERROR_CODES.PRODUCT_NOT_FOUND,
       `Static product not found: ${productNo}`
     );
   }
@@ -391,6 +413,7 @@ async function lookupProductInfo(
       'Static product is out of stock'
     );
   }
+  const validProjectIds = projectIds(match.projectList);
   return {
     backendProductNo: match.productId,
     price: resolveOpenAgentPrice(
@@ -405,6 +428,9 @@ async function lookupProductInfo(
     duration: match.duration ?? 30,
     unit: match.unit ?? 1,
     projectId: chooseStaticProjectId(match),
+    projectRequired: validProjectIds.length > 0,
+    validProjectIds,
+    upstreamPrice: Number(match.price),
   };
 }
 
@@ -446,11 +472,11 @@ async function provisionSessionAsync(
     backendPasswordEnc: string | null;
   },
   input: CreateSessionRequest,
-  product: ProductInfo
+  product: ProductInfo,
+  exchangeRate: number
 ): Promise<void> {
   let balanceBefore: number | undefined;
   let userToken: string | undefined;
-  let expectedChargeCny = 0;
   try {
     if (
       !agent.backendUsername ||
@@ -477,8 +503,8 @@ async function provisionSessionAsync(
 
     const qty = input.quantity ?? 1;
     const dur = input.duration ?? product.duration;
-    const totalAmount = product.price * qty;
-    expectedChargeCny = totalAmount;
+    const months = input.session_type === SESSION_TYPE.STATIC ? staticMonths(dur) : 1;
+    const totalAmount = product.price * qty * months;
 
     let backendOrderNo: string | undefined;
     let expiresAt: Date | undefined;
@@ -526,6 +552,10 @@ async function provisionSessionAsync(
           'Dynamic proxy extraction returned no proxy endpoint'
         );
       }
+      if (proxy.protocol !== input.protocol) {
+        throw new AppError(ERROR_CODES.INVALID_REQUEST, `Requested protocol ${input.protocol} was not returned by the supplier`);
+      }
+      await probeProxyEndpoint(proxy);
       await prisma.agentSession.update({
         where: { id: sessionDbId },
         data: proxy
@@ -573,6 +603,13 @@ async function provisionSessionAsync(
           'Static order creation returned no proxy endpoint'
         );
       }
+      if (proxy.protocol !== input.protocol) {
+        throw new AppError(
+          ERROR_CODES.INVALID_REQUEST,
+          `Requested protocol ${input.protocol} was not returned by the supplier`
+        );
+      }
+      await probeProxyEndpoint(proxy);
       await prisma.agentSession.update({
         where: { id: sessionDbId },
         data: {
@@ -585,10 +622,12 @@ async function provisionSessionAsync(
           proxyProtocol: proxy.protocol,
         },
       });
-      expiresAt = new Date(
-        Date.now() + dur * 24 * 60 * 60 * 1000
-      );
+      expiresAt = new Date(Date.now() + months * 30 * 24 * 60 * 60 * 1000);
     }
+
+    if (!backendOrderNo) throw new Error('Backend order number is missing');
+    const actualChargeCny = await waitForTransactionDebit(userToken, backendOrderNo);
+    const actualChargeUsd = Math.round((actualChargeCny / exchangeRate) * 100) / 100;
 
     await prisma.agentSession.update({
       where: { id: sessionDbId },
@@ -596,6 +635,7 @@ async function provisionSessionAsync(
         status: SESSION_STATUS.ACTIVE,
         backendOrderNo,
         expiresAt,
+        estimatedChargeUsd: actualChargeUsd,
       },
     });
   } catch (err) {
@@ -607,10 +647,7 @@ async function provisionSessionAsync(
     if (userToken && balanceBefore !== undefined && agent.backendUserId) {
       try {
         const balanceAfter = await backend.getBalance(userToken);
-        const chargedCny = Math.min(
-          refundableCharge(balanceBefore, balanceAfter),
-          expectedChargeCny
-        );
+        const chargedCny = refundableCharge(balanceBefore, balanceAfter);
         if (chargedCny > 0) {
           await backend.refundUserBalance(
             agent.backendUserId,
@@ -635,6 +672,20 @@ async function provisionSessionAsync(
       },
     });
   }
+}
+
+async function waitForTransactionDebit(userToken: string, orderNo: string): Promise<number> {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const transactions = await backend.getTransactions(userToken, {
+      page: 1,
+      page_size: 50,
+      order_no: orderNo,
+    });
+    const debit = transactionDebitCny(transactions.items, orderNo);
+    if (debit !== null) return debit;
+    await sleep(500 * (attempt + 1));
+  }
+  throw new Error(`Billing transaction not found for ${orderNo}`);
 }
 
 async function waitForStaticProxy(
@@ -923,9 +974,11 @@ export async function terminateSession(
   }
 
   if (shouldReleaseStaticResource(session)) {
-    await backend.releaseZtProxyStaticOrder(
-      session.backendOrderNo!
-    );
+    try {
+      await backend.releaseZtProxyStaticOrder(session.backendOrderNo!);
+    } catch (error) {
+      console.error(`[terminate] static cleanup failed for ${session.sessionId}:`, (error as Error).message);
+    }
   }
 
   await prisma.agentSession.update({
