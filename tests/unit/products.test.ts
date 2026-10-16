@@ -39,7 +39,7 @@ describe('openAgent product catalog', () => {
       { type: 'DYN-EMPTY', name: 'Empty Dynamic', proxyType: 104, price: 28, flow: 0, country: 'US', city: '' },
     ]);
     getStaticProducts.mockResolvedValue([
-      { productId: 'S-1', proxyType: 103, productType: 1, price: 70, stock: 2, status: 1, country: 'US', city: 'NYC' },
+      { productId: '静态资源-1', proxyType: 103, productType: 1, price: 70, stock: 2, status: 1, country: 'US', city: '纽约' },
     ]);
   });
 
@@ -54,6 +54,7 @@ describe('openAgent product catalog', () => {
     expect(first).toEqual(second);
     expect(first.pricing_owner_agent_id).toBe(1474);
     expect(first.cache_ttl_seconds).toBe(60);
+    expect(first.items.every((item) => /^[\x20-\x7E]+$/.test(item.name))).toBe(true);
   });
 
   it('marks zero-flow dynamic products unavailable and applies filters/cursors', async () => {
@@ -64,5 +65,6 @@ describe('openAgent product catalog', () => {
     expect(available.items).toHaveLength(1);
     expect(available.next_cursor).not.toBeNull();
     expect(available.items[0]).toMatchObject({ sharing: 'shared', available: true, price: 4 });
+    expect(available.items.every((item) => /^[\x20-\x7E]+$/.test(item.name))).toBe(true);
   });
 });

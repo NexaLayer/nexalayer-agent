@@ -55,14 +55,13 @@ async function getPricingToken(): Promise<string> {
 }
 
 function englishStaticName(product: {
-  productId: string;
   country?: string;
   city?: string;
 }): string {
   const location = [product.city, product.country]
     .filter((part): part is string => Boolean(part && /^[\x20-\x7E]+$/.test(part)))
     .join(', ');
-  return `${location ? `${location} ` : ''}Exclusive Static Proxy (${product.productId})`;
+  return `${location ? `${location} ` : ''}Exclusive Static Proxy`;
 }
 
 async function loadCatalog(): Promise<ProductListItem[]> {

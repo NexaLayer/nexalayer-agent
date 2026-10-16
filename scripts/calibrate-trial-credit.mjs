@@ -1,10 +1,10 @@
 const pricingUrl = process.env.PUBLIC_PRODUCTS_URL ??
-  'https://api.nexalayer.net/v1/public/products?type=dynamic&in_stock=true&limit=100';
+  'https://api.nexalayer.net/v1/public/products?type=dynamic&in_stock=false&limit=100';
 const response = await fetch(pricingUrl);
 if (!response.ok) throw new Error(`Unable to read public products: HTTP ${response.status}`);
 const products = (await response.json())?.data?.items ?? [];
 const dynamic = products
-  .filter((product) => product.type === 'dynamic' && product.available)
+  .filter((product) => product.type === 'dynamic' && Number(product.price) > 0)
   .sort((a, b) => Number(a.price) - Number(b.price))[0];
 if (!dynamic) throw new Error('No available dynamic product was returned');
 // Fractional orders are accepted by the control plane but do not yield usable
