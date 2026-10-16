@@ -86,4 +86,14 @@ describe('openAgent product catalog', () => {
     ]));
     expect(result.items.some((item) => item.product_no === 'INTERNAL-NO-PRICE')).toBe(false);
   });
+
+  it('whitelists public fields and does not expose internal pricing metadata', async () => {
+    const service = await import('../../src/modules/product/product.service');
+    const result = await service.listPublicProducts({ type: 'static', in_stock: true, limit: 20 });
+    expect(result).not.toHaveProperty('pricing_owner_agent_id');
+    expect(result.items[0]).not.toHaveProperty('proxy_type');
+    expect(result.items[0]).not.toHaveProperty('product_type');
+    expect(result.items[0]).not.toHaveProperty('projects');
+    expect(result.items[0]).not.toHaveProperty('project_required');
+  });
 });

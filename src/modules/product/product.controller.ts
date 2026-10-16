@@ -50,5 +50,10 @@ export async function handlePublicPricing(
 ): Promise<void> {
   const query = listProductsSchema.parse(request.query);
   reply.header('Cache-Control', 'public, max-age=60, s-maxage=60');
-  sendSuccess(reply, await productService.listProducts(query), 200, request.startTime);
+  sendSuccess(
+    reply,
+    await productService.listPublicProducts(query),
+    200,
+    request.startTime
+  );
 }

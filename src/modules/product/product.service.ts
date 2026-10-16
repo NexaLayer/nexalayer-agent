@@ -175,6 +175,28 @@ export async function listProducts(query: ListProductsQuery) {
   };
 }
 
+export async function listPublicProducts(query: ListProductsQuery) {
+  const result = await listProducts(query);
+  return {
+    items: result.items.map((product) => ({
+      product_no: product.product_no,
+      name: product.name,
+      type: product.type,
+      sharing: product.sharing,
+      available: product.available,
+      price: product.price,
+      currency: product.currency,
+      unit: product.unit,
+      country: product.country,
+      city: product.city,
+      stock: product.stock,
+    })),
+    next_cursor: result.next_cursor,
+    total: result.total,
+    cache_ttl_seconds: result.cache_ttl_seconds,
+  };
+}
+
 export async function listRegions(_agentId: number) {
   const hierarchy = await backend.getAreaHierarchy(await getPricingToken());
   const items = hierarchy.areas.map((area) => ({
