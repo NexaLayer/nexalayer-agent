@@ -32,6 +32,34 @@ const result = (value: unknown) => ({
   content: [{ type: 'text' as const, text: JSON.stringify(value, null, 2) }],
 });
 
+type Product = Record<string, unknown>;
+
+function productItems(response: unknown): Product[] {
+  if (!response || typeof response !== 'object') return [];
+  const body = response as Record<string, unknown>;
+  const data = body.data && typeof body.data === 'object'
+    ? body.data as Record<string, unknown>
+    : body;
+  return Array.isArray(data.items)
+    ? data.items.filter((item): item is Product => Boolean(item) && typeof item === 'object')
+    : [];
+}
+
+function compactProduct(product: Product) {
+  const fields = [
+    'product_no', 'name', 'type', 'price', 'currency', 'unit',
+    'stock', 'country', 'city', 'project_required',
+  ] as const;
+  const compact: Product = {};
+  for (const field of fields) {
+    if (product[field] !== undefined && product[field] !== null) {
+      compact[field] = product[field];
+    }
+  }
+  if (Array.isArray(product.projects)) compact.project_count = product.projects.length;
+  return compact;
+}
+
 const server = new McpServer({ name: 'nexalayer', version: '0.1.4' });
 
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } as const;
@@ -39,16 +67,34 @@ const paidWrite = { readOnlyHint: false, destructiveHint: false, idempotentHint:
 const policyWrite = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false } as const;
 const destructiveWrite = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true } as const;
 
-server.tool('nexalayer_list_products', 'List current products and prices before purchasing.', {
+server.tool('nexalayer_list_products', 'List a compact, paginated catalog of currently available products and prices before purchasing.', {
   type: z.enum(['all', 'dynamic', 'static']).default('all'),
   country_code: z.string().optional(),
-}, readOnly, async ({ type, country_code }) => {
+  page: z.number().int().positive().default(1),
+  page_size: z.number().int().min(1).max(50).default(20),
+  available_only: z.boolean().default(true),
+}, readOnly, async ({ type, country_code, page, page_size, available_only }) => {
   const query = new URLSearchParams({ type });
   if (country_code) query.set('country_code', country_code);
-  return result(await api('GET', `/products?${query}`));
+  const response = await api('GET', `/products?${query}`);
+  const products = productItems(response)
+    .filter((product) => !available_only || product.stock === undefined || Number(product.stock) > 0)
+    .map(compactProduct);
+  const total = products.length;
+  const offset = (page - 1) * page_size;
+  return result({
+    items: products.slice(offset, offset + page_size),
+    pagination: {
+      page,
+      page_size,
+      total,
+      total_pages: Math.ceil(total / page_size),
+      has_more: offset + page_size < total,
+    },
+  });
 });
 
-server.tool('nexalayer_create_session', 'Create a paid network session. Configure a budget first and obtain owner approval for autonomous spend.', {
+server.tool('nexalayer_create_session', 'Create a paid network session. This action incurs charges against the account balance. Configure a budget first and obtain owner approval for autonomous spend.', {
   session_type: z.enum(['dynamic', 'static']),
   product_no: z.string(),
   protocol: z.enum(['socks5', 'http']).default('socks5'),
