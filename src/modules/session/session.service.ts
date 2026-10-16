@@ -366,6 +366,7 @@ async function lookupProductInfo(
       {
         id: match.id,
         productNo: match.type,
+        aliases: [match.backendProductNo],
       },
       await getOpenAgentPriceMap([104])
     );

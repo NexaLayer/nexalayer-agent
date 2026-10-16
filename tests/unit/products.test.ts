@@ -41,13 +41,13 @@ describe('openAgent product catalog', () => {
       { id: 2, type: 'DYN-EMPTY', name: 'Empty Dynamic', proxyType: 104, price: 28, flow: 0, country: 'US', city: '' },
     ]);
     getStaticProducts.mockResolvedValue([
-      { id: 201, productId: 'STATIC-SHARED', proxyType: 103, productType: 2, price: 70, stock: 2, status: 1, country: 'US', city: 'New York' },
-      { id: 202, productId: 'INTERNAL-NO-PRICE', proxyType: 103, productType: 1, price: 999, stock: 2, status: 1, country: 'US', city: 'Internal' },
+      { id: 0, productId: 'STATIC-SHARED', proxyType: 103, productType: 2, price: 70, stock: 2, status: 1, country: 'US', city: 'New York' },
+      { id: 0, productId: 'INTERNAL-NO-PRICE', proxyType: 103, productType: 1, price: 999, stock: 2, status: 1, country: 'US', city: 'Internal' },
     ]);
     getAgentProductPrices.mockResolvedValue([
       { id: 1, type: 'dynamic', price: 1.5, costPrice: 0, globalPrice: 15 },
       { id: 2, type: 'dynamic', price: 1.5, costPrice: 0, globalPrice: 15 },
-      { id: 201, type: 'static', price: 5, costPrice: 0, globalPrice: 70 },
+      { id: 201, type: 'STATIC-SHARED', price: 5, costPrice: 0, globalPrice: 70 },
     ]);
   });
 

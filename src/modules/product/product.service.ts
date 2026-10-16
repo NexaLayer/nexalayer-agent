@@ -92,7 +92,11 @@ async function loadCatalog(): Promise<ProductListItem[]> {
 
   const items: ProductListItem[] = [
     ...dynamicProducts.flatMap((product) => {
-      const price = findOpenAgentPrice(product.id, agentPrices);
+      const price = findOpenAgentPrice(
+        product.id,
+        [product.type, product.backendProductNo],
+        agentPrices
+      );
       if (price === undefined) return [];
       return [{
       product_no: product.type,
@@ -109,7 +113,11 @@ async function loadCatalog(): Promise<ProductListItem[]> {
       }];
     }),
     ...staticProducts.flatMap((product) => {
-      const price = findOpenAgentPrice(product.id, agentPrices);
+      const price = findOpenAgentPrice(
+        product.id,
+        [product.productId],
+        agentPrices
+      );
       if (price === undefined) return [];
       return [{
       product_no: product.productId,
