@@ -1,8 +1,15 @@
 {
   "name": "nexalayer-agent",
   "version": "1.0.0",
-  "description": "AI Agent Network Execution Layer",
+  "description": "NexaLayer Model Context Protocol (MCP) server and backend API for managed proxy sessions",
   "main": "dist/index.js",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "ai-agent",
+    "proxy"
+  ],
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "npx prisma generate && tsc",

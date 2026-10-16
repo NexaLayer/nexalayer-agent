@@ -1,6 +1,73 @@
 # NexaLayer Agent
 
-Agent Layer backend for NexaLayer, the Network Execution Layer for AI Agents.
+NexaLayer MCP Server — a Model Context Protocol (MCP) server that lets AI agents create and manage proxy sessions with budget guardrails.
+
+The MCP implementation is in [`mcp/`](./mcp/), with its source entry point at [`mcp/src/index.ts`](./mcp/src/index.ts). The published package builds that file to the runtime entry path `mcp/dist/index.js`.
+
+## MCP Server
+
+### Install
+
+Run the published stdio server with npm:
+
+```bash
+npx -y @nexalayer/mcp
+```
+
+Or build and run the existing Docker image from the repository root:
+
+```bash
+docker build -t nexalayer-mcp ./mcp
+docker run -i --rm \
+  -e NEXALAYER_API_KEY="$NEXALAYER_API_KEY" \
+  nexalayer-mcp
+```
+
+The Docker image uses stdio and does not expose a port.
+
+### Configure
+
+Set `NEXALAYER_API_KEY` for API-backed tool calls. The server can start and expose `initialize` and `tools/list` without a key so MCP clients and directories can discover its capabilities. `NEXALAYER_BASE_URL` is an optional override.
+
+Claude Desktop and Cursor both accept an `mcpServers` configuration like this:
+
+```json
+{
+  "mcpServers": {
+    "nexalayer": {
+      "command": "npx",
+      "args": ["-y", "@nexalayer/mcp"],
+      "env": {
+        "NEXALAYER_API_KEY": "agk_your_key"
+      }
+    }
+  }
+}
+```
+
+### Tools
+
+| Tool | Description | Charges |
+| --- | --- | --- |
+| `nexalayer_list_products` | List the compact, paginated catalog of available proxy products and current prices. | No |
+| `nexalayer_create_session` | Create a dynamic or static proxy session with an idempotency key. | **Yes — deducts from the account balance** |
+| `nexalayer_rotate_session` | Rotate a dynamic session when health or telemetry recommends it. | May affect paid usage |
+| `nexalayer_terminate_session` | Terminate a session and release its network resource; early termination does not imply a refund. | No new charge |
+| `nexalayer_session_health` | Read a session health score and rotation recommendation. | No |
+| `nexalayer_session_usage` | Read traffic and request usage for a session. | No |
+| `nexalayer_get_budget` | Read spend limits, current spend, pause state, and daily reset. | No |
+| `nexalayer_set_budget` | Set API-key and daily spend limits, alerts, and pause behavior. | No direct charge |
+| `nexalayer_usage_alerts` | Read actionable budget-threshold alerts. | No |
+| `nexalayer_get_balance` | Read the account balance and trial-credit state. | No |
+| `nexalayer_list_transactions` | List billing transactions for audit and reconciliation. | No |
+
+**Transport:** stdio.
+
+See the [`mcp/` package README](./mcp/README.md) for packaging, Docker, pricing, and approval-policy details.
+
+## Backend API
+
+The repository also contains the Agent Layer backend for NexaLayer, the Network Execution Layer for AI Agents.
 
 This service exposes API-first capabilities for AI Agent, Playwright, Puppeteer,
 Browser-use, crawler, and automation workflows:

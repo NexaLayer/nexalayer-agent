@@ -1,5 +1,7 @@
 # NexaLayer MCP Server
 
+This directory contains the MCP server package and implementation. For the repository overview, installation options, complete 11-tool catalog, and backend relationship, see the [root README](../README.md).
+
 Connect an MCP client to NexaLayer products, sessions, health, usage, and spend controls.
 
 ```json

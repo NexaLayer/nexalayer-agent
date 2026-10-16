@@ -1,7 +1,7 @@
 {
   "name": "@nexalayer/mcp",
   "version": "0.1.4",
-  "description": "MCP server for NexaLayer managed network sessions",
+  "description": "Model Context Protocol (MCP) server for NexaLayer managed proxy sessions",
   "mcpName": "io.github.NexaLayer/nexalayer",
   "type": "module",
   "bin": {
@@ -32,6 +32,8 @@
   "bugs": "https://github.com/NexaLayer/nexalayer-agent/issues",
   "keywords": [
     "mcp",
+    "model-context-protocol",
+    "mcp-server",
     "ai-agent",
     "proxy",
     "playwright",
