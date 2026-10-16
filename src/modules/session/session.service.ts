@@ -775,7 +775,8 @@ function dynamicValidTimeMinutes(input: {
 
 export async function getSession(
   agentId: number,
-  sessionId: string
+  sessionId: string,
+  includeCredentials = false
 ) {
   const session = await prisma.agentSession.findFirst({
     where: { sessionId, agentId },
@@ -788,7 +789,10 @@ export async function getSession(
     );
   }
 
-  const formatted = formatSession(session, true);
+  const formatted = formatSession(
+    session,
+    includeCredentials
+  );
   if (
     session.sessionType === SESSION_TYPE.DYNAMIC &&
     session.backendProductNo
@@ -912,7 +916,8 @@ export async function getSessionUsage(
 export async function rotateSession(
   agentId: number,
   sessionId: string,
-  reason: string
+  reason: string,
+  includeCredentials = false
 ) {
   const session = await prisma.agentSession.findFirst({
     where: { sessionId, agentId },
@@ -1028,7 +1033,7 @@ export async function rotateSession(
       where: { id: session.id },
     });
 
-    return formatSession(updated!);
+    return formatSession(updated!, includeCredentials);
   } catch (err) {
     await prisma.agentSession.update({
       where: { id: session.id },

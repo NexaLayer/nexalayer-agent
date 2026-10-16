@@ -7,6 +7,8 @@ describe('session list credential redaction contract', () => {
     );
     expect(source).toContain('sessions.map((session) => formatSession(session, false))');
     expect(source).toContain('includeCredentials ? buildProxyUrl(session) : undefined');
-    expect(source).toContain('const formatted = formatSession(session, true)');
+    expect(source).toContain('includeCredentials = false');
+    expect(source).toContain('const formatted = formatSession(\n    session,\n    includeCredentials');
+    expect(source).toContain('return formatSession(updated!, includeCredentials)');
   });
 });

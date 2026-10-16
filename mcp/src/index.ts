@@ -102,8 +102,9 @@ server.tool('nexalayer_create_session', 'Create a paid network session. This act
 server.tool('nexalayer_rotate_session', 'Rotate a dynamic session after health or telemetry recommends rotation.', {
   session_id: z.string(),
   reason: z.string().optional(),
+  include_credentials: z.boolean().default(false),
   idempotency_key: z.string().min(1).max(64),
-}, paidWrite, async ({ session_id, reason, idempotency_key }) => result(await api('POST', `/sessions/${encodeURIComponent(session_id)}/rotate`, { reason }, idempotency_key)));
+}, paidWrite, async ({ session_id, reason, include_credentials, idempotency_key }) => result(await api('POST', `/sessions/${encodeURIComponent(session_id)}/rotate?include_credentials=${include_credentials}`, { reason }, idempotency_key)));
 
 server.tool('nexalayer_terminate_session', 'Terminate a session and release its underlying network resource. Early termination does not imply a refund.', {
   session_id: z.string(),

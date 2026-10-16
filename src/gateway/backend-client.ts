@@ -406,23 +406,26 @@ export async function getDynamicResourceUsage(
   current_month_gb: number;
   last_month_gb: number;
 }> {
-  const qs = new URLSearchParams({
-    productNo:
-      toBackendDynamicProductNo(productNo) ?? productNo,
-  });
+  if (toPublicDynamicProductNo(productNo) !== 'dynamic_2') {
+    throw new Error(
+      `Live usage is not supported for dynamic product ${productNo}`
+    );
+  }
   const res = await fetchJson<
     BackendResponse<Record<string, unknown>>
-  >(`/api/proxy/dynamic-resource?${qs}`, {
+  >('/api/open/app/dashboard/dynamic2/v2', {
     headers: { Authorization: `Bearer ${userToken}` },
   });
   const data = res.data ?? {};
   return {
-    total_gb: num(data.totalFlow),
-    used_gb: num(data.usedFlow),
-    remaining_gb: num(data.remainingFlow),
-    today_gb: num(data.todayFlow),
-    current_month_gb: num(data.currentMonthFlow),
-    last_month_gb: num(data.lastMonthFlow),
+    total_gb: num(data.total ?? data.total_recharged_flow),
+    used_gb: num(data.used ?? data.consumed_flow),
+    remaining_gb: num(data.remaining ?? data.remaining_flow),
+    today_gb: num(data.today_usage ?? data.today_consumption),
+    current_month_gb: num(data.month_usage ?? data.month_consumption),
+    last_month_gb: num(
+      data.last_month_usage ?? data.last_month_consumption
+    ),
   };
 }
 

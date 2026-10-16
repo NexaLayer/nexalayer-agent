@@ -18,6 +18,16 @@ const productCache = new NodeCache({
   checkperiod: env.PRODUCT_CACHE_TTL_SECONDS,
   useClones: true,
 });
+const CATALOG_STALE_TTL_SECONDS = 15 * 60;
+const catalogRefreshes = new Map<
+  string,
+  Promise<ProductListItem[]>
+>();
+
+type CatalogCacheEntry = {
+  items: ProductListItem[];
+  refreshedAt: number;
+};
 
 export type ProductListItem = {
   product_no: string;
@@ -134,8 +144,41 @@ async function loadCatalog(
   type: ListProductsQuery['type']
 ): Promise<ProductListItem[]> {
   const cacheKey = `open-agent-catalog:${type}`;
-  const cached = productCache.get<ProductListItem[]>(cacheKey);
-  if (cached) return cached;
+  const cached = productCache.get<CatalogCacheEntry>(cacheKey);
+  if (cached) {
+    if (
+      Date.now() - cached.refreshedAt >
+      env.PRODUCT_CACHE_TTL_SECONDS * 1000
+    ) {
+      void refreshCatalog(type, cacheKey).catch((error) => {
+        console.error(
+          `[products] background refresh failed for ${type}:`,
+          (error as Error).message
+        );
+      });
+    }
+    return cached.items;
+  }
+  return refreshCatalog(type, cacheKey);
+}
+
+async function refreshCatalog(
+  type: ListProductsQuery['type'],
+  cacheKey: string
+): Promise<ProductListItem[]> {
+  const running = catalogRefreshes.get(cacheKey);
+  if (running) return running;
+
+  const refresh = fetchCatalog(type).finally(() => {
+    catalogRefreshes.delete(cacheKey);
+  });
+  catalogRefreshes.set(cacheKey, refresh);
+  return refresh;
+}
+
+async function fetchCatalog(
+  type: ListProductsQuery['type']
+): Promise<ProductListItem[]> {
 
   const userToken = await getPricingToken();
   const includeDynamic = type !== 'static';
@@ -206,7 +249,11 @@ async function loadCatalog(
       }];
     }),
   ];
-  productCache.set(cacheKey, items);
+  productCache.set(
+    `open-agent-catalog:${type}`,
+    { items, refreshedAt: Date.now() },
+    CATALOG_STALE_TTL_SECONDS
+  );
   return items;
 }
 
@@ -273,4 +320,12 @@ export async function listRegions(_agentId: number) {
 
 export function clearProductCacheForTests(): void {
   productCache.flushAll();
+  catalogRefreshes.clear();
+}
+
+export async function warmProductCache(): Promise<void> {
+  await Promise.all([
+    loadCatalog('dynamic'),
+    loadCatalog('static'),
+  ]);
 }

@@ -31,6 +31,7 @@ describe('public API and MCP contracts', () => {
     expect(session).toContain('assertPriceMatches(price, match.price)');
     expect(session).toContain('refundUserBalance');
     expect(session).toContain('estimatedChargeUsd: refundedCny > 0 ? 0 : undefined');
+    expect(session).toContain('includeCredentials = false');
   });
 
   it('documents shared/exclusive availability and charged MCP creation', () => {
@@ -38,6 +39,15 @@ describe('public API and MCP contracts', () => {
     expect(mcp).toContain("'sharing', 'available'");
     expect(mcp).toContain('limit: z.number().int().min(1).max(100).default(20)');
     expect(mcp).toMatch(/create_session[\s\S]+incurs charges/);
+  });
+
+  it('reads Dynamic Pool 2 usage from the synchronized dashboard source', () => {
+    const backend = readFileSync(
+      resolve(process.cwd(), 'src/gateway/backend-client.ts'),
+      'utf8'
+    );
+    expect(backend).toContain('/api/open/app/dashboard/dynamic2/v2');
+    expect(backend).not.toContain('/api/proxy/dynamic-resource?');
   });
 
   it('uses the Error schema for reusable OpenAPI errors', () => {

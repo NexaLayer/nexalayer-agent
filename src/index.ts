@@ -1,6 +1,7 @@
 import { buildApp, prisma } from './app';
 import { env } from './config/env';
 import { startTrialClaimMonitor } from './modules/account/trial-monitor.service';
+import { warmProductCache } from './modules/product/product.service';
 
 async function main() {
   const app = await buildApp();
@@ -8,6 +9,13 @@ async function main() {
   try {
     await prisma.$connect();
     app.log.info('Database connected');
+
+    void warmProductCache().catch((error) => {
+      app.log.warn(
+        { err: error },
+        'Product cache warm-up failed'
+      );
+    });
 
     const stopTrialClaimMonitor = startTrialClaimMonitor(app.log);
     app.addHook('onClose', async () => {

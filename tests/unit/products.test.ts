@@ -68,6 +68,14 @@ describe('openAgent product catalog', () => {
     expect(first.items.every((item) => /^[\x20-\x7E]+$/.test(item.name))).toBe(true);
   });
 
+  it('warms dynamic and static catalogs so the first request uses cache', async () => {
+    const service = await import('../../src/modules/product/product.service');
+    await service.warmProductCache();
+    await service.listProducts({ type: 'dynamic', in_stock: true, limit: 20 });
+    expect(getDynamicProducts).toHaveBeenCalledTimes(1);
+    expect(getStaticProducts).toHaveBeenCalledTimes(1);
+  });
+
   it('treats products returned by the upstream saleable-product query as available', async () => {
     const service = await import('../../src/modules/product/product.service');
     const all = await service.listProducts({ type: 'dynamic', in_stock: false, limit: 20 });

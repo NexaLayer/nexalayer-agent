@@ -47,6 +47,13 @@ export const rotateSessionSchema = z.object({
     .default('manual'),
 });
 
+export const sessionCredentialsQuerySchema = z.object({
+  include_credentials: z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((value) => value === 'true'),
+});
+
 export const renewSessionSchema = z.object({
   duration: z.number().int().positive(),
 });

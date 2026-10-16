@@ -27,7 +27,10 @@ export async function sessionRoutes(
   app.get('/', handleList);
   app.get('/:session_id', handleGet);
   app.get('/:session_id/usage', handleUsage);
-  app.post<{ Params: { session_id: string } }>(
+  app.post<{
+    Params: { session_id: string };
+    Querystring: { include_credentials?: string };
+  }>(
     '/:session_id/rotate',
     { preHandler: idempotencyGuard },
     handleRotate

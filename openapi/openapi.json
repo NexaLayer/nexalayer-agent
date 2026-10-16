@@ -397,6 +397,15 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/SessionId"
+          },
+          {
+            "in": "query",
+            "name": "include_credentials",
+            "description": "Set true to include proxy username, password, and full_url. Defaults to false.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -447,6 +456,15 @@
           },
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "in": "query",
+            "name": "include_credentials",
+            "description": "Set true to include rotated proxy credentials. Defaults to false.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "requestBody": {

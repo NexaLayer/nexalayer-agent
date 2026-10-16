@@ -5,6 +5,7 @@ import {
   renewSessionSchema,
   listSessionsSchema,
   whitelistSchema,
+  sessionCredentialsQuerySchema,
 } from './session.schema';
 import * as sessionService from './session.service';
 import {
@@ -45,13 +46,18 @@ export async function handleCreate(
 export async function handleGet(
   request: FastifyRequest<{
     Params: { session_id: string };
+    Querystring: { include_credentials?: string };
   }>,
   reply: FastifyReply
 ): Promise<void> {
   const ctx = getCtx(request);
+  const query = sessionCredentialsQuerySchema.parse(
+    request.query ?? {}
+  );
   const result = await sessionService.getSession(
     ctx.agentId,
-    request.params.session_id
+    request.params.session_id,
+    query.include_credentials
   );
   sendSuccess(reply, result, 200, request.startTime);
 }
@@ -95,6 +101,7 @@ export async function handleUsage(
 export async function handleRotate(
   request: FastifyRequest<{
     Params: { session_id: string };
+    Querystring: { include_credentials?: string };
   }>,
   reply: FastifyReply
 ): Promise<FastifyReply> {
@@ -102,10 +109,14 @@ export async function handleRotate(
   const body = rotateSessionSchema.parse(
     request.body ?? {}
   );
+  const query = sessionCredentialsQuerySchema.parse(
+    request.query ?? {}
+  );
   const result = await sessionService.rotateSession(
     ctx.agentId,
     request.params.session_id,
-    body.reason ?? 'manual'
+    body.reason ?? 'manual',
+    query.include_credentials
   );
   return sendSuccess(reply, result, 200, request.startTime);
 }
