@@ -138,6 +138,11 @@ async function loadCatalog(
         agentPrices
       );
       if (price === undefined) return [];
+      // IPProxy does not inherit AgentPrice as an ordinary user's sale price.
+      // Until the child user has a matching UserPrice, the order endpoint will
+      // replace our displayed price with its (usually higher) user/global price.
+      // Never advertise a product that cannot be charged at the shown price.
+      if (Math.abs(product.price - price) > 0.0001) return [];
       return [{
       product_no: product.productId,
       name: englishStaticName(product),

@@ -792,7 +792,7 @@ export async function getSession(
     );
   }
 
-  return formatSession(session);
+  return formatSession(session, true);
 }
 
 export async function listSessions(
@@ -816,7 +816,7 @@ export async function listSessions(
   ]);
 
   return {
-    items: sessions.map(formatSession),
+    items: sessions.map((session) => formatSession(session, false)),
     total,
     page: query.page,
     page_size: query.page_size,
@@ -1157,7 +1157,8 @@ function formatSession(
     expiresAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
-  }
+  },
+  includeCredentials = true
 ) {
   return {
     session_id: session.sessionId,
@@ -1168,12 +1169,12 @@ function formatSession(
         ? {
             host: session.proxyHost,
             port: session.proxyPort,
-            username: session.proxyUsername,
-            password: session.proxyPasswordEnc
+            username: includeCredentials ? session.proxyUsername : undefined,
+            password: includeCredentials && session.proxyPasswordEnc
               ? decrypt(session.proxyPasswordEnc)
-              : null,
+              : undefined,
             protocol: session.proxyProtocol,
-            full_url: buildProxyUrl(session),
+            full_url: includeCredentials ? buildProxyUrl(session) : undefined,
           }
         : undefined,
     location: {

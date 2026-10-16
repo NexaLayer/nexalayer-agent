@@ -42,13 +42,15 @@ describe('openAgent product catalog', () => {
       { id: 2, type: 'DYN-EMPTY', name: 'Empty Dynamic', proxyType: 104, price: 28, flow: 0, country: 'US', city: '' },
     ]);
     getStaticProducts.mockResolvedValue([
-      { id: 0, productId: 'STATIC-SHARED', proxyType: 103, productType: 2, price: 70, stock: 2, status: 1, country: 'US', city: 'New York' },
+      { id: 0, productId: 'STATIC-SHARED', proxyType: 103, productType: 2, price: 5, stock: 2, status: 1, country: 'US', city: 'New York' },
+      { id: 0, productId: 'STATIC-PRICE-MISMATCH', proxyType: 103, productType: 2, price: 33, stock: 2, status: 1, country: 'US', city: 'Chicago' },
       { id: 0, productId: 'INTERNAL-NO-PRICE', proxyType: 103, productType: 1, price: 999, stock: 2, status: 1, country: 'US', city: 'Internal' },
     ]);
     getAgentProductPrices.mockResolvedValue([
       { id: 1, type: 'dynamic', price: 1.5, costPrice: 0, globalPrice: 15 },
       { id: 2, type: 'dynamic', price: 1.5, costPrice: 0, globalPrice: 15 },
       { id: 201, type: 'STATIC-SHARED', price: 5, costPrice: 0, globalPrice: 70 },
+      { id: 202, type: 'STATIC-PRICE-MISMATCH', price: 5, costPrice: 0, globalPrice: 33 },
     ]);
   });
 
@@ -89,6 +91,7 @@ describe('openAgent product catalog', () => {
       expect.objectContaining({ product_no: 'STATIC-SHARED', sharing: 'shared', price: 0.71 }),
     ]));
     expect(result.items.some((item) => item.product_no === 'INTERNAL-NO-PRICE')).toBe(false);
+    expect(result.items.some((item) => item.product_no === 'STATIC-PRICE-MISMATCH')).toBe(false);
   });
 
   it('whitelists public fields and does not expose internal pricing metadata', async () => {
@@ -103,7 +106,7 @@ describe('openAgent product catalog', () => {
 
   it('uses the ZT product number as the canonical location label', async () => {
     getStaticProducts.mockResolvedValueOnce([
-      { id: 0, productId: 'ZT_US_Englewood_5', proxyType: 103, productType: 2, price: 70, stock: 2, status: 1, country: 'US', city: 'LOS_ANGELES' },
+      { id: 0, productId: 'ZT_US_Englewood_5', proxyType: 103, productType: 2, price: 5, stock: 2, status: 1, country: 'US', city: 'LOS_ANGELES' },
     ]);
     getAgentProductPrices.mockResolvedValueOnce([
       { id: 201, type: 'ZT_US_Englewood_5', price: 5, costPrice: 0, globalPrice: 70 },
