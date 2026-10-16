@@ -1,139 +1,179 @@
+import NodeCache from 'node-cache';
 import { prisma } from '../../app';
 import { decrypt } from '../../utils/crypto';
 import { AppError } from '../../utils/response';
 import { ERROR_CODES } from '../../config/constants';
+import { env } from '../../config/env';
 import * as backend from '../../gateway/backend-client';
+import type { ListProductsQuery } from './product.schema';
 
-async function getAgentBackendToken(
-  agentId: number
-): Promise<string> {
+const productCache = new NodeCache({
+  stdTTL: env.PRODUCT_CACHE_TTL_SECONDS,
+  checkperiod: env.PRODUCT_CACHE_TTL_SECONDS,
+  useClones: true,
+});
+
+export type ProductListItem = {
+  product_no: string;
+  name: string;
+  type: 'dynamic' | 'static';
+  sharing: 'exclusive' | 'shared';
+  available: boolean;
+  price: number;
+  currency: 'USD';
+  unit: string;
+  country?: string;
+  city?: string;
+  stock?: number;
+  proxy_type?: number;
+  product_type?: number | string;
+  project_required?: boolean;
+  projects?: Record<string, unknown>[];
+};
+
+async function getPricingToken(): Promise<string> {
   const agent = await prisma.agentApp.findUnique({
-    where: { id: agentId },
+    where: { id: env.PRICING_AGENT_APP_ID },
   });
-
-  if (
-    !agent?.backendUsername ||
-    !agent.backendPasswordEnc
-  ) {
+  if (!agent?.backendUsername || !agent.backendPasswordEnc) {
+    throw new AppError(ERROR_CODES.BACKEND_ERROR, 'Pricing account is not configured');
+  }
+  const identity = await backend.getUserIdentity(
+    agent.backendUsername,
+    decrypt(agent.backendPasswordEnc)
+  );
+  const owner = identity.agentId === undefined
+    ? await backend.getBackendUserOwner(agent.backendUsername)
+    : { agentId: identity.agentId };
+  if (owner.agentId !== env.PRICING_OWNER_AGENT_ID) {
     throw new AppError(
       ERROR_CODES.BACKEND_ERROR,
-      'Backend credentials not configured'
+      'Pricing account owner does not match the configured reseller'
     );
   }
-
-  const password = decrypt(agent.backendPasswordEnc);
-  return backend.getUserToken(
-    agent.backendUsername,
-    password
-  );
+  return identity.token;
 }
 
-export async function listProducts(
-  agentId: number,
-  type: string,
-  countryCode?: string
-) {
-  const userToken =
-    await getAgentBackendToken(agentId);
-  const rate = await backend.getUsdtRate(userToken);
-  const exchangeRate = Number(
-    rate.effective_rate ?? rate.rate
-  );
+function englishStaticName(product: {
+  productId: string;
+  country?: string;
+  city?: string;
+}): string {
+  const location = [product.city, product.country]
+    .filter((part): part is string => Boolean(part && /^[\x20-\x7E]+$/.test(part)))
+    .join(', ');
+  return `${location ? `${location} ` : ''}Exclusive Static Proxy (${product.productId})`;
+}
+
+async function loadCatalog(): Promise<ProductListItem[]> {
+  const cached = productCache.get<ProductListItem[]>('open-agent-catalog');
+  if (cached) return cached;
+
+  const userToken = await getPricingToken();
+  const [rate, dynamicProducts, staticProducts] = await Promise.all([
+    backend.getUsdtRate(userToken),
+    backend.getDynamicProducts(userToken),
+    backend.getStaticProducts(userToken),
+  ]);
+  const exchangeRate = Number(rate.effective_rate ?? rate.rate);
   if (!Number.isFinite(exchangeRate) || exchangeRate <= 0) {
-    throw new AppError(
-      ERROR_CODES.BACKEND_ERROR,
-      'Backend exchange rate is unavailable'
-    );
+    throw new AppError(ERROR_CODES.BACKEND_ERROR, 'Backend exchange rate is unavailable');
   }
   const usd = (priceCny: number) =>
     Math.round((priceCny / exchangeRate) * 100) / 100;
 
-  const products: {
-    product_no: string;
-    name: string;
-    type: string;
-    proxy_type?: number;
-    price: number;
-    price_cny?: number;
-    currency?: string;
-    exchange_rate?: number;
-    unit: string;
-    stock?: number;
-    country?: string;
-    city?: string;
-    product_type?: number | string;
-    project_required?: boolean;
-    projects?: Record<string, unknown>[];
-  }[] = [];
-
-  if (type === 'all' || type === 'dynamic') {
-    const dynamicProducts =
-      await backend.getDynamicProducts(userToken);
-    for (const p of dynamicProducts) {
-      products.push({
-        product_no: p.type,
-        name: p.name || p.type,
-        type: 'dynamic',
-        proxy_type: p.proxyType,
-        price: usd(p.price),
-        price_cny: p.price,
-        currency: 'USD',
-        exchange_rate: exchangeRate,
-        unit: 'GB',
-        country: p.country || undefined,
-        city: p.city || undefined,
-      });
-    }
-  }
-
-  if (type === 'all' || type === 'static') {
-    const staticProducts =
-      await backend.getStaticProducts(userToken, {
-        countryCode,
-      });
-    for (const p of staticProducts) {
-      products.push({
-        product_no: p.productId,
-        name: p.name,
-        type: 'static',
-        proxy_type: p.proxyType,
-        product_type: p.productType,
-        price: usd(p.price),
-        price_cny: p.price,
-        currency: 'USD',
-        exchange_rate: exchangeRate,
-        unit: 'month',
-        stock: p.stock,
-        country: p.country,
-        city: p.city,
-        project_required: Boolean(
-          p.projectList?.length
-        ),
-        projects: p.projectList,
-      });
-    }
-  }
-
-  return { items: products, total: products.length };
+  const items: ProductListItem[] = [
+    ...dynamicProducts.map((product) => ({
+      product_no: product.type,
+      name: product.name,
+      type: 'dynamic' as const,
+      sharing: 'shared' as const,
+      available: product.flow > 0 && product.price > 0,
+      price: usd(product.price),
+      currency: 'USD' as const,
+      unit: 'GB',
+      country: product.country || undefined,
+      city: product.city || undefined,
+      proxy_type: product.proxyType,
+    })),
+    ...staticProducts.map((product) => ({
+      product_no: product.productId,
+      name: englishStaticName(product),
+      type: 'static' as const,
+      sharing: 'exclusive' as const,
+      available: product.status === 1 && product.stock > 0 && product.price > 0,
+      price: usd(product.price),
+      currency: 'USD' as const,
+      unit: 'month',
+      stock: product.stock,
+      country: product.country || undefined,
+      city: product.city || undefined,
+      proxy_type: product.proxyType,
+      product_type: product.productType,
+      project_required: Boolean(product.projectList?.length),
+      projects: product.projectList,
+    })),
+  ];
+  productCache.set('open-agent-catalog', items);
+  return items;
 }
 
-export async function listRegions(agentId: number) {
-  const userToken =
-    await getAgentBackendToken(agentId);
-  const hierarchy = await backend.getAreaHierarchy(
-    userToken
-  );
-  const items = hierarchy.areas.map((a) => ({
-    code: a.areaCode,
-    name: a.areaName,
-    countries: a.countries.map((c) => ({
-      code: c.countryCode,
-      name: c.countryName,
-      cities: c.cities.map((ci) => ({
-        code: ci.cityCode,
-        name: ci.cityName,
+function decodeCursor(cursor?: string): number {
+  if (!cursor) return 0;
+  try {
+    const value = Number(Buffer.from(cursor, 'base64url').toString('utf8'));
+    if (Number.isInteger(value) && value >= 0) return value;
+  } catch {
+    // Converted to a public validation error below.
+  }
+  throw new AppError(ERROR_CODES.INVALID_REQUEST, 'Invalid product cursor');
+}
+
+export async function listProducts(query: ListProductsQuery) {
+  const country = (query.country ?? query.country_code)?.toLowerCase();
+  const filtered = (await loadCatalog()).filter((product) => {
+    if (query.type !== 'all' && product.type !== query.type) return false;
+    if (query.in_stock && !product.available) return false;
+    if (
+      country &&
+      ![product.country, product.city]
+        .filter(Boolean)
+        .some((value) => value!.toLowerCase() === country)
+    ) return false;
+    return true;
+  });
+  const offset = decodeCursor(query.cursor);
+  const items = filtered.slice(offset, offset + query.limit);
+  const nextOffset = offset + items.length;
+  return {
+    items,
+    next_cursor:
+      nextOffset < filtered.length
+        ? Buffer.from(String(nextOffset)).toString('base64url')
+        : null,
+    total: filtered.length,
+    cache_ttl_seconds: env.PRODUCT_CACHE_TTL_SECONDS,
+    pricing_owner_agent_id: env.PRICING_OWNER_AGENT_ID,
+  };
+}
+
+export async function listRegions(_agentId: number) {
+  const hierarchy = await backend.getAreaHierarchy(await getPricingToken());
+  const items = hierarchy.areas.map((area) => ({
+    code: area.areaCode,
+    name: area.areaName,
+    countries: area.countries.map((country) => ({
+      code: country.countryCode,
+      name: country.countryName,
+      cities: country.cities.map((city) => ({
+        code: city.cityCode,
+        name: city.cityName,
       })),
     })),
   }));
   return { items };
+}
+
+export function clearProductCacheForTests(): void {
+  productCache.flushAll();
 }

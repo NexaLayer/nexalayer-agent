@@ -1,0 +1,1274 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "NexaLayer Agent API",
+    "version": "1.0.0",
+    "description": "Session-based Network Execution Layer API for AI agents and browser automation."
+  },
+  "servers": [
+    {
+      "url": "https://api.nexalayer.net/v1"
+    }
+  ],
+  "security": [
+    {
+      "ApiKey": [
+
+      ]
+    }
+  ],
+  "paths": {
+    "/public/products": {
+      "get": {
+        "summary": "Read current openAgent product prices without an API key.",
+        "security": [
+
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "dynamic",
+                "static"
+              ],
+              "default": "all"
+            }
+          },
+          {
+            "in": "query",
+            "name": "country",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "in_stock",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current product prices owned by reseller openAgent (1474), cached for at most 60 seconds.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/account/request-api-key": {
+      "post": {
+        "summary": "Request an API Key by email.",
+        "security": [
+
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Client-Installation-Id",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Stable first-party installation identifier used only for trial abuse prevention."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "referral_code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "API Key email accepted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestApiKeyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/register": {
+      "post": {
+        "summary": "Register an Agent account and receive API credentials.",
+        "security": [
+
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "contact_email": {
+                    "type": "string"
+                  },
+                  "referral_code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Registered. Check backend_ready before creating sessions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/info": {
+      "get": {
+        "summary": "Get Agent account state.",
+        "responses": {
+          "200": {
+            "description": "Account info.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "api_key_prefix": {
+                          "type": "string",
+                          "example": "nx_abcd…wxyz"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/account/budget": {
+      "get": {
+        "summary": "Read API-Key and daily spend guardrails.",
+        "responses": {
+          "200": {
+            "description": "Budget policy and current spend."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "put": {
+        "summary": "Configure spend limits, alerts, and manual pause state.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBudgetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated budget policy."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        }
+      }
+    },
+    "/account/usage-alerts": {
+      "get": {
+        "summary": "Read crossed budget thresholds and pause state.",
+        "responses": {
+          "200": {
+            "description": "Usage alerts."
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "summary": "List dynamic and static proxy products.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "dynamic",
+                "static"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "country",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "in_stock",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        }
+      }
+    },
+    "/sessions": {
+      "post": {
+        "summary": "Create a dynamic or static proxy session asynchronously.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Session creation accepted. Poll GET /sessions/{session_id}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "402": {
+            "$ref": "#/components/responses/InsufficientBalance"
+          },
+          "422": {
+            "$ref": "#/components/responses/Unprocessable"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        }
+      }
+    },
+    "/sessions/{session_id}": {
+      "get": {
+        "summary": "Get session status, proxy config, health, and usage.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SessionId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session detail.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Terminate a session.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SessionId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Terminated."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/sessions/{session_id}/rotate": {
+      "post": {
+        "summary": "Rotate a session proxy and record the reason.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SessionId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "enum": [
+                      "manual",
+                      "scheduled",
+                      "http_403",
+                      "http_429",
+                      "captcha",
+                      "timeout",
+                      "block"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Rotated session."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        }
+      }
+    },
+    "/sessions/{session_id}/renew": {
+      "post": {
+        "summary": "Renew a static session.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SessionId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "duration"
+                ],
+                "properties": {
+                  "duration": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Renewed session."
+          }
+        }
+      }
+    },
+    "/sessions/{session_id}/report-event": {
+      "post": {
+        "summary": "Report execution telemetry for a session.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SessionId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelemetryEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event recorded."
+          }
+        }
+      }
+    },
+    "/sessions/{session_id}/health": {
+      "get": {
+        "summary": "Get session health metrics and rotation recommendation.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SessionId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Health metrics."
+          }
+        }
+      }
+    },
+    "/billing/balance": {
+      "get": {
+        "summary": "Get account balance.",
+        "responses": {
+          "200": {
+            "description": "Balance."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/billing/recharge": {
+      "post": {
+        "summary": "Create a recharge order.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "anyOf": [
+                  {
+                    "required": [
+                      "amount"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "amount_usd"
+                    ]
+                  }
+                ],
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "minimum": 10
+                  },
+                  "amount_usd": {
+                    "type": "number",
+                    "minimum": 10
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "USDT"
+                    ],
+                    "default": "USDT"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Recharge order created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RechargeResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        }
+      }
+    },
+    "/billing/transactions": {
+      "get": {
+        "summary": "List billing transactions.",
+        "responses": {
+          "200": {
+            "description": "Transaction list."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    },
+    "parameters": {
+      "SessionId": {
+        "in": "path",
+        "name": "session_id",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "IdempotencyKey": {
+        "in": "header",
+        "name": "Idempotency-Key",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "maxLength": 64
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid request.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "API key is missing or invalid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "The requested route, product, or session was not found.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "InsufficientBalance": {
+        "description": "Account balance is insufficient for the requested operation.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Product state or idempotency key conflicts with the request.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "RateLimited": {
+        "description": "Request or trial limit exceeded.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Unprocessable": {
+        "description": "The request is valid but cannot be fulfilled in the current product or budget state.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "AUTH_INVALID_KEY",
+              "AUTH_EXPIRED_TOKEN",
+              "AUTH_INSUFFICIENT_PERMISSION",
+              "ACCOUNT_DISABLED",
+              "INVALID_REQUEST",
+              "ROUTE_NOT_FOUND",
+              "INSUFFICIENT_BALANCE",
+              "BUDGET_EXCEEDED",
+              "IDEMPOTENCY_CONFLICT",
+              "RATE_LIMIT_EXCEEDED",
+              "TRIAL_NOT_ELIGIBLE",
+              "PRODUCT_NOT_FOUND",
+              "PRODUCT_OUT_OF_STOCK",
+              "SESSION_NOT_FOUND",
+              "SESSION_EXPIRED",
+              "SESSION_LIMIT_REACHED",
+              "BACKEND_ERROR",
+              "BACKEND_TIMEOUT",
+              "INTERNAL_ERROR"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data",
+          "error",
+          "meta"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "data": {
+            "nullable": true
+          },
+          "error": {
+            "$ref": "#/components/schemas/Error"
+          },
+          "meta": {
+            "type": "object",
+            "required": [
+              "request_id",
+              "timestamp"
+            ],
+            "properties": {
+              "request_id": {
+                "type": "string"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "latency_ms": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "ProductListResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              },
+              "next_cursor": {
+                "type": "string",
+                "nullable": true
+              },
+              "total": {
+                "type": "integer"
+              },
+              "cache_ttl_seconds": {
+                "type": "integer",
+                "maximum": 60
+              },
+              "pricing_owner_agent_id": {
+                "type": "integer",
+                "enum": [
+                  1474
+                ]
+              }
+            }
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "required": [
+          "product_no",
+          "name",
+          "type",
+          "sharing",
+          "available",
+          "price",
+          "currency",
+          "unit"
+        ],
+        "properties": {
+          "product_no": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "English product name"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "dynamic",
+              "static"
+            ]
+          },
+          "sharing": {
+            "type": "string",
+            "enum": [
+              "exclusive",
+              "shared"
+            ]
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "price": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "USD"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
+          "stock": {
+            "type": "integer"
+          },
+          "country": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          }
+        }
+      },
+      "RechargeResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "order_id": {
+                "type": "string"
+              },
+              "amount_usd": {
+                "type": "number"
+              },
+              "amount_usdt": {
+                "type": "number"
+              },
+              "amount_cny": {
+                "type": "number"
+              },
+              "exchange_rate": {
+                "type": "number"
+              },
+              "network": {
+                "type": "string",
+                "example": "TRC20"
+              },
+              "wallet_address": {
+                "type": "string"
+              },
+              "wallet_explorer_url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "status": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "RequestApiKeyResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "email_sent",
+                  "email_recently_sent"
+                ]
+              },
+              "balance": {
+                "type": "number",
+                "example": 0
+              },
+              "backend_ready": {
+                "type": "boolean"
+              },
+              "message": {
+                "type": "string"
+              },
+              "trial": {
+                "type": "object",
+                "properties": {
+                  "granted": {
+                    "type": "boolean"
+                  },
+                  "amount_usd": {
+                    "type": "number"
+                  },
+                  "expires_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "RegisterResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "agent_id": {
+                "type": "integer"
+              },
+              "api_key": {
+                "type": "string"
+              },
+              "api_secret": {
+                "type": "string"
+              },
+              "backend_ready": {
+                "type": "boolean"
+              },
+              "backend_sync_error": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "CreateSessionRequest": {
+        "type": "object",
+        "required": [
+          "session_type",
+          "product_no"
+        ],
+        "properties": {
+          "session_type": {
+            "type": "string",
+            "enum": [
+              "dynamic",
+              "static"
+            ]
+          },
+          "product_no": {
+            "type": "string"
+          },
+          "provisioning_mode": {
+            "type": "string",
+            "enum": [
+              "purchase",
+              "existing"
+            ],
+            "default": "purchase",
+            "description": "Use existing for a resource already configured on the backend account; no NexaLayer purchase or charge is made."
+          },
+          "resource_id": {
+            "type": "string",
+            "description": "Optional existing static order number. If omitted, NexaLayer selects a usable static resource on the account."
+          },
+          "quantity": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "default": 1
+          },
+          "duration": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "protocol": {
+            "type": "string",
+            "enum": [
+              "socks5",
+              "http",
+              "https"
+            ],
+            "default": "socks5"
+          },
+          "country_code": {
+            "type": "string"
+          },
+          "city_code": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string",
+            "description": "Static shared proxy project code. Required by some shared static products."
+          },
+          "rotation_mode": {
+            "type": "string",
+            "enum": [
+              "fixed",
+              "timed",
+              "on_demand"
+            ]
+          },
+          "rotation_interval_sec": {
+            "type": "integer"
+          }
+        }
+      },
+      "UpdateBudgetRequest": {
+        "type": "object",
+        "properties": {
+          "key_limit_usd": {
+            "type": "number",
+            "minimum": 0,
+            "nullable": true
+          },
+          "daily_limit_usd": {
+            "type": "number",
+            "minimum": 0,
+            "nullable": true
+          },
+          "pause_on_exceed": {
+            "type": "boolean",
+            "default": false,
+            "deprecated": true,
+            "description": "Retained for compatibility; exceeding a budget never pauses the key automatically."
+          },
+          "alert_thresholds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          "paused": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SessionResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "session_id": {
+                "type": "string"
+              },
+              "session_type": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "provisioning_mode": {
+                "type": "string",
+                "enum": [
+                  "purchase",
+                  "existing"
+                ]
+              },
+              "proxy": {
+                "type": "object",
+                "properties": {
+                  "host": {
+                    "type": "string"
+                  },
+                  "port": {
+                    "type": "integer"
+                  },
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "protocol": {
+                    "type": "string"
+                  },
+                  "full_url": {
+                    "type": "string",
+                    "nullable": true,
+                    "example": "socks5://user:pass@proxy.example.com:1080"
+                  }
+                }
+              },
+              "health": {
+                "type": "object",
+                "properties": {
+                  "risk_level": {
+                    "type": "string",
+                    "enum": [
+                      "low",
+                      "medium",
+                      "high"
+                    ]
+                  },
+                  "health_score": {
+                    "type": "integer"
+                  },
+                  "success_rate": {
+                    "type": "number"
+                  },
+                  "consecutive_failures": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "TelemetryEvent": {
+        "type": "object",
+        "required": [
+          "event_type"
+        ],
+        "properties": {
+          "event_type": {
+            "type": "string",
+            "enum": [
+              "success",
+              "http_error",
+              "captcha",
+              "timeout",
+              "block",
+              "rate_limit",
+              "custom"
+            ]
+          },
+          "status_code": {
+            "type": "integer"
+          },
+          "target_host": {
+            "type": "string"
+          },
+          "latency_ms": {
+            "type": "integer"
+          },
+          "error_message": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

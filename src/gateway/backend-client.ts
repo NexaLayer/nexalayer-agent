@@ -241,6 +241,22 @@ export async function getUserToken(
   return res.data.token;
 }
 
+export async function getUserIdentity(
+  username: string,
+  password: string
+): Promise<{ token: string; agentId?: number }> {
+  const res = await fetchJson<BackendResponse<BackendLoginResponse>>(
+    '/api/auth/login',
+    { method: 'POST', body: JSON.stringify({ username, password }) }
+  );
+  const raw = res.data.user as BackendLoginResponse['user'] & {
+    agent_id?: number;
+    agentId?: number;
+  };
+  const agentId = num(raw.agent_id ?? raw.agentId);
+  return { token: res.data.token, agentId: agentId || undefined };
+}
+
 export async function createBackendUser(
   username: string,
   password: string,
@@ -352,6 +368,20 @@ async function findBackendUserByUsername(
   return match
     ? normalizeBackendUser({ data: match }, username)
     : null;
+}
+
+export async function getBackendUserOwner(
+  username: string
+): Promise<{ userId: number; agentId?: number; agentName?: string }> {
+  const user = await findBackendUserByUsername(await authHeaders(), username);
+  if (!user) {
+    throw new Error(`Backend pricing user not found: ${username}`);
+  }
+  return {
+    userId: user.id,
+    agentId: user.agent_id,
+    agentName: user.agent_name,
+  };
 }
 
 export async function getBalance(
@@ -500,6 +530,14 @@ export async function adjustUserBalance(
     body: JSON.stringify({ amount, remark }),
   });
   return res.data;
+}
+
+export async function refundUserBalance(
+  userId: number,
+  amount: number,
+  remark: string
+): Promise<BackendBalanceAdjustResponse> {
+  return adjustUserBalance(await getAdminToken(), userId, amount, remark);
 }
 
 export async function getAreaHierarchy(

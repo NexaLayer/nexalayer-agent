@@ -97,12 +97,6 @@ export async function assertBudgetAllowsSpend(agentId: number, amountUsd: number
       ? 'daily_limit_exceeded'
       : null;
   if (!reason) return;
-  if (policy.pauseOnExceed) {
-    await prisma.agentBudgetPolicy.update({
-      where: { agentId },
-      data: { pausedAt: new Date(), pauseReason: reason },
-    });
-  }
   throw new AppError(ERROR_CODES.BUDGET_EXCEEDED, 'Spend limit would be exceeded', {
     reason,
     requested_usd: amountUsd,
@@ -110,7 +104,7 @@ export async function assertBudgetAllowsSpend(agentId: number, amountUsd: number
     projected_daily_spend_usd: projectedDaily,
     key_limit_usd: keyLimit,
     daily_limit_usd: dailyLimit,
-    paused: policy.pauseOnExceed,
+    paused: false,
   });
 }
 
@@ -142,12 +136,6 @@ export async function createBudgetedSession(
           ? 'daily_limit_exceeded'
           : null;
       if (reason) {
-        if (policy.pauseOnExceed) {
-          await tx.agentBudgetPolicy.update({
-            where: { agentId },
-            data: { pausedAt: new Date(), pauseReason: reason },
-          });
-        }
         blockedDetails = {
           reason,
           requested_usd: amountUsd,
@@ -155,7 +143,7 @@ export async function createBudgetedSession(
           projected_daily_spend_usd: projectedDaily,
           key_limit_usd: keyLimit,
           daily_limit_usd: dailyLimit,
-          paused: policy.pauseOnExceed,
+          paused: false,
         };
         return null;
       }

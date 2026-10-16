@@ -10,11 +10,21 @@ security:
 paths:
   /public/products:
     get:
-      summary: Read public starting prices without an API key.
+      summary: Read current openAgent product prices without an API key.
       security: []
+      parameters:
+        - { in: query, name: type, schema: { type: string, enum: [all, dynamic, static], default: all } }
+        - { in: query, name: country, schema: { type: string } }
+        - { in: query, name: in_stock, schema: { type: boolean, default: true } }
+        - { in: query, name: limit, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+        - { in: query, name: cursor, schema: { type: string } }
       responses:
         "200":
-          description: Public starting prices. Exact authenticated product pricing may vary.
+          description: Current product prices owned by reseller openAgent (1474), cached for at most 60 seconds.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProductListResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
   /account/request-api-key:
     post:
       summary: Request an API Key by email.
@@ -70,6 +80,16 @@ paths:
       responses:
         "200":
           description: Account info.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      api_key_prefix: { type: string, example: nx_abcd…wxyz }
+        "401": { $ref: "#/components/responses/Unauthorized" }
   /account/budget:
     get:
       summary: Read API-Key and daily spend guardrails.
@@ -77,7 +97,7 @@ paths:
         "200": { description: Budget policy and current spend. }
         "401": { $ref: "#/components/responses/Unauthorized" }
     put:
-      summary: Configure spend limits, alerts, and automatic pause.
+      summary: Configure spend limits, alerts, and manual pause state.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
@@ -104,12 +124,17 @@ paths:
         - in: query
           name: type
           schema: { type: string, enum: [all, dynamic, static] }
-        - in: query
-          name: country_code
-          schema: { type: string }
+        - { in: query, name: country, schema: { type: string } }
+        - { in: query, name: in_stock, schema: { type: boolean, default: true } }
+        - { in: query, name: limit, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+        - { in: query, name: cursor, schema: { type: string } }
       responses:
         "200":
           description: Product list.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProductListResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "429": { $ref: "#/components/responses/RateLimited" }
   /sessions:
@@ -131,6 +156,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/SessionResponse"
         "402": { $ref: "#/components/responses/InsufficientBalance" }
+        "422": { $ref: "#/components/responses/Unprocessable" }
         "409": { $ref: "#/components/responses/Conflict" }
         "429": { $ref: "#/components/responses/RateLimited" }
   /sessions/{session_id}:
@@ -307,22 +333,28 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Unprocessable:
+      description: The request is valid but cannot be fulfilled in the current product or budget state.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
   schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum: [AUTH_INVALID_KEY, AUTH_EXPIRED_TOKEN, AUTH_INSUFFICIENT_PERMISSION, ACCOUNT_DISABLED, INVALID_REQUEST, ROUTE_NOT_FOUND, INSUFFICIENT_BALANCE, BUDGET_EXCEEDED, IDEMPOTENCY_CONFLICT, RATE_LIMIT_EXCEEDED, TRIAL_NOT_ELIGIBLE, PRODUCT_NOT_FOUND, PRODUCT_OUT_OF_STOCK, SESSION_NOT_FOUND, SESSION_EXPIRED, SESSION_LIMIT_REACHED, BACKEND_ERROR, BACKEND_TIMEOUT, INTERNAL_ERROR]
+        message: { type: string }
+        details: { type: object, additionalProperties: true }
     ErrorResponse:
       type: object
       required: [success, data, error, meta]
       properties:
         success: { type: boolean, enum: [false] }
         data: { nullable: true }
-        error:
-          type: object
-          required: [code, message]
-          properties:
-            code:
-              type: string
-              enum: [AUTH_INVALID_KEY, AUTH_EXPIRED_TOKEN, AUTH_INSUFFICIENT_PERMISSION, ACCOUNT_DISABLED, INVALID_REQUEST, ROUTE_NOT_FOUND, INSUFFICIENT_BALANCE, BUDGET_EXCEEDED, IDEMPOTENCY_CONFLICT, RATE_LIMIT_EXCEEDED, TRIAL_NOT_ELIGIBLE, PRODUCT_NOT_FOUND, PRODUCT_OUT_OF_STOCK, SESSION_NOT_FOUND, SESSION_EXPIRED, SESSION_LIMIT_REACHED, BACKEND_ERROR, BACKEND_TIMEOUT, INTERNAL_ERROR]
-            message: { type: string }
-            details: { type: object, additionalProperties: true }
+        error: { $ref: "#/components/schemas/Error" }
         meta:
           type: object
           required: [request_id, timestamp]
@@ -330,6 +362,35 @@ components:
             request_id: { type: string }
             timestamp: { type: string, format: date-time }
             latency_ms: { type: integer }
+    ProductListResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:
+          type: object
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/Product" }
+            next_cursor: { type: string, nullable: true }
+            total: { type: integer }
+            cache_ttl_seconds: { type: integer, maximum: 60 }
+            pricing_owner_agent_id: { type: integer, enum: [1474] }
+    Product:
+      type: object
+      required: [product_no, name, type, sharing, available, price, currency, unit]
+      properties:
+        product_no: { type: string }
+        name: { type: string, description: English product name }
+        type: { type: string, enum: [dynamic, static] }
+        sharing: { type: string, enum: [exclusive, shared] }
+        available: { type: boolean }
+        price: { type: number }
+        currency: { type: string, enum: [USD] }
+        unit: { type: string }
+        stock: { type: integer }
+        country: { type: string }
+        city: { type: string }
     RechargeResponse:
       type: object
       properties:
@@ -406,7 +467,11 @@ components:
       properties:
         key_limit_usd: { type: number, minimum: 0, nullable: true }
         daily_limit_usd: { type: number, minimum: 0, nullable: true }
-        pause_on_exceed: { type: boolean, default: true }
+        pause_on_exceed:
+          type: boolean
+          default: false
+          deprecated: true
+          description: Retained for compatibility; exceeding a budget never pauses the key automatically.
         alert_thresholds:
           type: array
           items: { type: integer, minimum: 1, maximum: 100 }

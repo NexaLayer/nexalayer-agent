@@ -25,11 +25,11 @@ The server writes protocol messages only to stdout. API errors go through MCP to
 - Policy write: change API-Key and daily budget limits. Require owner approval.
 - Cleanup: terminate a Session when the task ends. Early termination does not imply a refund.
 
-`nexalayer_list_products` returns a compact, paginated catalog. It defaults to 20 currently available products per page, omits zero-stock static products, and excludes internal pricing and supplier fields. Set `available_only` to `false` only when unavailable products are relevant.
+`nexalayer_list_products` returns a compact, cursor-paginated catalog. It defaults to 20 currently available products, supports `type`, `country`, `in_stock`, `limit`, and `cursor`, and excludes internal pricing and supplier fields.
 
 `nexalayer_create_session` incurs charges against the account balance. Read the current quote and budget, then obtain owner approval before calling it.
 
-Public starting prices are USD 4/GB for dynamic proxies and USD 10/month for static proxies. Always read `nexalayer_list_products` before purchase because the returned quote is authoritative.
+Always read `nexalayer_list_products` before purchase because it returns the current openAgent-backed quote and availability.
 
 ```text
 nexalayer_list_products → nexalayer_get_budget → owner approval

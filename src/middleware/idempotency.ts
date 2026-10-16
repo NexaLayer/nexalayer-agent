@@ -7,6 +7,7 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../app';
 import { ERROR_CODES } from '../config/constants';
 import { AppError } from '../utils/response';
+import { hashIdempotentRequest, parseResponsePayload } from '../utils/idempotency';
 
 const IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -28,6 +29,7 @@ export async function idempotencyGuard(
   if (!agentId) return;
 
   const requestPath = buildRequestPath(request);
+  const requestHash = hashIdempotentRequest(request);
   const existing =
     await prisma.agentIdempotencyKey.findUnique({
       where: {
@@ -39,7 +41,10 @@ export async function idempotencyGuard(
     });
 
   if (existing) {
-    if (existing.requestPath !== requestPath) {
+    if (
+      existing.requestPath !== requestPath ||
+      (existing.requestHash !== null && existing.requestHash !== requestHash)
+    ) {
       throw new AppError(
         ERROR_CODES.IDEMPOTENCY_CONFLICT,
         'Idempotency-Key was already used for a different request',
@@ -76,6 +81,7 @@ export async function idempotencyGuard(
           agentId,
           idempotencyKey: key,
           requestPath,
+          requestHash,
           expiresAt: new Date(
             Date.now() + IDEMPOTENCY_TTL_MS
           ),
@@ -99,7 +105,7 @@ export function registerIdempotencyPersistence(
     async (request, reply, payload) => {
       if (!request.idempotencyRecordId) return payload;
 
-      const body = parsePayload(payload);
+      const body = parseResponsePayload(payload);
       await prisma.agentIdempotencyKey
         .update({
           where: { id: request.idempotencyRecordId },
@@ -125,15 +131,4 @@ function buildRequestPath(
   request: FastifyRequest
 ): string {
   return `${request.method.toUpperCase()} ${request.url}`;
-}
-
-function parsePayload(payload: unknown): unknown {
-  if (typeof payload !== 'string') {
-    return { raw: String(payload ?? '') };
-  }
-  try {
-    return JSON.parse(payload);
-  } catch {
-    return { raw: payload };
-  }
 }

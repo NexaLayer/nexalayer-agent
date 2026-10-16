@@ -27,6 +27,7 @@ import { getBalance } from '../billing/billing.service';
 import { sendApiKeyEmail } from './email.service';
 import { sendLoginCodeEmail } from './email.service';
 import { env } from '../../config/env';
+import { maskApiKey } from '../../utils/api-key';
 
 const OPEN_AGENT_ID = 1474;
 const API_KEY_EMAIL_RESEND_COOLDOWN_MS = 10 * 60 * 1000;
@@ -562,7 +563,7 @@ export async function getAgentInfo(agentId: number) {
 
   return {
     agent_id: agent.id,
-    api_key: agent.apiKey,
+    api_key_prefix: maskApiKey(agent.apiKey),
     name: agent.name,
     status: agent.status,
     balance: balance.balance,

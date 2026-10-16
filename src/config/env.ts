@@ -30,6 +30,9 @@ const envSchema = z.object({
   BACKEND_BASE_URL: z.string().min(1),
   BACKEND_ADMIN_USERNAME: z.string().min(1),
   BACKEND_ADMIN_PASSWORD: z.string().min(1),
+  PRICING_AGENT_APP_ID: z.coerce.number().int().positive().default(139),
+  PRICING_OWNER_AGENT_ID: z.coerce.number().int().positive().default(1474),
+  PRODUCT_CACHE_TTL_SECONDS: z.coerce.number().int().positive().max(60).default(60),
 
   ENCRYPTION_KEY: z.string().min(32),
 
@@ -37,8 +40,8 @@ const envSchema = z.object({
   RATE_LIMIT_PER_DAY: z.coerce.number().default(10000),
   TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(1),
 
-  // $20 covers five 1 GB dynamic test sessions at the public $4/GB
-  // starting price. Keep this aligned with scripts/calibrate-trial-credit.mjs.
+  // Keep the default trial amount aligned with scripts/calibrate-trial-credit.mjs
+  // and validate it against the live public product catalog before changing it.
   TRIAL_BALANCE: z.coerce.number().positive().default(20.0),
   TRIAL_DURATION_DAYS: z.coerce.number().default(30),
   TRIAL_MAX_CLAIMS_PER_IP_PER_DAY: z.coerce.number().int().positive().default(3),

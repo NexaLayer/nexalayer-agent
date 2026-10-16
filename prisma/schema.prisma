@@ -281,6 +281,7 @@ model AgentIdempotencyKey {
   agentId        Int      @map("agent_id")
   idempotencyKey String   @map("idempotency_key") @db.VarChar(64)
   requestPath    String   @map("request_path") @db.VarChar(500)
+  requestHash    String?  @map("request_hash") @db.VarChar(64)
   responseStatus Int?     @map("response_status")
   responseBody   Json?    @map("response_body")
   expiresAt      DateTime @map("expires_at") @db.Timestamptz

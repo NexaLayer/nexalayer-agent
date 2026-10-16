@@ -14,6 +14,7 @@ import {
 } from './session.schema';
 import { shouldReleaseStaticResource } from './session-lifecycle';
 import { createBudgetedSession } from '../account/budget.service';
+import { refundableCharge } from '../../utils/billing';
 
 const STATIC_ORDER_READY_TIMEOUT_MS = 120_000;
 const STATIC_ORDER_POLL_MS = 3_000;
@@ -350,6 +351,13 @@ async function lookupProductInfo(
       );
     }
 
+    if (match.flow <= 0) {
+      throw new AppError(
+        ERROR_CODES.PRODUCT_OUT_OF_STOCK,
+        'Dynamic product has no available traffic'
+      );
+    }
+
     let price = match.price;
     if (!price || price <= 0) {
       const prices =
@@ -389,6 +397,12 @@ async function lookupProductInfo(
   if (!match) {
     throw new Error(
       `Static product not found: ${productNo}`
+    );
+  }
+  if (match.status !== 1 || match.stock <= 0) {
+    throw new AppError(
+      ERROR_CODES.PRODUCT_OUT_OF_STOCK,
+      'Static product is out of stock'
     );
   }
   return {
@@ -442,6 +456,9 @@ async function provisionSessionAsync(
   input: CreateSessionRequest,
   product: ProductInfo
 ): Promise<void> {
+  let balanceBefore: number | undefined;
+  let userToken: string | undefined;
+  let expectedChargeCny = 0;
   try {
     if (
       !agent.backendUsername ||
@@ -460,14 +477,16 @@ async function provisionSessionAsync(
     const backendPassword = decrypt(
       agent.backendPasswordEnc
     );
-    const userToken = await backend.getUserToken(
+    userToken = await backend.getUserToken(
       agent.backendUsername,
       backendPassword
     );
+    balanceBefore = await backend.getBalance(userToken);
 
     const qty = input.quantity ?? 1;
     const dur = input.duration ?? product.duration;
     const totalAmount = product.price * qty;
+    expectedChargeCny = totalAmount;
 
     let backendOrderNo: string | undefined;
     let expiresAt: Date | undefined;
@@ -592,14 +611,35 @@ async function provisionSessionAsync(
       `[provision] session #${sessionDbId} failed:`,
       (err as Error).message
     );
+    let refundedCny = 0;
+    if (userToken && balanceBefore !== undefined && agent.backendUserId) {
+      try {
+        const balanceAfter = await backend.getBalance(userToken);
+        const chargedCny = Math.min(
+          refundableCharge(balanceBefore, balanceAfter),
+          expectedChargeCny
+        );
+        if (chargedCny > 0) {
+          await backend.refundUserBalance(
+            agent.backendUserId,
+            chargedCny,
+            `Automatic refund for failed NexaLayer session ${sessionDbId}`
+          );
+          refundedCny = chargedCny;
+        }
+      } catch (refundError) {
+        console.error(
+          `[provision] automatic refund failed for session #${sessionDbId}:`,
+          (refundError as Error).message
+        );
+      }
+    }
     await prisma.agentSession.update({
       where: { id: sessionDbId },
       data: {
         status: SESSION_STATUS.ERROR,
-        lastErrorType: (err as Error).message.slice(
-          0,
-          50
-        ),
+        estimatedChargeUsd: refundedCny > 0 ? 0 : undefined,
+        lastErrorType: `${(err as Error).message}${refundedCny > 0 ? '; refunded' : ''}`.slice(0, 50),
       },
     });
   }

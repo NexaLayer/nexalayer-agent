@@ -47,7 +47,7 @@ function productItems(response: unknown): Product[] {
 
 function compactProduct(product: Product) {
   const fields = [
-    'product_no', 'name', 'type', 'price', 'currency', 'unit',
+    'product_no', 'name', 'type', 'sharing', 'available', 'price', 'currency', 'unit',
     'stock', 'country', 'city', 'project_required',
   ] as const;
   const compact: Product = {};
@@ -60,37 +60,32 @@ function compactProduct(product: Product) {
   return compact;
 }
 
-const server = new McpServer({ name: 'nexalayer', version: '0.1.4' });
+const server = new McpServer({ name: 'nexalayer', version: '0.1.5' });
 
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } as const;
 const paidWrite = { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true } as const;
 const policyWrite = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false } as const;
 const destructiveWrite = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true } as const;
 
-server.tool('nexalayer_list_products', 'List a compact, paginated catalog of currently available products and prices before purchasing.', {
+server.tool('nexalayer_list_products', 'List a compact catalog of current products and prices before purchasing.', {
   type: z.enum(['all', 'dynamic', 'static']).default('all'),
-  country_code: z.string().optional(),
-  page: z.number().int().positive().default(1),
-  page_size: z.number().int().min(1).max(50).default(20),
-  available_only: z.boolean().default(true),
-}, readOnly, async ({ type, country_code, page, page_size, available_only }) => {
-  const query = new URLSearchParams({ type });
-  if (country_code) query.set('country_code', country_code);
+  country: z.string().optional(),
+  in_stock: z.boolean().default(true),
+  limit: z.number().int().min(1).max(100).default(20),
+  cursor: z.string().optional(),
+}, readOnly, async ({ type, country, in_stock, limit, cursor }) => {
+  const query = new URLSearchParams({ type, in_stock: String(in_stock), limit: String(limit) });
+  if (country) query.set('country', country);
+  if (cursor) query.set('cursor', cursor);
   const response = await api('GET', `/products?${query}`);
-  const products = productItems(response)
-    .filter((product) => !available_only || product.stock === undefined || Number(product.stock) > 0)
-    .map(compactProduct);
-  const total = products.length;
-  const offset = (page - 1) * page_size;
+  const products = productItems(response).map(compactProduct);
+  const data = response && typeof response === 'object'
+    ? (response as Record<string, unknown>).data as Record<string, unknown> | undefined
+    : undefined;
   return result({
-    items: products.slice(offset, offset + page_size),
-    pagination: {
-      page,
-      page_size,
-      total,
-      total_pages: Math.ceil(total / page_size),
-      has_more: offset + page_size < total,
-    },
+    items: products,
+    next_cursor: data?.next_cursor ?? null,
+    total: data?.total ?? products.length,
   });
 });
 

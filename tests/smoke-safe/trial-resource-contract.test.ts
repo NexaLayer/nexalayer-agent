@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { getPublicPricing } from '../../src/modules/product/public-pricing';
 import { readFileSync } from 'node:fs';
 import { createSessionSchema } from '../../src/modules/session/session.schema';
 import { rechargeSchema } from '../../src/modules/billing/billing.schema';
@@ -127,48 +126,23 @@ describe('trial resource contract', () => {
     );
   });
 
-  it('publishes unauthenticated starting prices', () => {
-    const pricingSource = readFileSync(
-      new URL('../../src/modules/product/public-pricing.ts', import.meta.url),
-      'utf8'
-    );
-    const pricing = JSON.parse(
-      readFileSync('src/config/public-pricing.json', 'utf8')
-    );
-    expect(pricingSource).toContain('currency: pricing.currency');
-    expect(pricingSource).toContain('pricing.products.dynamic.unit');
-    expect(pricingSource).toContain('pricing.products.static.unit');
-    expect(pricing.currency).toBe('USD');
-    expect(pricing.products.dynamic.unit).toBe('GB');
-    expect(pricing.products.static.unit).toBe('month');
-    expect(pricing.products.dynamic.starting_price).toBe(4);
-    expect(pricing.products.static.starting_price).toBe(10);
+  it('publishes unauthenticated current prices from openAgent', () => {
+    const pricingSource = readFileSync('src/modules/product/product.service.ts', 'utf8');
+    expect(pricingSource).toContain('PRICING_AGENT_APP_ID');
+    expect(pricingSource).toContain('PRICING_OWNER_AGENT_ID');
+    expect(pricingSource).toContain('PRODUCT_CACHE_TTL_SECONDS');
+    expect(pricingSource).toContain("sharing: 'shared'");
+    expect(pricingSource).toContain('available: product.flow > 0');
     expect(readFileSync('openapi/openapi.yaml', 'utf8')).toContain(
       '/public/products:'
     );
   });
 
-  it('exposes only the public pricing field allowlist', () => {
-    const response = getPublicPricing();
-    expect(Object.keys(response).sort()).toEqual(
-      ['currency', 'exact_pricing_url', 'items', 'updated_at'].sort()
-    );
-    expect(response.items).toHaveLength(2);
-    for (const item of response.items) {
-      expect(Object.keys(item).sort()).toEqual(
-        ['name', 'price_qualifier', 'starting_price', 'type', 'unit'].sort()
-      );
-      expect(item).not.toHaveProperty('product_no');
-      expect(item).not.toHaveProperty('supplier');
-      expect(item).not.toHaveProperty('cost');
-      expect(item).not.toHaveProperty('stock');
-      expect(item).not.toHaveProperty('projects');
-      expect(item).not.toHaveProperty('product_type');
-    }
-    expect(response.items.map((item) => item.type).sort()).toEqual([
-      'dynamic',
-      'static',
-    ]);
+  it('keeps the public product cache at no more than 60 seconds', () => {
+    const envSource = readFileSync('src/config/env.ts', 'utf8');
+    const controllerSource = readFileSync('src/modules/product/product.controller.ts', 'utf8');
+    expect(envSource).toContain('PRODUCT_CACHE_TTL_SECONDS: z.coerce.number().int().positive().max(60).default(60)');
+    expect(controllerSource).toContain("public, max-age=60, s-maxage=60");
   });
 
   it('guards automatic trial credit by email provider, IP, and installation', () => {
