@@ -395,6 +395,37 @@ export async function getBalance(
   return res.data.balance;
 }
 
+export async function getDynamicResourceUsage(
+  userToken: string,
+  productNo: string
+): Promise<{
+  total_gb: number;
+  used_gb: number;
+  remaining_gb: number;
+  today_gb: number;
+  current_month_gb: number;
+  last_month_gb: number;
+}> {
+  const qs = new URLSearchParams({
+    productNo:
+      toBackendDynamicProductNo(productNo) ?? productNo,
+  });
+  const res = await fetchJson<
+    BackendResponse<Record<string, unknown>>
+  >(`/api/proxy/dynamic-resource?${qs}`, {
+    headers: { Authorization: `Bearer ${userToken}` },
+  });
+  const data = res.data ?? {};
+  return {
+    total_gb: num(data.totalFlow),
+    used_gb: num(data.usedFlow),
+    remaining_gb: num(data.remainingFlow),
+    today_gb: num(data.todayFlow),
+    current_month_gb: num(data.currentMonthFlow),
+    last_month_gb: num(data.lastMonthFlow),
+  };
+}
+
 export async function getDynamicProducts(
   userToken: string
 ): Promise<BackendProductResponse[]> {

@@ -204,6 +204,16 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "429": { $ref: "#/components/responses/RateLimited" }
+  /sessions/{session_id}/usage:
+    get:
+      summary: Get live traffic and locally reported request usage for a session.
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Session usage.
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /sessions/{session_id}/renew:
     post:
       summary: Renew a static session.
@@ -517,4 +527,5 @@ components:
         target_host: { type: string }
         latency_ms: { type: integer }
         error_message: { type: string }
+        bytes_used: { type: integer, minimum: 0 }
         metadata: { type: object }

@@ -16,6 +16,7 @@ export const reportEventSchema = z.object({
   target_host: z.string().max(200).optional(),
   latency_ms: z.number().int().min(0).optional(),
   error_message: z.string().max(500).optional(),
+  bytes_used: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).optional(),
   metadata: z.record(z.unknown()).optional(),
 });
 

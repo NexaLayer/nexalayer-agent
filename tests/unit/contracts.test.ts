@@ -42,6 +42,7 @@ describe('public API and MCP contracts', () => {
 
   it('uses the Error schema for reusable OpenAPI errors', () => {
     const spec = readFileSync(resolve(root, 'openapi/openapi.yaml'), 'utf8');
+    expect(spec).toContain('/sessions/{session_id}/usage');
     expect(spec).toContain('Error:');
     expect(spec).toContain('error: { $ref: "#/components/schemas/Error" }');
     for (const name of ['BadRequest', 'Unauthorized', 'NotFound', 'InsufficientBalance', 'Conflict', 'RateLimited', 'Unprocessable']) {

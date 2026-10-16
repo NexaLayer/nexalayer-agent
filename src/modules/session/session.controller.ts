@@ -78,6 +78,20 @@ export async function handleList(
   );
 }
 
+export async function handleUsage(
+  request: FastifyRequest<{
+    Params: { session_id: string };
+  }>,
+  reply: FastifyReply
+): Promise<void> {
+  const ctx = getCtx(request);
+  const result = await sessionService.getSessionUsage(
+    ctx.agentId,
+    request.params.session_id
+  );
+  sendSuccess(reply, result, 200, request.startTime);
+}
+
 export async function handleRotate(
   request: FastifyRequest<{
     Params: { session_id: string };

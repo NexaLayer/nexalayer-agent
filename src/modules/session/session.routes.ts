@@ -7,6 +7,7 @@ import {
   handleTerminate,
   handleRenew,
   handleWhitelist,
+  handleUsage,
 } from './session.controller';
 import {
   handleReportEvent,
@@ -25,6 +26,7 @@ export async function sessionRoutes(
   app.post('/', { preHandler: idempotencyGuard }, handleCreate);
   app.get('/', handleList);
   app.get('/:session_id', handleGet);
+  app.get('/:session_id/usage', handleUsage);
   app.post<{ Params: { session_id: string } }>(
     '/:session_id/rotate',
     { preHandler: idempotencyGuard },

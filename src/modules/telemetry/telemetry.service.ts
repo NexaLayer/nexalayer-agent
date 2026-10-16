@@ -58,7 +58,8 @@ export async function reportEvent(
   await updateSessionHealth(
     session.id,
     input.event_type,
-    riskLevel
+    riskLevel,
+    reportedBytes(input)
   );
 
   return {
@@ -184,7 +185,8 @@ function computeBlockProbability(
 async function updateSessionHealth(
   sessionDbId: number,
   eventType: string,
-  riskLevel: string
+  riskLevel: string,
+  bytesUsed: number
 ): Promise<void> {
   const session = await prisma.agentSession.findUnique({
     where: { id: sessionDbId },
@@ -237,8 +239,21 @@ async function updateSessionHealth(
       consecutiveFailures: newConsecFailures,
       riskLevel: riskLevel,
       lastErrorType: isFailure ? eventType : null,
+      requestsCount: { increment: 1 },
+      bytesUsed: { increment: BigInt(bytesUsed) },
     },
   });
+}
+
+function reportedBytes(input: ReportEventRequest): number {
+  if (input.bytes_used !== undefined) return input.bytes_used;
+  const metadata = input.metadata ?? {};
+  const direct = Number(metadata.bytes_used ?? metadata.bytes);
+  if (Number.isSafeInteger(direct) && direct >= 0) return direct;
+  const requestBytes = Number(metadata.request_bytes ?? 0);
+  const responseBytes = Number(metadata.response_bytes ?? 0);
+  const total = requestBytes + responseBytes;
+  return Number.isSafeInteger(total) && total >= 0 ? total : 0;
 }
 
 function getRecommendation(

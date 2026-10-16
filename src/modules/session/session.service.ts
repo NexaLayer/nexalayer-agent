@@ -788,7 +788,24 @@ export async function getSession(
     );
   }
 
-  return formatSession(session, true);
+  const formatted = formatSession(session, true);
+  if (
+    session.sessionType === SESSION_TYPE.DYNAMIC &&
+    session.backendProductNo
+  ) {
+    try {
+      return {
+        ...formatted,
+        usage: await getSessionUsage(agentId, sessionId),
+      };
+    } catch (error) {
+      console.error(
+        `[usage] live refresh failed for ${sessionId}:`,
+        (error as Error).message
+      );
+    }
+  }
+  return formatted;
 }
 
 export async function listSessions(
@@ -816,6 +833,79 @@ export async function listSessions(
     total,
     page: query.page,
     page_size: query.page_size,
+  };
+}
+
+export async function getSessionUsage(
+  agentId: number,
+  sessionId: string
+) {
+  const session = await prisma.agentSession.findFirst({
+    where: { sessionId, agentId },
+  });
+  if (!session) {
+    throw new AppError(
+      ERROR_CODES.SESSION_NOT_FOUND,
+      'Session not found'
+    );
+  }
+
+  let traffic = {
+    total_gb: 0,
+    used_gb: Number(session.bytesUsed) / 1024 ** 3,
+    remaining_gb: 0,
+    usage_percentage: 0,
+    today_gb: 0,
+    current_month_gb: 0,
+    last_month_gb: 0,
+    source: 'reported_events',
+  };
+
+  if (
+    session.sessionType === SESSION_TYPE.DYNAMIC &&
+    session.backendProductNo
+  ) {
+    const agent = await prisma.agentApp.findUnique({
+      where: { id: agentId },
+    });
+    if (!agent?.backendUsername || !agent.backendPasswordEnc) {
+      throw new AppError(
+        ERROR_CODES.BACKEND_ERROR,
+        'Backend credentials missing'
+      );
+    }
+    const userToken = await backend.getUserToken(
+      agent.backendUsername,
+      decrypt(agent.backendPasswordEnc)
+    );
+    const upstream = await backend.getDynamicResourceUsage(
+      userToken,
+      session.backendProductNo
+    );
+    traffic = {
+      ...upstream,
+      usage_percentage:
+        upstream.total_gb > 0
+          ? Math.round(
+              (upstream.used_gb / upstream.total_gb) *
+                10_000
+            ) / 100
+          : 0,
+      source: 'backend_account_product',
+    };
+  }
+
+  return {
+    session_id: session.sessionId,
+    traffic,
+    requests: {
+      total: session.requestsCount,
+    },
+    reported_bytes: Number(session.bytesUsed),
+    period: {
+      start: session.createdAt.toISOString(),
+      end: session.expiresAt?.toISOString() ?? null,
+    },
   };
 }
 

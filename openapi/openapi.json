@@ -528,6 +528,27 @@
         }
       }
     },
+    "/sessions/{session_id}/usage": {
+      "get": {
+        "summary": "Get live traffic and locally reported request usage for a session.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SessionId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session usage."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/sessions/{session_id}/report-event": {
       "post": {
         "summary": "Report execution telemetry for a session.",
@@ -1263,6 +1284,10 @@
           },
           "error_message": {
             "type": "string"
+          },
+          "bytes_used": {
+            "type": "integer",
+            "minimum": 0
           },
           "metadata": {
             "type": "object"

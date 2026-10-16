@@ -7,6 +7,7 @@ import { API_PREFIX, ERROR_CODES } from './config/constants';
 import { registerErrorHandler } from './middleware/error-handler';
 import { registerRateLimit } from './middleware/rate-limit';
 import { registerLogger } from './middleware/logger';
+import { registerTolerantJsonParser } from './middleware/json-parser';
 import {
   registerIdempotencyPersistence,
 } from './middleware/idempotency';
@@ -46,6 +47,8 @@ export async function buildApp() {
           : undefined,
     },
   });
+
+  registerTolerantJsonParser(app);
 
   await app.register(cors, { origin: true });
 
