@@ -119,6 +119,7 @@ export interface BackendUsdtRateResponse {
 }
 
 export interface BackendStaticProductResponse {
+  id: number;
   productId: string;
   name: string;
   proxyType: number;

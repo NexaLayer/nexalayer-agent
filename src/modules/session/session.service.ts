@@ -15,6 +15,10 @@ import {
 import { shouldReleaseStaticResource } from './session-lifecycle';
 import { createBudgetedSession } from '../account/budget.service';
 import { refundableCharge } from '../../utils/billing';
+import {
+  getOpenAgentPriceMap,
+  resolveOpenAgentPrice,
+} from '../product/agent-pricing';
 
 const STATIC_ORDER_READY_TIMEOUT_MS = 120_000;
 const STATIC_ORDER_POLL_MS = 3_000;
@@ -358,26 +362,13 @@ async function lookupProductInfo(
       );
     }
 
-    let price = match.price;
-    if (!price || price <= 0) {
-      const prices =
-        await backend.getDynamicPrices();
-      const priceEntry = prices.find(
-        (p) =>
-          p.id === match.id ||
-          p.type === match.type
-      );
-      if (priceEntry && priceEntry.price > 0) {
-        price = priceEntry.price;
-      }
-    }
-    if (!price || price <= 0) {
-      throw new Error(
-        `No valid price for product ` +
-          `${productNo} (id=${match.id}). ` +
-          `Configure pricing first.`
-      );
-    }
+    const price = resolveOpenAgentPrice(
+      {
+        id: match.id,
+        productNo: match.type,
+      },
+      await getOpenAgentPriceMap([104])
+    );
 
     return {
       backendProductNo: match.backendProductNo,
@@ -407,7 +398,13 @@ async function lookupProductInfo(
   }
   return {
     backendProductNo: match.productId,
-    price: match.price,
+    price: resolveOpenAgentPrice(
+      {
+        id: match.id,
+        productNo: match.productId,
+      },
+      await getOpenAgentPriceMap([103])
+    ),
     proxyType: match.proxyType,
     flow: match.flow ?? 0,
     duration: match.duration ?? 30,

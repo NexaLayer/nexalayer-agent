@@ -437,18 +437,30 @@ export interface PriceEntry {
   globalPrice: number;
 }
 
-export async function getDynamicPrices(): Promise<
+export async function getAgentProductPrices(
+  agentId: number,
+  proxyTypes: number[] = [103, 104]
+): Promise<
   PriceEntry[]
 > {
   const headers = await authHeaders();
-  const qs =
-    'is_global=false&proxy_types=104';
+  const qs = new URLSearchParams({
+    is_global: 'false',
+    agent_id: String(agentId),
+  });
+  for (const proxyType of proxyTypes) {
+    qs.append('proxy_types', String(proxyType));
+  }
   const res = await fetchJson<
     BackendResponse<PriceEntry[]>
-  >(`/api/v1/product-prices/prices?${qs}`, {
+  >(`/api/v1/product-prices/prices?${qs.toString()}`, {
     headers,
   });
   return res.data ?? [];
+}
+
+export async function getDynamicPrices(): Promise<PriceEntry[]> {
+  return getAgentProductPrices(env.PRICING_OWNER_AGENT_ID, [104]);
 }
 
 export async function getStaticProducts(
@@ -480,6 +492,7 @@ export async function getStaticProducts(
       p.projects ??
       p.projectList;
     return {
+      id: num(p.id),
       productId,
       name: String(p.name ?? productId),
       proxyType: num(p.proxyType, 103),

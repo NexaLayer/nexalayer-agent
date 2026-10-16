@@ -5,6 +5,7 @@ const getUserIdentity = vi.fn();
 const getUsdtRate = vi.fn();
 const getDynamicProducts = vi.fn();
 const getStaticProducts = vi.fn();
+const getAgentProductPrices = vi.fn();
 
 vi.mock('../../src/app', () => ({
   prisma: { agentApp: { findUnique } },
@@ -23,6 +24,7 @@ vi.mock('../../src/gateway/backend-client', () => ({
   getUsdtRate,
   getDynamicProducts,
   getStaticProducts,
+  getAgentProductPrices,
   getAreaHierarchy: vi.fn(),
 }));
 
@@ -35,11 +37,17 @@ describe('openAgent product catalog', () => {
     getUserIdentity.mockResolvedValue({ token: 'token', agentId: 1474 });
     getUsdtRate.mockResolvedValue({ effective_rate: 7 });
     getDynamicProducts.mockResolvedValue([
-      { type: 'DYN-1', name: 'Dynamic Proxy', proxyType: 104, price: 28, flow: 10, country: 'US', city: '' },
-      { type: 'DYN-EMPTY', name: 'Empty Dynamic', proxyType: 104, price: 28, flow: 0, country: 'US', city: '' },
+      { id: 1, type: 'DYN-1', name: 'Dynamic Proxy', proxyType: 104, price: 28, flow: 10, country: 'US', city: '' },
+      { id: 2, type: 'DYN-EMPTY', name: 'Empty Dynamic', proxyType: 104, price: 28, flow: 0, country: 'US', city: '' },
     ]);
     getStaticProducts.mockResolvedValue([
-      { productId: '静态资源-1', proxyType: 103, productType: 1, price: 70, stock: 2, status: 1, country: 'US', city: '纽约' },
+      { id: 201, productId: 'STATIC-SHARED', proxyType: 103, productType: 2, price: 70, stock: 2, status: 1, country: 'US', city: 'New York' },
+      { id: 202, productId: 'INTERNAL-NO-PRICE', proxyType: 103, productType: 1, price: 999, stock: 2, status: 1, country: 'US', city: 'Internal' },
+    ]);
+    getAgentProductPrices.mockResolvedValue([
+      { id: 1, type: 'dynamic', price: 1.5, costPrice: 0, globalPrice: 15 },
+      { id: 2, type: 'dynamic', price: 1.5, costPrice: 0, globalPrice: 15 },
+      { id: 201, type: 'static', price: 5, costPrice: 0, globalPrice: 70 },
     ]);
   });
 
@@ -64,7 +72,18 @@ describe('openAgent product catalog', () => {
     const available = await service.listProducts({ type: 'all', country: 'US', in_stock: true, limit: 1 });
     expect(available.items).toHaveLength(1);
     expect(available.next_cursor).not.toBeNull();
-    expect(available.items[0]).toMatchObject({ sharing: 'shared', available: true, price: 4 });
+    expect(available.items[0]).toMatchObject({ sharing: 'shared', available: true, price: 0.21 });
     expect(available.items.every((item) => /^[\x20-\x7E]+$/.test(item.name))).toBe(true);
+  });
+
+  it('uses openAgent prices rather than the ordinary pricing-account prices', async () => {
+    const service = await import('../../src/modules/product/product.service');
+    const result = await service.listProducts({ type: 'all', in_stock: true, limit: 20 });
+    expect(getAgentProductPrices).toHaveBeenCalledWith(1474, [103, 104]);
+    expect(result.items).toEqual(expect.arrayContaining([
+      expect.objectContaining({ product_no: 'DYN-1', price: 0.21 }),
+      expect.objectContaining({ product_no: 'STATIC-SHARED', sharing: 'shared', price: 0.71 }),
+    ]));
+    expect(result.items.some((item) => item.product_no === 'INTERNAL-NO-PRICE')).toBe(false);
   });
 });

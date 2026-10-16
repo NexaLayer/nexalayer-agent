@@ -6,6 +6,10 @@ import { ERROR_CODES } from '../../config/constants';
 import { env } from '../../config/env';
 import * as backend from '../../gateway/backend-client';
 import type { ListProductsQuery } from './product.schema';
+import {
+  getOpenAgentPriceMap,
+  findOpenAgentPrice,
+} from './agent-pricing';
 
 const productCache = new NodeCache({
   stdTTL: env.PRODUCT_CACHE_TTL_SECONDS,
@@ -57,11 +61,15 @@ async function getPricingToken(): Promise<string> {
 function englishStaticName(product: {
   country?: string;
   city?: string;
+  productType?: number | string;
 }): string {
   const location = [product.city, product.country]
     .filter((part): part is string => Boolean(part && /^[\x20-\x7E]+$/.test(part)))
     .join(', ');
-  return `${location ? `${location} ` : ''}Exclusive Static Proxy`;
+  const sharing = product.productType === 2 || product.productType === '2'
+    ? 'Shared'
+    : 'Exclusive';
+  return `${location ? `${location} ` : ''}${sharing} Static Proxy`;
 }
 
 async function loadCatalog(): Promise<ProductListItem[]> {
@@ -69,10 +77,11 @@ async function loadCatalog(): Promise<ProductListItem[]> {
   if (cached) return cached;
 
   const userToken = await getPricingToken();
-  const [rate, dynamicProducts, staticProducts] = await Promise.all([
+  const [rate, dynamicProducts, staticProducts, agentPrices] = await Promise.all([
     backend.getUsdtRate(userToken),
     backend.getDynamicProducts(userToken),
     backend.getStaticProducts(userToken),
+    getOpenAgentPriceMap(),
   ]);
   const exchangeRate = Number(rate.effective_rate ?? rate.rate);
   if (!Number.isFinite(exchangeRate) || exchangeRate <= 0) {
@@ -82,26 +91,35 @@ async function loadCatalog(): Promise<ProductListItem[]> {
     Math.round((priceCny / exchangeRate) * 100) / 100;
 
   const items: ProductListItem[] = [
-    ...dynamicProducts.map((product) => ({
+    ...dynamicProducts.flatMap((product) => {
+      const price = findOpenAgentPrice(product.id, agentPrices);
+      if (price === undefined) return [];
+      return [{
       product_no: product.type,
       name: product.name,
       type: 'dynamic' as const,
       sharing: 'shared' as const,
-      available: product.flow > 0 && product.price > 0,
-      price: usd(product.price),
+      available: product.flow > 0,
+      price: usd(price),
       currency: 'USD' as const,
       unit: 'GB',
       country: product.country || undefined,
       city: product.city || undefined,
       proxy_type: product.proxyType,
-    })),
-    ...staticProducts.map((product) => ({
+      }];
+    }),
+    ...staticProducts.flatMap((product) => {
+      const price = findOpenAgentPrice(product.id, agentPrices);
+      if (price === undefined) return [];
+      return [{
       product_no: product.productId,
       name: englishStaticName(product),
       type: 'static' as const,
-      sharing: 'exclusive' as const,
-      available: product.status === 1 && product.stock > 0 && product.price > 0,
-      price: usd(product.price),
+      sharing: product.productType === 2 || product.productType === '2'
+        ? 'shared' as const
+        : 'exclusive' as const,
+      available: product.status === 1 && product.stock > 0,
+      price: usd(price),
       currency: 'USD' as const,
       unit: 'month',
       stock: product.stock,
@@ -111,7 +129,8 @@ async function loadCatalog(): Promise<ProductListItem[]> {
       product_type: product.productType,
       project_required: Boolean(product.projectList?.length),
       projects: product.projectList,
-    })),
+      }];
+    }),
   ];
   productCache.set('open-agent-catalog', items);
   return items;
