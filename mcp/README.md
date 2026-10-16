@@ -32,4 +32,28 @@ nexalayer_list_products → nexalayer_get_budget → owner approval
 
 Common API error codes include `AUTH_INVALID_KEY`, `INSUFFICIENT_BALANCE`, `BUDGET_EXCEEDED`, `IDEMPOTENCY_CONFLICT`, and `RATE_LIMIT_EXCEEDED`.
 
+## Docker
+
+Build the stdio MCP server from the repository root:
+
+```bash
+docker build -t nexalayer-mcp ./mcp
+```
+
+The container can start and expose its tool catalog without credentials, which allows MCP directories and clients to inspect it safely:
+
+```bash
+docker run -i --rm nexalayer-mcp
+```
+
+Pass the API Key only at runtime when calling NexaLayer tools:
+
+```bash
+docker run -i --rm \
+  -e NEXALAYER_API_KEY="$NEXALAYER_API_KEY" \
+  nexalayer-mcp
+```
+
+`NEXALAYER_BASE_URL` remains optional. The image uses stdio and does not expose a network port or contain credentials.
+
 Request an API key and one-time trial credit at https://nexalayer.net/agents?source=mcp-readme.

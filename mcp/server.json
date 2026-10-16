@@ -5,12 +5,12 @@
   "description": "Managed proxy sessions, health, rotation, usage, and spend controls for AI agents.",
   "websiteUrl": "https://nexalayer.net/agents",
   "repository": { "url": "https://github.com/NexaLayer/nexalayer-agent", "source": "github", "subfolder": "mcp" },
-  "version": "0.1.3",
+  "version": "0.1.4",
   "packages": [{
     "registryType": "npm",
     "registryBaseUrl": "https://registry.npmjs.org",
     "identifier": "@nexalayer/mcp",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "transport": { "type": "stdio" },
     "environmentVariables": [
       { "name": "NEXALAYER_API_KEY", "description": "NexaLayer API key requested at https://nexalayer.net/agents?source=mcp-registry", "isRequired": true, "isSecret": true },

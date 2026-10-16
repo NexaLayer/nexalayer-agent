@@ -3,21 +3,22 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 
-const apiKey = process.env.NEXALAYER_API_KEY;
 const baseUrl = (process.env.NEXALAYER_BASE_URL ?? 'https://api.nexalayer.net/v1').replace(/\/$/, '');
 
-if (!apiKey) {
-  process.stderr.write('NEXALAYER_API_KEY is required\n');
-  process.exit(1);
-}
-
 async function api(method: string, path: string, body?: unknown, idempotencyKey?: string) {
+  const apiKey = process.env.NEXALAYER_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      'NEXALAYER_API_KEY is not set. Get one at https://www.nexalayer.net'
+    );
+  }
+
   const response = await fetch(`${baseUrl}${path}`, {
     method,
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      'X-API-Key': apiKey!,
+      'X-API-Key': apiKey,
       ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
     },
     body: body === undefined ? undefined : JSON.stringify(body),
@@ -31,7 +32,7 @@ const result = (value: unknown) => ({
   content: [{ type: 'text' as const, text: JSON.stringify(value, null, 2) }],
 });
 
-const server = new McpServer({ name: 'nexalayer', version: '0.1.3' });
+const server = new McpServer({ name: 'nexalayer', version: '0.1.4' });
 
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } as const;
 const paidWrite = { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true } as const;
