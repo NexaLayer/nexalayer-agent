@@ -26,7 +26,7 @@ describe('session product lookup errors', () => {
     await expect(lookupProductInfo('token', 'missing', 'static')).rejects.toMatchObject({ code: 'PRODUCT_NOT_FOUND' });
   });
 
-  it('accepts dynamic inventory with stock even when flow is zero', async () => {
+  it('accepts a dynamic product returned by the upstream saleable-product query', async () => {
     getDynamicProducts.mockResolvedValue([
       { type: 'dynamic_2', backendProductNo: 'out_dynamic_ipweb', proxyType: 104, price: 1.5, flow: 0, stock: 1000, duration: 30, unit: 1 },
     ]);
@@ -34,17 +34,6 @@ describe('session product lookup errors', () => {
     await expect(lookupProductInfo('token', 'dynamic_2', 'dynamic')).resolves.toMatchObject({
       backendProductNo: 'out_dynamic_ipweb',
       price: 1.5,
-      stock: 1000,
-    });
-  });
-
-  it('rejects dynamic inventory with zero stock even when flow is positive', async () => {
-    getDynamicProducts.mockResolvedValue([
-      { type: 'dynamic_2', backendProductNo: 'out_dynamic_ipweb', proxyType: 104, price: 1.5, flow: 1000, stock: 0, duration: 30, unit: 1 },
-    ]);
-    const { lookupProductInfo } = await import('../../src/modules/session/session.service');
-    await expect(lookupProductInfo('token', 'dynamic_2', 'dynamic')).rejects.toMatchObject({
-      code: 'PRODUCT_OUT_OF_STOCK',
     });
   });
 

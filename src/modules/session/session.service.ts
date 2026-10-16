@@ -38,7 +38,7 @@ type ProductInfo = {
   price: number;
   proxyType: number;
   flow: number;
-  stock: number;
+  stock?: number;
   duration: number;
   unit: number;
   projectId?: string;
@@ -379,13 +379,6 @@ export async function lookupProductInfo(
       );
     }
 
-    if (match.stock <= 0) {
-      throw new AppError(
-        ERROR_CODES.PRODUCT_OUT_OF_STOCK,
-        'Dynamic product is out of stock'
-      );
-    }
-
     const price = getOpenAgentDynamicPrice();
     assertPriceMatches(price, match.price);
 
@@ -394,7 +387,6 @@ export async function lookupProductInfo(
       price,
       proxyType: match.proxyType,
       flow: match.flow,
-      stock: match.stock,
       duration: match.duration || 1,
       unit: match.unit || 1,
     };

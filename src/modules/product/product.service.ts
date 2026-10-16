@@ -64,9 +64,11 @@ function toSafeProductListItem(
     price: product.price,
     currency: product.currency,
     unit: product.unit,
-    country: product.country,
-    city: product.city,
-    stock: product.stock,
+    ...(product.country ? { country: product.country } : {}),
+    ...(product.city ? { city: product.city } : {}),
+    ...(product.stock === undefined
+      ? {}
+      : { stock: product.stock }),
   };
 }
 
@@ -159,13 +161,15 @@ async function loadCatalog(
       name: product.name,
       type: 'dynamic' as const,
       sharing: 'shared' as const,
-      available: product.stock > 0,
+      // The standard upstream endpoint already filters disabled/inactive
+      // products. Dynamic traffic is quota-based and does not use the static
+      // inventory column, which is normally zero for dynamic_2.
+      available: true,
       price: usd(price),
       currency: 'USD' as const,
       unit: 'GB',
       country: product.country || undefined,
       city: product.city || undefined,
-      stock: product.stock,
       proxy_type: product.proxyType,
       }];
     }),

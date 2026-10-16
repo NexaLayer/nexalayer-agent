@@ -132,7 +132,7 @@ describe('trial resource contract', () => {
     expect(pricingSource).toContain('PRICING_OWNER_AGENT_ID');
     expect(pricingSource).toContain('PRODUCT_CACHE_TTL_SECONDS');
     expect(pricingSource).toContain("sharing: 'shared'");
-    expect(pricingSource).toContain('available: product.stock > 0');
+    expect(pricingSource).toContain('available: true');
     expect(readFileSync('openapi/openapi.yaml', 'utf8')).toContain(
       '/public/products:'
     );

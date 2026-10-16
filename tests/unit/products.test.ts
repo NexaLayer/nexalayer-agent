@@ -38,8 +38,7 @@ describe('openAgent product catalog', () => {
     getUserIdentity.mockResolvedValue({ token: 'token', agentId: 1474 });
     getUsdtRate.mockResolvedValue({ effective_rate: 7 });
     getDynamicProducts.mockResolvedValue([
-      { id: 1, type: 'DYN-1', name: 'Dynamic Proxy', proxyType: 104, price: 1.5, flow: 0, stock: 10, country: 'US', city: '' },
-      { id: 2, type: 'DYN-EMPTY', name: 'Empty Dynamic', proxyType: 104, price: 1.5, flow: 999, stock: 0, country: 'US', city: '' },
+      { id: 1, type: 'DYN-1', name: 'Dynamic Proxy', proxyType: 104, price: 1.5, flow: 0, stock: 0, country: 'US', city: '' },
     ]);
     getStaticProducts.mockResolvedValue([
       { id: 0, productId: 'STATIC-SHARED', proxyType: 103, productType: 2, price: 5, stock: 2, status: 1, country: 'US', city: 'New York' },
@@ -69,10 +68,11 @@ describe('openAgent product catalog', () => {
     expect(first.items.every((item) => /^[\x20-\x7E]+$/.test(item.name))).toBe(true);
   });
 
-  it('uses real dynamic stock for availability and applies filters/cursors', async () => {
+  it('treats products returned by the upstream saleable-product query as available', async () => {
     const service = await import('../../src/modules/product/product.service');
     const all = await service.listProducts({ type: 'dynamic', in_stock: false, limit: 20 });
-    expect(all.items.find((item) => item.product_no === 'DYN-EMPTY')?.available).toBe(false);
+    expect(all.items[0]).toMatchObject({ product_no: 'DYN-1', available: true });
+    expect(all.items[0]).not.toHaveProperty('stock');
     expect(getStaticProducts).not.toHaveBeenCalled();
     expect(getAgentProductPrices).not.toHaveBeenCalled();
     const available = await service.listProducts({ type: 'all', country: 'US', in_stock: true, limit: 1 });
