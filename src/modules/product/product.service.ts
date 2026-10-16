@@ -60,11 +60,17 @@ async function getPricingToken(): Promise<string> {
 }
 
 function englishStaticName(product: {
+  productId: string;
   country?: string;
   city?: string;
   productType?: number | string;
 }): string {
-  const location = [product.city, product.country]
+  const ztLocation = product.productId.match(/^ZT_([A-Z]{2})_(.+)_\d+$/);
+  const city = ztLocation
+    ? ztLocation[2].replace(/_/g, ' ').trim().toUpperCase()
+    : product.city;
+  const country = ztLocation ? ztLocation[1] : product.country;
+  const location = [city, country]
     .filter((part): part is string => Boolean(part && /^[\x20-\x7E]+$/.test(part)))
     .join(', ');
   const sharing = product.productType === 2 || product.productType === '2'
@@ -73,16 +79,21 @@ function englishStaticName(product: {
   return `${location ? `${location} ` : ''}${sharing} Static Proxy`;
 }
 
-async function loadCatalog(): Promise<ProductListItem[]> {
-  const cached = productCache.get<ProductListItem[]>('open-agent-catalog');
+async function loadCatalog(
+  type: ListProductsQuery['type']
+): Promise<ProductListItem[]> {
+  const cacheKey = `open-agent-catalog:${type}`;
+  const cached = productCache.get<ProductListItem[]>(cacheKey);
   if (cached) return cached;
 
   const userToken = await getPricingToken();
+  const includeDynamic = type !== 'static';
+  const includeStatic = type !== 'dynamic';
   const [rate, dynamicProducts, staticProducts, agentPrices] = await Promise.all([
     backend.getUsdtRate(userToken),
-    backend.getDynamicProducts(userToken),
-    backend.getStaticProducts(userToken),
-    getOpenAgentPriceMap([103]),
+    includeDynamic ? backend.getDynamicProducts(userToken) : Promise.resolve([]),
+    includeStatic ? backend.getStaticProducts(userToken) : Promise.resolve([]),
+    includeStatic ? getOpenAgentPriceMap([103]) : Promise.resolve(new Map()),
   ]);
   const exchangeRate = Number(rate.effective_rate ?? rate.rate);
   if (!Number.isFinite(exchangeRate) || exchangeRate <= 0) {
@@ -136,7 +147,7 @@ async function loadCatalog(): Promise<ProductListItem[]> {
       }];
     }),
   ];
-  productCache.set('open-agent-catalog', items);
+  productCache.set(cacheKey, items);
   return items;
 }
 
@@ -153,7 +164,7 @@ function decodeCursor(cursor?: string): number {
 
 export async function listProducts(query: ListProductsQuery) {
   const country = (query.country ?? query.country_code)?.toLowerCase();
-  const filtered = (await loadCatalog()).filter((product) => {
+  const filtered = (await loadCatalog(query.type)).filter((product) => {
     if (query.type !== 'all' && product.type !== query.type) return false;
     if (query.in_stock && !product.available) return false;
     if (
