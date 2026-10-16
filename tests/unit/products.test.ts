@@ -14,6 +14,7 @@ vi.mock('../../src/config/env', () => ({
   env: {
     PRICING_AGENT_APP_ID: 139,
     PRICING_OWNER_AGENT_ID: 1474,
+    NEXALAYER_DYNAMIC_PRICE_CNY: 1.5,
     PRODUCT_CACHE_TTL_SECONDS: 60,
   },
 }));
@@ -65,10 +66,10 @@ describe('openAgent product catalog', () => {
     expect(first.items.every((item) => /^[\x20-\x7E]+$/.test(item.name))).toBe(true);
   });
 
-  it('marks zero-flow dynamic products unavailable and applies filters/cursors', async () => {
+  it('keeps dynamic products purchasable and applies filters/cursors', async () => {
     const service = await import('../../src/modules/product/product.service');
     const all = await service.listProducts({ type: 'dynamic', in_stock: false, limit: 20 });
-    expect(all.items.find((item) => item.product_no === 'DYN-EMPTY')?.available).toBe(false);
+    expect(all.items.find((item) => item.product_no === 'DYN-EMPTY')?.available).toBe(true);
     const available = await service.listProducts({ type: 'all', country: 'US', in_stock: true, limit: 1 });
     expect(available.items).toHaveLength(1);
     expect(available.next_cursor).not.toBeNull();
@@ -79,7 +80,7 @@ describe('openAgent product catalog', () => {
   it('uses openAgent prices rather than the ordinary pricing-account prices', async () => {
     const service = await import('../../src/modules/product/product.service');
     const result = await service.listProducts({ type: 'all', in_stock: true, limit: 20 });
-    expect(getAgentProductPrices).toHaveBeenCalledWith(1474, [103, 104]);
+    expect(getAgentProductPrices).toHaveBeenCalledWith(1474, [103]);
     expect(result.items).toEqual(expect.arrayContaining([
       expect.objectContaining({ product_no: 'DYN-1', price: 0.21 }),
       expect.objectContaining({ product_no: 'STATIC-SHARED', sharing: 'shared', price: 0.71 }),

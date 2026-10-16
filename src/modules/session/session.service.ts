@@ -17,6 +17,7 @@ import { createBudgetedSession } from '../account/budget.service';
 import { refundableCharge } from '../../utils/billing';
 import {
   getOpenAgentPriceMap,
+  getOpenAgentDynamicPrice,
   resolveOpenAgentPrice,
 } from '../product/agent-pricing';
 
@@ -362,14 +363,7 @@ async function lookupProductInfo(
       );
     }
 
-    const price = resolveOpenAgentPrice(
-      {
-        id: match.id,
-        productNo: match.type,
-        aliases: [match.backendProductNo],
-      },
-      await getOpenAgentPriceMap([104])
-    );
+    const price = getOpenAgentDynamicPrice();
 
     return {
       backendProductNo: match.backendProductNo,

@@ -8,6 +8,7 @@ import * as backend from '../../gateway/backend-client';
 import type { ListProductsQuery } from './product.schema';
 import {
   getOpenAgentPriceMap,
+  getOpenAgentDynamicPrice,
   findOpenAgentPrice,
 } from './agent-pricing';
 
@@ -81,7 +82,7 @@ async function loadCatalog(): Promise<ProductListItem[]> {
     backend.getUsdtRate(userToken),
     backend.getDynamicProducts(userToken),
     backend.getStaticProducts(userToken),
-    getOpenAgentPriceMap(),
+    getOpenAgentPriceMap([103]),
   ]);
   const exchangeRate = Number(rate.effective_rate ?? rate.rate);
   if (!Number.isFinite(exchangeRate) || exchangeRate <= 0) {
@@ -92,18 +93,13 @@ async function loadCatalog(): Promise<ProductListItem[]> {
 
   const items: ProductListItem[] = [
     ...dynamicProducts.flatMap((product) => {
-      const price = findOpenAgentPrice(
-        product.id,
-        [product.type, product.backendProductNo],
-        agentPrices
-      );
-      if (price === undefined) return [];
+      const price = getOpenAgentDynamicPrice();
       return [{
       product_no: product.type,
       name: product.name,
       type: 'dynamic' as const,
       sharing: 'shared' as const,
-      available: product.flow > 0,
+      available: true,
       price: usd(price),
       currency: 'USD' as const,
       unit: 'GB',

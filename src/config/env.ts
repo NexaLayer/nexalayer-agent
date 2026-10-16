@@ -32,6 +32,10 @@ const envSchema = z.object({
   BACKEND_ADMIN_PASSWORD: z.string().min(1),
   PRICING_AGENT_APP_ID: z.coerce.number().int().positive().default(139),
   PRICING_OWNER_AGENT_ID: z.coerce.number().int().positive().default(1474),
+  // IPProxy resolves dynamic products to its global tier price even when an
+  // AgentPrice exists. Keep NexaLayer's reseller sale price explicit until a
+  // read-only AgentPrice endpoint is available.
+  NEXALAYER_DYNAMIC_PRICE_CNY: z.coerce.number().positive().default(1.5),
   PRODUCT_CACHE_TTL_SECONDS: z.coerce.number().int().positive().max(60).default(60),
 
   ENCRYPTION_KEY: z.string().min(32),

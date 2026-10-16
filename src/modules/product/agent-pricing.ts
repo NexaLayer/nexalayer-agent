@@ -9,6 +9,10 @@ type PriceableProduct = {
 
 export type OpenAgentPriceMap = Map<string, number>;
 
+export function getOpenAgentDynamicPrice(): number {
+  return env.NEXALAYER_DYNAMIC_PRICE_CNY;
+}
+
 export async function getOpenAgentPriceMap(
   proxyTypes: number[] = [103, 104]
 ): Promise<OpenAgentPriceMap> {
