@@ -5,7 +5,8 @@ NexaLayer MCP Server — a Model Context Protocol (MCP) server that lets AI agen
 The MCP implementation is in [`mcp/`](./mcp/), with its source entry point at [`mcp/src/index.ts`](./mcp/src/index.ts). The published package builds that file to the runtime entry path `mcp/dist/index.js`.
 
 Current public starting prices are **$0.23/GB** for dynamic proxy sessions and
-**$1.05/month** for shared static proxy sessions. Query
+**$1.05/month** for shared static proxy sessions. Exclusive static proxy sessions
+are **$1.43–$5.86/month** (launch pricing, live API authoritative). Query
 `GET /v1/public/products` or the authenticated product catalog for the current,
 authoritative quote and availability before creating a paid session.
 
@@ -55,8 +56,9 @@ Claude Desktop and Cursor both accept an `mcpServers` configuration like this:
 | Tool | Description | Charges |
 | --- | --- | --- |
 | `nexalayer_list_products` | List the compact, paginated catalog of available proxy products and current prices. | No |
-| `nexalayer_create_session` | Create a dynamic or static proxy session with an idempotency key. | **Yes — deducts from the account balance** |
-| `nexalayer_rotate_session` | Rotate a dynamic session when health or telemetry recommends it. | May affect paid usage |
+| `nexalayer_create_session` | Create a dynamic or static proxy session with an idempotency key. The create API does not honor `include_credentials` and omits proxy credentials. `PRICE_MISMATCH` (409): re-read prices, retry once. `BUDGET_EXCEEDED` and `INSUFFICIENT_BALANCE` (402): ask the owner, don't retry. | **Yes — deducts from the account balance** |
+| `nexalayer_get_session` | Read one session. Credentials are omitted unless `include_credentials=true`; never log them. | No |
+| `nexalayer_rotate_session` | Rotate a dynamic session when health or telemetry recommends it. Credentials are omitted unless `include_credentials=true`; never log them. | May affect paid usage |
 | `nexalayer_terminate_session` | Terminate a session and release its network resource; early termination does not imply a refund. | No new charge |
 | `nexalayer_session_health` | Read a session health score and rotation recommendation. | No |
 | `nexalayer_session_usage` | Read traffic and request usage for a session. | No |
@@ -126,10 +128,14 @@ Review `docs/agentTest.md` and the target environment before running it.
 
 Session detail and rotation responses hide `proxy.full_url` by default. Send
 `include_credentials=true` only when the caller needs to connect, and never log
-the returned credentials. Read measured traffic from
+the returned credentials. `nexalayer_get_session` and `nexalayer_rotate_session`
+pass that flag through. `POST /sessions` does not honor it, so
+`nexalayer_create_session` omits proxy credentials; read the session after it
+is active. Read measured traffic from
 `GET /v1/sessions/{session_id}/usage`. Unknown product numbers return HTTP 404
-with `PRODUCT_NOT_FOUND`; a quote/upstream charge discrepancy is rejected before
-charging with HTTP 409 and `PRICE_MISMATCH`.
+with `PRODUCT_NOT_FOUND`. `PRICE_MISMATCH` is HTTP 409: re-read prices, retry
+once. `BUDGET_EXCEEDED` and `INSUFFICIENT_BALANCE` are HTTP 402: ask the owner,
+don't retry.
 
 ## Chinese Docs and Examples
 

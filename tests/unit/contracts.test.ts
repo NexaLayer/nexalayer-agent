@@ -39,6 +39,10 @@ describe('public API and MCP contracts', () => {
     expect(mcp).toContain("'sharing', 'available'");
     expect(mcp).toContain('limit: z.number().int().min(1).max(100).default(20)');
     expect(mcp).toMatch(/create_session[\s\S]+incurs charges/);
+    expect(mcp).toContain('PRICE_MISMATCH (409: re-read prices, retry once)');
+    expect(mcp).toContain("BUDGET_EXCEEDED and INSUFFICIENT_BALANCE (402: ask the owner, don't retry)");
+    expect(mcp).toContain("server.tool('nexalayer_get_session'");
+    expect(mcp).toContain('include_credentials: z.boolean().default(false)');
   });
 
   it('reads Dynamic Pool 2 usage from the synchronized dashboard source', () => {
