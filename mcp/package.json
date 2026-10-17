@@ -1,6 +1,6 @@
 {
   "name": "@nexalayer/mcp",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Model Context Protocol (MCP) server for NexaLayer managed proxy sessions",
   "mcpName": "io.github.NexaLayer/nexalayer",
   "type": "module",
@@ -17,6 +17,7 @@
     "build": "tsc",
     "mcpb:build": "npm run build && node scripts/build-mcpb.mjs",
     "check": "tsc --noEmit",
+    "test": "node --test test/credentials.integration.mjs",
     "prepublishOnly": "npm run build"
   },
   "engines": {

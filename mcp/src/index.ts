@@ -2,6 +2,11 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
+import {
+  CREDENTIALS_NOTE,
+  getSessionApiPath,
+  rotateSessionApiPath,
+} from './session-request.js';
 
 const baseUrl = (process.env.NEXALAYER_BASE_URL ?? 'https://api.nexalayer.net/v1').replace(/\/$/, '');
 
@@ -60,7 +65,7 @@ function compactProduct(product: Product) {
   return compact;
 }
 
-const server = new McpServer({ name: 'nexalayer', version: '0.1.5' });
+const server = new McpServer({ name: 'nexalayer', version: '0.1.6' });
 
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } as const;
 const paidWrite = { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true } as const;
@@ -89,7 +94,7 @@ server.tool('nexalayer_list_products', 'List a compact catalog of current produc
   });
 });
 
-server.tool('nexalayer_create_session', 'Create a paid network session. This action incurs charges against the account balance. Configure a budget first and obtain owner approval for autonomous spend.', {
+server.tool('nexalayer_create_session', `Create a paid network session. This action incurs charges against the account balance. Configure a budget first and obtain owner approval for autonomous spend. The create API does not honor include_credentials and omits proxy credentials; read the session with include_credentials=true. ${CREDENTIALS_NOTE} PRICE_MISMATCH (409: re-read prices, retry once). BUDGET_EXCEEDED and INSUFFICIENT_BALANCE (402: ask the owner, don't retry).`, {
   session_type: z.enum(['dynamic', 'static']),
   product_no: z.string(),
   protocol: z.enum(['socks5', 'http']).default('socks5'),
@@ -99,12 +104,17 @@ server.tool('nexalayer_create_session', 'Create a paid network session. This act
   idempotency_key: z.string().min(1).max(64),
 }, paidWrite, async ({ idempotency_key, ...body }) => result(await api('POST', '/sessions', body, idempotency_key)));
 
-server.tool('nexalayer_rotate_session', 'Rotate a dynamic session after health or telemetry recommends rotation.', {
+server.tool('nexalayer_get_session', `Read one session's status and proxy endpoint. ${CREDENTIALS_NOTE}`, {
+  session_id: z.string(),
+  include_credentials: z.boolean().default(false),
+}, readOnly, async ({ session_id, include_credentials }) => result(await api('GET', getSessionApiPath(session_id, include_credentials))));
+
+server.tool('nexalayer_rotate_session', `Rotate a dynamic session after health or telemetry recommends rotation. ${CREDENTIALS_NOTE}`, {
   session_id: z.string(),
   reason: z.string().optional(),
   include_credentials: z.boolean().default(false),
   idempotency_key: z.string().min(1).max(64),
-}, paidWrite, async ({ session_id, reason, include_credentials, idempotency_key }) => result(await api('POST', `/sessions/${encodeURIComponent(session_id)}/rotate?include_credentials=${include_credentials}`, { reason }, idempotency_key)));
+}, paidWrite, async ({ session_id, reason, include_credentials, idempotency_key }) => result(await api('POST', rotateSessionApiPath(session_id, include_credentials), { reason }, idempotency_key)));
 
 server.tool('nexalayer_terminate_session', 'Terminate a session and release its underlying network resource. Early termination does not imply a refund.', {
   session_id: z.string(),
