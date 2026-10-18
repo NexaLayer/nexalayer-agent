@@ -29,6 +29,10 @@ import {
   transactionDebitCny,
 } from './session-policy';
 import { probeProxyEndpoint } from './proxy-probe';
+import { scheduleUpstreamCleanup } from './upstream-cleanup.service';
+import { OPS_ALERT_EVENTS, sendOpsAlert } from '../ops/ops-alert.service';
+import { supportContactLine } from '../support/support-contact';
+import { redactString } from '../support/redact';
 
 const STATIC_ORDER_READY_TIMEOUT_MS = 120_000;
 const STATIC_ORDER_POLL_MS = 3_000;
@@ -311,7 +315,7 @@ async function provisionExistingSessionAsync(
         throw new Error(
           input.resource_id
             ? `Existing static resource not found: ${input.resource_id}`
-            : 'No usable existing static resource found. Recharge or contact Telegram support @ztproxy.'
+            : `No usable existing static resource found. Recharge or ${supportContactLine()}.`
         );
       }
       backendOrderNo = selected.order_no;
@@ -324,7 +328,7 @@ async function provisionExistingSessionAsync(
 
     if (!proxy) {
       throw new Error(
-        'Existing resource returned no proxy endpoint. Recharge or contact Telegram support @ztproxy.'
+        `Existing resource returned no proxy endpoint. Recharge or ${supportContactLine()}.`
       );
     }
     assertProtocolSupported(input.session_type, input.protocol);
@@ -644,6 +648,14 @@ async function provisionSessionAsync(
       try {
         const balanceAfter = await backend.getBalance(userToken);
         const chargedCny = refundableCharge(balanceBefore, balanceAfter);
+        if ((err as Error).message.startsWith('Billing transaction not found')) {
+          void sendOpsAlert(OPS_ALERT_EVENTS.DEBIT_PROVISION_MISMATCH, 'critical', {
+            session_db_id: sessionDbId,
+            agent_id: agent.id,
+            kind: 'provisioned_without_debit_record',
+            balance_delta_cny: chargedCny,
+          }, { dedupeKey: `session:${sessionDbId}` });
+        }
         if (chargedCny > 0) {
           await backend.refundUserBalance(
             agent.backendUserId,
@@ -657,6 +669,13 @@ async function provisionSessionAsync(
           `[provision] automatic refund failed for session #${sessionDbId}:`,
           (refundError as Error).message
         );
+        void sendOpsAlert(OPS_ALERT_EVENTS.DEBIT_PROVISION_MISMATCH, 'critical', {
+          session_db_id: sessionDbId,
+          agent_id: agent.id,
+          kind: 'charged_but_not_provisioned_refund_failed',
+          provision_error: (err as Error).message.slice(0, 200),
+          action: 'Check the balance delta and refund manually after review.',
+        }, { dedupeKey: `session:${sessionDbId}` });
       }
     }
     await prisma.agentSession.update({
@@ -1064,11 +1083,42 @@ export async function terminateSession(
     );
   }
 
+  // Idempotent repeat: report the original stop time, not a new one.
+  if (session.status === SESSION_STATUS.TERMINATED) {
+    const job = await prisma.upstreamCleanupJob.findUnique({ where: { sessionId: session.sessionId } });
+    const stoppedAt = (job?.billingStoppedAt ?? session.updatedAt).toISOString();
+    return {
+      session_id: session.sessionId,
+      status: SESSION_STATUS.TERMINATED,
+      terminated_at: stoppedAt,
+      billing_stopped_at: stoppedAt,
+      ...(job ? { upstream_cleanup: { status: job.status === 'done' ? 'released' : job.status === 'failed' ? 'retry_pending_manual' : 'retry_scheduled', billing_stopped_at: stoppedAt, next_attempt_at: job.status === 'pending' ? job.nextAttemptAt.toISOString() : null } } : {}),
+    };
+  }
+
+  // Billing stops at the first terminate attempt, even if the upstream
+  // release fails; the release is then retried in the background.
+  const terminateAttemptAt = new Date();
+  let upstreamCleanup: Record<string, unknown> | undefined;
   if (shouldReleaseStaticResource(session)) {
     try {
       await backend.releaseZtProxyStaticOrder(session.backendOrderNo!);
+      upstreamCleanup = { status: 'released' };
     } catch (error) {
-      console.error(`[terminate] static cleanup failed for ${session.sessionId}:`, (error as Error).message);
+      console.error(`[terminate] static cleanup failed for ${session.sessionId}:`, redactString((error as Error).message).value);
+      try {
+        const scheduled = await scheduleUpstreamCleanup({
+          agentId,
+          sessionId: session.sessionId,
+          backendOrderNo: session.backendOrderNo!,
+          error,
+          billingStoppedAt: terminateAttemptAt,
+        });
+        upstreamCleanup = { status: 'retry_scheduled', ...scheduled };
+      } catch (scheduleError) {
+        console.error(`[terminate] could not schedule cleanup for ${session.sessionId}:`, (scheduleError as Error).message);
+        upstreamCleanup = { status: 'retry_pending_manual' };
+      }
     }
   }
 
@@ -1080,7 +1130,9 @@ export async function terminateSession(
   return {
     session_id: session.sessionId,
     status: SESSION_STATUS.TERMINATED,
-    terminated_at: new Date().toISOString(),
+    terminated_at: terminateAttemptAt.toISOString(),
+    billing_stopped_at: terminateAttemptAt.toISOString(),
+    ...(upstreamCleanup ? { upstream_cleanup: upstreamCleanup } : {}),
   };
 }
 

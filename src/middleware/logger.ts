@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import { prisma } from '../app';
+import { recordRequestOutcome } from '../modules/support/status.service';
 
 export function registerLogger(
   app: FastifyInstance
@@ -11,6 +12,7 @@ export function registerLogger(
   app.addHook(
     'onResponse',
     async (request, reply) => {
+      recordRequestOutcome(request.url, reply.statusCode);
       if (shouldSkipLog(request)) return;
 
       const latencyMs = request.startTime
@@ -30,6 +32,8 @@ export function registerLogger(
             idempotencyKey: request.headers[
               'idempotency-key'
             ] as string | undefined,
+            requestId: request.id,
+            errorCode: request.errorCode,
           },
         })
         .catch((err) => {

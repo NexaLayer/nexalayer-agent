@@ -436,7 +436,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Terminated."
+            "description": "Terminated. Billing stops at the first terminate attempt (billing_stopped_at). If the upstream release fails, upstream_cleanup.status is retry_scheduled and NexaLayer retries in the background."
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -699,6 +699,562 @@
           }
         }
       }
+    },
+    "/public/status": {
+      "get": {
+        "security": [
+
+        ],
+        "summary": "Public service status (Statuspage vocabulary): components, active incidents, and incident history. No API key.",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Current status. Cache-Control: max-age=30.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PublicStatus"
+                    },
+                    "error": {
+                      "nullable": true
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/known-issues": {
+      "get": {
+        "security": [
+
+        ],
+        "summary": "Known issues with machine-runnable workaround steps. No API key.",
+        "tags": [
+          "Support"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "open",
+                "investigating",
+                "identified",
+                "monitoring",
+                "workaround_available",
+                "resolved"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "error_code",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "component",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "since",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Known issues.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/KnownIssue"
+                          }
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "error": {
+                      "nullable": true
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/errors": {
+      "get": {
+        "security": [
+
+        ],
+        "summary": "Error catalog: every error code with retryable, suggested_action, side_effects, and agent/owner steps. No API key.",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Error catalog and the self-serve procedure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ErrorCatalogEntry"
+                          }
+                        },
+                        "self_serve_procedure": {
+                          "type": "string"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "error": {
+                      "nullable": true
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/errors/{code}": {
+      "get": {
+        "security": [
+
+        ],
+        "summary": "One error catalog entry (the target of error.doc_url). No API key.",
+        "tags": [
+          "Support"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Catalog entry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ErrorCatalogEntry"
+                    },
+                    "error": {
+                      "nullable": true
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/public/sla": {
+      "get": {
+        "security": [
+
+        ],
+        "summary": "Early-access support response TARGETS (not guarantees): S1 4h, S2 24h, S3 3 business days, S4 best effort. No API key.",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Response targets, billing policy, and contact.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "error": {
+                      "nullable": true
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/support/ticket-states": {
+      "get": {
+        "security": [
+
+        ],
+        "summary": "Ticket state machine (8 states including awaiting_approval) and allowed transitions. No API key.",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "States and transitions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "error": {
+                      "nullable": true
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/support/tickets": {
+      "post": {
+        "summary": "File a support ticket. Scoped to the API key's account; server assigns severity S1-S4. Recent failed request_ids and error codes on this account are attached automatically; foreign request_ids are dropped. Credentials and full_url are redacted and never stored. Limit 5/hour and 20/day per key.",
+        "tags": [
+          "Support"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTicketRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ticket created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SupportTicket"
+                    },
+                    "error": {
+                      "nullable": true
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Duplicate or idempotent repeat; returns the existing ticket with deduplicated=true.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SupportTicket"
+                    },
+                    "error": {
+                      "nullable": true
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        }
+      },
+      "get": {
+        "summary": "List this account's tickets (most recent 50).",
+        "tags": [
+          "Support"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "description": "open, or a ticket state"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tickets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/SupportTicket"
+                          }
+                        }
+                      }
+                    },
+                    "error": {
+                      "nullable": true
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/support/tickets/{ticket_id}": {
+      "get": {
+        "summary": "Read one ticket: status, severity, events, matched known issue, resolution. Poll no sooner than next_check_after_seconds.",
+        "tags": [
+          "Support"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "ticket_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ticket.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SupportTicket"
+                    },
+                    "error": {
+                      "nullable": true
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -787,6 +1343,13 @@
               "$ref": "#/components/schemas/ErrorResponse"
             }
           }
+        },
+        "headers": {
+          "Retry-After": {
+            "schema": {
+              "type": "integer"
+            }
+          }
         }
       },
       "Unprocessable": {
@@ -829,7 +1392,14 @@
               "SESSION_LIMIT_REACHED",
               "BACKEND_ERROR",
               "BACKEND_TIMEOUT",
-              "INTERNAL_ERROR"
+              "INTERNAL_ERROR",
+              "PRICE_MISMATCH",
+              "INVALID_REFERRAL_CODE",
+              "REFERRAL_CODE_NOT_FOUND",
+              "UPSTREAM_UNAVAILABLE",
+              "TICKET_NOT_FOUND",
+              "ERROR_CODE_NOT_FOUND",
+              "INVALID_STATE_TRANSITION"
             ]
           },
           "message": {
@@ -838,8 +1408,129 @@
           "details": {
             "type": "object",
             "additionalProperties": true
+          },
+          "status": {
+            "type": "integer",
+            "description": "Equals the HTTP status."
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "invalid_request",
+              "auth",
+              "payment",
+              "conflict",
+              "not_found",
+              "rate_limit",
+              "upstream",
+              "internal"
+            ]
+          },
+          "retryable": {
+            "type": "boolean",
+            "description": "Whether the same request is safe to repeat (same Idempotency-Key for paid writes)."
+          },
+          "retry_after": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Seconds; mirrors the Retry-After header."
+          },
+          "suggested_action": {
+            "type": "string",
+            "enum": [
+              "retry_with_backoff",
+              "wait_and_retry",
+              "refresh_quote_and_retry",
+              "fix_request",
+              "use_socks5",
+              "add_project_id",
+              "ask_owner_to_top_up",
+              "ask_owner_to_raise_budget",
+              "rotate_session",
+              "recreate_session",
+              "check_status",
+              "report_issue",
+              "do_not_retry"
+            ]
+          },
+          "side_effects": {
+            "type": "object",
+            "properties": {
+              "charged": {
+                "oneOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "unknown"
+                    ]
+                  }
+                ]
+              },
+              "order_created": {
+                "oneOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "unknown"
+                    ]
+                  }
+                ]
+              },
+              "session_state_changed": {
+                "oneOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "unknown"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "doc_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "JSON catalog entry at /v1/public/errors/{code}."
+          },
+          "known_issue_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "support": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string"
+              },
+              "telegram": {
+                "type": "string"
+              },
+              "ticket_api": {
+                "type": "string"
+              }
+            }
+          },
+          "error_schema_version": {
+            "type": "string",
+            "enum": [
+              "1"
+            ]
           }
-        }
+        },
+        "description": "Additive, backward-compatible error envelope (error_schema_version 1). Agents branch on code, retryable, suggested_action and side_effects; message is for humans."
       },
       "ErrorResponse": {
         "type": "object",
@@ -1311,7 +2002,626 @@
             "type": "object"
           }
         }
+      },
+      "Meta": {
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "example": "req_be9b2b51868b4147"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "latency_ms": {
+            "type": "integer"
+          }
+        }
+      },
+      "ErrorCatalogEntry": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "invalid_request",
+              "auth",
+              "payment",
+              "conflict",
+              "not_found",
+              "rate_limit",
+              "upstream",
+              "internal"
+            ]
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "retry_after": {
+            "type": "integer",
+            "nullable": true
+          },
+          "suggested_action": {
+            "type": "string",
+            "enum": [
+              "retry_with_backoff",
+              "wait_and_retry",
+              "refresh_quote_and_retry",
+              "fix_request",
+              "use_socks5",
+              "add_project_id",
+              "ask_owner_to_top_up",
+              "ask_owner_to_raise_budget",
+              "rotate_session",
+              "recreate_session",
+              "check_status",
+              "report_issue",
+              "do_not_retry"
+            ]
+          },
+          "side_effects": {
+            "type": "object",
+            "properties": {
+              "charged": {
+                "oneOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "unknown"
+                    ]
+                  }
+                ]
+              },
+              "order_created": {
+                "oneOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "unknown"
+                    ]
+                  }
+                ]
+              },
+              "session_state_changed": {
+                "oneOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "unknown"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "description": {
+            "type": "string"
+          },
+          "agent_steps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "owner_steps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "doc_url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "PublicStatus": {
+        "type": "object",
+        "properties": {
+          "indicator": {
+            "type": "string",
+            "enum": [
+              "none",
+              "minor",
+              "major",
+              "critical"
+            ]
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "enum": [
+                    "api",
+                    "sessions",
+                    "billing",
+                    "catalog",
+                    "upstream_network"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "operational",
+                    "degraded_performance",
+                    "partial_outage",
+                    "major_outage",
+                    "under_maintenance"
+                  ]
+                },
+                "source": {
+                  "type": "string",
+                  "enum": [
+                    "auto",
+                    "admin"
+                  ]
+                },
+                "reason": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "active_incidents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Incident"
+            }
+          },
+          "incident_history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Incident"
+            }
+          },
+          "scheduled_maintenance": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "Incident": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "component": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "investigating",
+              "identified",
+              "monitoring",
+              "resolved"
+            ]
+          },
+          "impact": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resolved_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "updates": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "KnownIssue": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "S1",
+              "S2",
+              "S3",
+              "S4"
+            ]
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "error_codes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "workaround": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "wait",
+                        "call",
+                        "set_param",
+                        "ask_owner",
+                        "report_issue",
+                        "upgrade"
+                      ]
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              },
+              "billing_note": {
+                "type": "string"
+              }
+            }
+          },
+          "fixed_in": {
+            "type": "object",
+            "nullable": true
+          }
+        }
+      },
+      "CreateTicketRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "category",
+          "summary"
+        ],
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "usage_question",
+              "bug",
+              "outage",
+              "billing",
+              "refund_request",
+              "feature_request",
+              "sales_pricing",
+              "abuse_report",
+              "security"
+            ]
+          },
+          "severity_claimed": {
+            "type": "string",
+            "enum": [
+              "S1",
+              "S2",
+              "S3",
+              "S4"
+            ]
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "request_ids": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "string",
+              "pattern": "^req_[A-Za-z0-9]+$"
+            }
+          },
+          "session_id": {
+            "type": "string"
+          },
+          "error_codes": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9_]*$"
+            }
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "known_issue_id": {
+            "type": "string"
+          },
+          "reproduction": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": [
+                  "GET",
+                  "POST",
+                  "PUT",
+                  "DELETE",
+                  "PATCH",
+                  "MCP"
+                ]
+              },
+              "endpoint_or_tool": {
+                "type": "string"
+              },
+              "params_redacted": {
+                "type": "object"
+              },
+              "expected": {
+                "type": "string",
+                "maxLength": 1000
+              },
+              "actual": {
+                "type": "string",
+                "maxLength": 1000
+              },
+              "attempts": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          },
+          "client": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "agent_name": {
+                "type": "string"
+              },
+              "agent_version": {
+                "type": "string"
+              },
+              "via": {
+                "type": "string",
+                "enum": [
+                  "rest",
+                  "mcp",
+                  "python_sdk",
+                  "other"
+                ]
+              },
+              "sdk_or_mcp_version": {
+                "type": "string"
+              },
+              "mcp_client": {
+                "type": "string"
+              }
+            }
+          },
+          "desired_outcome": {
+            "type": "string",
+            "enum": [
+              "fix",
+              "workaround",
+              "refund_review",
+              "explanation",
+              "feature"
+            ]
+          },
+          "notify": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "owner_email_cc": {
+                "type": "boolean"
+              }
+            }
+          },
+          "idempotency_key": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Alternative to the Idempotency-Key header."
+          }
+        }
+      },
+      "SupportTicket": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": "string",
+            "example": "tkt_mvdt5su3b51f57f3d2"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "received",
+              "triaged",
+              "needs_info",
+              "in_progress",
+              "awaiting_approval",
+              "workaround_available",
+              "resolved",
+              "closed"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "S1",
+              "S2",
+              "S3",
+              "S4"
+            ]
+          },
+          "category": {
+            "type": "string"
+          },
+          "triage_class": {
+            "type": "string"
+          },
+          "assignee_role": {
+            "type": "string",
+            "enum": [
+              "product_bot",
+              "founder",
+              "sales_bot"
+            ]
+          },
+          "route": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "session_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "request_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "error_codes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "auto_attached_error_codes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deduplicated": {
+            "type": "boolean"
+          },
+          "duplicate_count": {
+            "type": "integer"
+          },
+          "redactions_applied": {
+            "type": "integer"
+          },
+          "matched_known_issue": {
+            "type": "object",
+            "nullable": true
+          },
+          "response_target": {
+            "type": "object",
+            "properties": {
+              "first_response_by": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "early_access_target_not_guarantee"
+                ]
+              }
+            }
+          },
+          "next_check_after_seconds": {
+            "type": "integer"
+          },
+          "resolution": {
+            "type": "object",
+            "nullable": true
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "from": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "to": {
+                  "type": "string"
+                },
+                "actor": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "human_contact": {
+            "type": "object"
+          },
+          "links": {
+            "type": "object"
+          }
+        }
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Support",
+      "description": "Machine-readable support for agents: status, known issues, error catalog, SLA targets, and tickets. Human contact: support@nexalayer.net (Telegram @LEWISMIN)."
+    }
+  ]
 }

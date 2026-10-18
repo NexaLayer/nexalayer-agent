@@ -37,6 +37,24 @@ export function registerErrorHandler(
       }
 
       const fastifyErr = error as FastifyError;
+      // @fastify/rate-limit throws the errorResponseBuilder object; keep its
+      // code instead of collapsing it into INVALID_REQUEST.
+      const rateLimited = error as unknown as {
+        statusCode?: number;
+        error?: { code?: string; message?: string; details?: Record<string, unknown> };
+      };
+      if (
+        rateLimited.statusCode === 429 &&
+        rateLimited.error?.code === ERROR_CODES.RATE_LIMIT_EXCEEDED
+      ) {
+        return sendError(
+          reply,
+          ERROR_CODES.RATE_LIMIT_EXCEEDED,
+          rateLimited.error.message ?? 'Rate limit exceeded',
+          rateLimited.error.details,
+          request.startTime
+        );
+      }
       if (fastifyErr.validation) {
         return sendError(
           reply,

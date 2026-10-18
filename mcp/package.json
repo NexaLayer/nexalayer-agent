@@ -1,6 +1,6 @@
 {
   "name": "@nexalayer/mcp",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "Model Context Protocol (MCP) server for NexaLayer managed proxy sessions",
   "mcpName": "io.github.NexaLayer/nexalayer",
   "type": "module",

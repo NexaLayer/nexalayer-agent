@@ -51,6 +51,7 @@ model AgentApp {
   workflows       Workflow[]
   proxyPools      ProxyPool[]
   budgetPolicy    AgentBudgetPolicy?
+  supportTickets  SupportTicket[]
 
   @@index([status])
   @@index([backendUserId])
@@ -267,12 +268,15 @@ model AgentApiLog {
   ipAddress       String?  @map("ip_address") @db.VarChar(45)
   userAgent       String?  @map("user_agent") @db.VarChar(500)
   idempotencyKey  String?  @map("idempotency_key") @db.VarChar(64)
+  requestId       String?  @map("request_id") @db.VarChar(40)
+  errorCode       String?  @map("error_code") @db.VarChar(64)
   createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   agent AgentApp? @relation(fields: [agentId], references: [id])
 
   @@index([agentId, createdAt(sort: Desc)])
   @@index([createdAt(sort: Desc)])
+  @@index([requestId])
   @@map("agent_api_logs")
 }
 
@@ -624,4 +628,102 @@ model ProxyPool {
 
   @@index([agentId])
   @@map("proxy_pools")
+}
+
+// ==================== Agent support (MVP) ====================
+
+model SupportTicket {
+  id                Int       @id @default(autoincrement())
+  ticketId          String    @unique @map("ticket_id") @db.VarChar(40)
+  agentId           Int       @map("agent_id")
+  category          String    @db.VarChar(30)
+  severity          String    @db.VarChar(2)
+  severityClaimed   String?   @map("severity_claimed") @db.VarChar(2)
+  status            String    @default("received") @db.VarChar(30)
+  triageClass       String    @map("triage_class") @db.VarChar(30)
+  assigneeRole      String    @map("assignee_role") @db.VarChar(20)
+  route             String    @db.VarChar(60)
+  summary           String    @db.VarChar(200)
+  sessionId         String?   @map("session_id") @db.VarChar(50)
+  requestIds        Json      @default("[]") @map("request_ids")
+  errorCodes        Json      @default("[]") @map("error_codes")
+  details           Json      @default("{}")
+  knownIssueId      String?   @map("known_issue_id") @db.VarChar(40)
+  fingerprint       String    @db.VarChar(64)
+  idempotencyKey    String?   @map("idempotency_key") @db.VarChar(64)
+  redactionsApplied Int       @default(0) @map("redactions_applied")
+  duplicateCount    Int       @default(0) @map("duplicate_count")
+  firstResponseBy   DateTime? @map("first_response_by") @db.Timestamptz
+  resolution        Json?
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  agent  AgentApp             @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  events SupportTicketEvent[]
+
+  @@unique([agentId, idempotencyKey], name: "uq_support_ticket_idempotency")
+  @@index([agentId, createdAt(sort: Desc)])
+  @@index([fingerprint, createdAt(sort: Desc)])
+  @@index([status])
+  @@map("support_tickets")
+}
+
+model SupportTicketEvent {
+  id         BigInt   @id @default(autoincrement())
+  ticketId   Int      @map("ticket_id")
+  fromStatus String?  @map("from_status") @db.VarChar(30)
+  toStatus   String   @map("to_status") @db.VarChar(30)
+  actor      String   @db.VarChar(20)
+  reason     String   @db.VarChar(80)
+  note       String?  @db.VarChar(1000)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId, createdAt])
+  @@map("support_ticket_events")
+}
+
+model StatusComponent {
+  id        String   @id @db.VarChar(40)
+  status    String   @default("operational") @db.VarChar(30)
+  source    String   @default("auto") @db.VarChar(10)
+  reason    String?  @db.VarChar(300)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("status_components")
+}
+
+model StatusIncident {
+  id          String    @id @db.VarChar(40)
+  componentId String    @map("component_id") @db.VarChar(40)
+  status      String    @db.VarChar(30)
+  impact      String    @db.VarChar(20)
+  source      String    @db.VarChar(10)
+  reason      String?   @db.VarChar(300)
+  updates     Json      @default("[]")
+  startedAt   DateTime  @default(now()) @map("started_at") @db.Timestamptz
+  resolvedAt  DateTime? @map("resolved_at") @db.Timestamptz
+
+  @@index([componentId, startedAt(sort: Desc)])
+  @@index([resolvedAt])
+  @@map("status_incidents")
+}
+
+model UpstreamCleanupJob {
+  id               Int       @id @default(autoincrement())
+  agentId          Int       @map("agent_id")
+  sessionId        String    @unique @map("session_id") @db.VarChar(50)
+  backendOrderNo   String    @map("backend_order_no") @db.VarChar(50)
+  status           String    @default("pending") @db.VarChar(20)
+  attempts         Int       @default(1)
+  lastError        String?   @map("last_error") @db.VarChar(300)
+  billingStoppedAt DateTime  @map("billing_stopped_at") @db.Timestamptz
+  nextAttemptAt    DateTime  @map("next_attempt_at") @db.Timestamptz
+  completedAt      DateTime? @map("completed_at") @db.Timestamptz
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([status, nextAttemptAt])
+  @@map("upstream_cleanup_jobs")
 }

@@ -21,6 +21,7 @@
     "lint": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:unit": "vitest run --config vitest.config.unit.ts",
     "test:smoke:safe": "vitest run --config vitest.config.safe-smoke.ts",
     "test:phase0": "node scripts/phase0-smoke.mjs",
     "test:phase0:real": "PHASE0_ALLOW_PAID=1 node scripts/phase0-smoke.mjs",

@@ -2,6 +2,8 @@ import { buildApp, prisma } from './app';
 import { env } from './config/env';
 import { startTrialClaimMonitor } from './modules/account/trial-monitor.service';
 import { warmProductCache } from './modules/product/product.service';
+import { startStatusMonitor } from './modules/support/status.service';
+import { startUpstreamCleanupWorker } from './modules/session/upstream-cleanup.service';
 
 async function main() {
   const app = await buildApp();
@@ -18,8 +20,12 @@ async function main() {
     });
 
     const stopTrialClaimMonitor = startTrialClaimMonitor(app.log);
+    const stopStatusMonitor = startStatusMonitor(app.log);
+    const stopUpstreamCleanup = startUpstreamCleanupWorker(app.log);
     app.addHook('onClose', async () => {
       stopTrialClaimMonitor();
+      stopStatusMonitor();
+      stopUpstreamCleanup();
     });
 
     await app.listen({

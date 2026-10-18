@@ -31,12 +31,20 @@ import { workspaceRoutes } from './modules/workspace/workspace.routes';
 import { workflowRoutes } from './modules/workflow/workflow.routes';
 import { systemRoutes } from './modules/system/system.routes';
 import { proxyPoolRoutes } from './modules/profile/proxy-pool.routes';
-import { sendError, sendSuccess } from './utils/response';
+import { newRequestId, sendError, sendSuccess } from './utils/response';
+import {
+  publicSupportRoutes,
+  supportAdminRoutes,
+  supportTicketRoutes,
+} from './modules/support/support.routes';
+import { checkBackendReachable } from './modules/support/status.service';
 
 export const prisma = new PrismaClient();
 
 export async function buildApp() {
   const app = Fastify({
+    // req_<16 hex>, mirrored in meta.request_id, error.request_id and X-Request-Id.
+    genReqId: () => newRequestId(),
     trustProxy: (_address, hop) =>
       hop < env.TRUST_PROXY_HOPS,
     logger: {
@@ -49,6 +57,10 @@ export async function buildApp() {
   });
 
   registerTolerantJsonParser(app);
+
+  app.addHook('onRequest', async (request, reply) => {
+    reply.header('X-Request-Id', request.id);
+  });
 
   await app.register(cors, { origin: true });
 
@@ -77,40 +89,11 @@ export async function buildApp() {
   app.get(
     `${API_PREFIX}/health`,
     async (_req, reply) => {
-      let backendReachable = false;
-      let backendError = '';
-
-      try {
-        const ctrl = new AbortController();
-        const t = setTimeout(
-          () => ctrl.abort(),
-          5000
-        );
-        const r = await fetch(
-          `${env.BACKEND_BASE_URL}/api/auth/login`,
-          {
-            method: 'POST',
-            signal: ctrl.signal,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: '{}',
-          }
-        );
-        clearTimeout(t);
-        backendReachable = r.status < 500;
-        backendError = '';
-      } catch (err) {
-        backendReachable = false;
-        const cause = (err as Error).cause
-          ? String((err as Error).cause)
-          : '';
-        backendError =
-          `${(err as Error).message}` +
-          (cause ? ` [${cause}]` : '');
+      const probe = await checkBackendReachable();
+      const backendReachable = probe.reachable;
+      if (!probe.reachable) {
         app.log.warn(
-          `Health: backend unreachable: ` +
-            `${backendError}`
+          `Health: backend unreachable: ${probe.error}`
         );
       }
 
@@ -123,6 +106,15 @@ export async function buildApp() {
     }
   );
 
+  await app.register(publicSupportRoutes, {
+    prefix: `${API_PREFIX}/public`,
+  });
+  await app.register(supportTicketRoutes, {
+    prefix: `${API_PREFIX}/support`,
+  });
+  await app.register(supportAdminRoutes, {
+    prefix: `${API_PREFIX}/admin`,
+  });
   await app.register(authRoutes, {
     prefix: `${API_PREFIX}/auth`,
   });
