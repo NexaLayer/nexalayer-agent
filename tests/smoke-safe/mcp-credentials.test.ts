@@ -59,13 +59,16 @@ describe('MCP include_credentials contract', () => {
     );
   });
 
-  it('publishes matching 0.1.6 metadata and exclusive static launch pricing', () => {
+  it('publishes matching MCP version metadata and exclusive static launch pricing', () => {
+    const pkgVersion = (JSON.parse(read('mcp/package.json')) as { version: string }).version;
+    expect(pkgVersion).toMatch(/^\d+\.\d+\.\d+$/);
     for (const path of ['mcp/package.json', 'mcp/server.json', 'mcp/mcpb/manifest.json']) {
       const meta = JSON.parse(read(path)) as { version: string; packages?: { version: string }[] };
-      expect(meta.version).toBe('0.1.6');
-      if (meta.packages) expect(meta.packages[0]?.version).toBe('0.1.6');
+      expect(meta.version).toBe(pkgVersion);
+      if (meta.packages) expect(meta.packages[0]?.version).toBe(pkgVersion);
     }
-    expect(mcp).toContain("version: '0.1.6'");
+    expect(mcp).toContain(`export const MCP_VERSION = '${pkgVersion}'`);
+    expect(mcp).toContain('version: MCP_VERSION');
     const price = '**$1.43–$5.86/month** (launch pricing, live API authoritative)';
     expect(read('README.md')).toContain(price);
     expect(read('mcp/README.md')).toContain(price);

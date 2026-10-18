@@ -27,7 +27,12 @@ fs.copyFileSync(path.join(root, 'package.json'), path.join(server, 'package.json
 fs.copyFileSync(path.join(root, 'package-lock.json'), path.join(server, 'package-lock.json'));
 
 const builtServer = fs.readFileSync(path.join(server, 'dist', 'index.js'), 'utf8');
-if (!builtServer.includes(`version: '${packageJson.version}'`)) {
+// The server reports MCP_VERSION (see src/index.ts); accept either that constant
+// or an inline literal so the check follows the source instead of one code shape.
+const reportsVersion =
+  builtServer.includes(`MCP_VERSION = '${packageJson.version}'`) ||
+  builtServer.includes(`version: '${packageJson.version}'`);
+if (!reportsVersion) {
   throw new Error('Built MCP server does not report the package version');
 }
 
