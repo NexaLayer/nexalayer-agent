@@ -49,7 +49,7 @@ Step 3: 使用代理 IP 发送请求
 ```
 
 > 💡 你可以自行充值后直接使用。如需试用，请联系
-> Telegram 售后 https://t.me/ZTPROXY（@ztproxy），由售后为对应邮箱账号配置资源。
+> 售后邮箱 support@nexalayer.net（备用 Telegram @LEWISMIN），由售后为对应邮箱账号配置资源。
 
 ### 1.2 快速示例（Python）
 
@@ -293,7 +293,7 @@ curl -X POST \
 ```
 
 > 💡 **试用资源**: 如需试用，请联系 Telegram 售后
-> https://t.me/ZTPROXY（@ztproxy）。售后配置完成后，
+> support@nexalayer.net（备用 Telegram @LEWISMIN）。售后配置完成后，
 > 使用 `provisioning_mode=existing` 创建 Session，避免重复下单或扣费。
 >
 > ⚠️ **重要**: 使用纯 API Key 模式时，只需保存
@@ -2266,7 +2266,7 @@ curl -X POST \
 
 ### Q10: 如何申请试用？
 
-**A**: 联系 Telegram 售后 https://t.me/ZTPROXY（@ztproxy），
+**A**: 联系 售后邮箱 support@nexalayer.net（备用 Telegram @LEWISMIN），
 由售后为对应邮箱账号配置资源；也可以自行通过 USDT 充值后直接使用。
 
 ### Q11: 为什么要上报 Telemetry？

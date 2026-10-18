@@ -293,8 +293,8 @@ export async function executeGetReferralCode(
   return {
     message: t(
       lang,
-      '推荐给其他用户对方每次充值你将获得15％的佣金！\n请发送邮件至support@ztproxy.net。',
-      'Refer users and earn 15% commission for each recharge.\nPlease email support@ztproxy.net.'
+      '推荐给其他用户对方每次充值你将获得15％的佣金！\n请发送邮件至support@nexalayer.net。',
+      'Refer users and earn 15% commission for each recharge.\nPlease email support@nexalayer.net.'
     ),
   };
 }

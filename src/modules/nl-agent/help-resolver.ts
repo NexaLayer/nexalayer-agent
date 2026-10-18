@@ -260,9 +260,9 @@ const COMMANDS: CmdDef[] = [
     zh: '推荐返佣说明',
     en: 'Referral commission guide',
     example_zh:
-      '推荐给其他用户对方每次充值你将获得15％的佣金，请发送邮件至support@ztproxy.net。',
+      '推荐给其他用户对方每次充值你将获得15％的佣金，请发送邮件至support@nexalayer.net。',
     example_en:
-      'Refer users and earn 15% commission on each recharge. Contact support@ztproxy.net.',
+      'Refer users and earn 15% commission on each recharge. Contact support@nexalayer.net.',
     roles: ['agent'],
     category: 'account',
   },

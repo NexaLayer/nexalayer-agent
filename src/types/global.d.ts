@@ -5,5 +5,7 @@ declare module 'fastify' {
     agentContext?: AgentContext;
     startTime?: number;
     idempotencyRecordId?: bigint;
+    /** Error code sent on this request, recorded in agent_api_logs. */
+    errorCode?: string;
   }
 }

@@ -1427,7 +1427,7 @@ Retry-After: 30           # 仅 429 时返回
 > ⚠️ `api_secret` 仅在注册时返回一次，请妥善保管。
 > 
 > 💡 用户可以自行充值后使用。如需试用，请联系 Telegram 售后
-> https://t.me/ZTPROXY（@ztproxy），由售后为对应邮箱账号配置资源。
+> support@nexalayer.net（备用 Telegram @LEWISMIN），由售后为对应邮箱账号配置资源。
 
 #### GET /v1/account/info
 

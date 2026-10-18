@@ -7,6 +7,13 @@ const logLevels = [
   'fatal', 'error', 'warn', 'info', 'debug', 'trace',
 ] as const;
 
+function optionalTrimmed<T extends z.ZodTypeAny>(schema: T) {
+  return z.preprocess(
+    (v) => typeof v === 'string' && v.trim() ? v.trim() : undefined,
+    schema.optional()
+  );
+}
+
 const envSchema = z.object({
   PORT: z.coerce.number().default(3000),
   NODE_ENV: z
@@ -66,6 +73,20 @@ const envSchema = z.object({
     (v) => typeof v === 'string' && v.trim() ? v.trim() : undefined,
     z.string().regex(/^-?\d+$/).optional()
   ),
+
+  // Shared owner/ops alert channel. Falls back to TRIAL_ALERT_* when unset.
+  OPS_ALERT_TELEGRAM_BOT_TOKEN: optionalTrimmed(z.string().min(20)),
+  OPS_ALERT_TELEGRAM_CHAT_ID: optionalTrimmed(z.string().regex(/^-?\d+$/)),
+  OPS_ALERT_WEBHOOK_URL: optionalTrimmed(z.string().url()),
+  OPS_ALERT_DEDUPE_MINUTES: z.coerce.number().int().positive().default(30),
+  // Bearer token for /v1/admin/* (component status overrides, ticket
+  // transitions). Admin routes are disabled when unset.
+  OPS_ADMIN_TOKEN: optionalTrimmed(z.string().min(32)),
+  STATUS_CHECK_INTERVAL_SECONDS: z.coerce.number().int().min(15).default(60),
+  UPSTREAM_CLEANUP_INTERVAL_SECONDS: z.coerce.number().int().min(15).default(60),
+  SUPPORT_EMAIL: z.string().email().default('support@nexalayer.net'),
+  SUPPORT_TELEGRAM: z.string().min(1).default('@LEWISMIN'),
+  PUBLIC_API_BASE_URL: z.string().url().default('https://api.nexalayer.net'),
 
   RESEND_API_KEY: z.preprocess(
     (v) =>

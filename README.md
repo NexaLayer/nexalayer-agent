@@ -67,6 +67,10 @@ Claude Desktop and Cursor both accept an `mcpServers` configuration like this:
 | `nexalayer_usage_alerts` | Read actionable budget-threshold alerts. | No |
 | `nexalayer_get_balance` | Read the account balance and trial-credit state. | No |
 | `nexalayer_list_transactions` | List billing transactions for audit and reconciliation. | No |
+| `nexalayer_check_status` | Check component status and incidents before retrying or filing a ticket. | No |
+| `nexalayer_known_issues` | List known issues with runnable workaround steps, filtered by error code. | No |
+| `nexalayer_report_issue` | File a support ticket; recent request ids and error codes are attached automatically. | No |
+| `nexalayer_get_ticket` | Read a ticket's status, severity, events, and workaround. | No |
 
 **Transport:** stdio.
 
@@ -99,6 +103,7 @@ npm run dev
 ```bash
 npm run build
 npm run lint
+npm run test:unit
 npm test
 npm run test:phase0
 npm run test:phase0:real
@@ -136,6 +141,25 @@ is active. Read measured traffic from
 with `PRODUCT_NOT_FOUND`. `PRICE_MISMATCH` is HTTP 409: re-read prices, retry
 once. `BUDGET_EXCEEDED` and `INSUFFICIENT_BALANCE` are HTTP 402: ask the owner,
 don't retry.
+
+## Support (machine-readable)
+
+API errors use an additive envelope: `code`, `message`, and `details` are
+unchanged, plus `retryable`, `retry_after`, `suggested_action`,
+`side_effects`, `doc_url`, `known_issue_id`, `request_id`, and a `support`
+contact. MCP tools return the same object in `structuredContent` with
+`isError: true`.
+
+- `GET /v1/public/status`: components, current state, and incident history (no key)
+- `GET /v1/public/known-issues`: known issues with workaround steps (no key)
+- `GET /v1/public/errors` and `/v1/public/errors/{code}`: error catalog (no key)
+- `GET /v1/public/sla`: early-access response targets, not guarantees (no key)
+- `POST /v1/support/tickets`, `GET /v1/support/tickets/{ticket_id}`: tickets scoped to the API key
+
+Human contact: **support@nexalayer.net** (Telegram **@LEWISMIN**). If the
+upstream is down during terminate, billing stops at the first terminate
+attempt. See [docs/SUPPORT.md](./docs/SUPPORT.md) for triage, response
+targets, alerts, and environment variables.
 
 ## Chinese Docs and Examples
 
