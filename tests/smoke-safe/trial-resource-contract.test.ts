@@ -164,11 +164,17 @@ describe('trial resource contract', () => {
     );
     expect(envSource).toContain('TRIAL_BALANCE: z.coerce.number().positive().default(20.0)');
     expect(envSource).toContain('TRIAL_ALERT_CLAIM_THRESHOLD: z.coerce.number().int().positive().default(5)');
-    expect(monitorSource).toContain("event: 'TRIAL_CLAIM_SURGE'");
-    expect(monitorSource).toContain('TRIAL_ALERT_WEBHOOK_URL');
-    expect(monitorSource).toContain('TRIAL_ALERT_TELEGRAM_BOT_TOKEN');
-    expect(monitorSource).toContain('TRIAL_ALERT_TELEGRAM_CHAT_ID');
-    expect(monitorSource).toContain('api.telegram.org');
+    // Delivery moved to the shared ops-alert service; the monitor must still
+    // raise TRIAL_CLAIM_SURGE through it, and the service must keep the legacy
+    // TRIAL_ALERT_* channels as a fallback.
+    const opsAlertSource = readFileSync('src/modules/ops/ops-alert.service.ts', 'utf8');
+    expect(monitorSource).toContain('OPS_ALERT_EVENTS.TRIAL_CLAIM_SURGE');
+    expect(monitorSource).toContain('sendOpsAlert(');
+    expect(opsAlertSource).toContain("TRIAL_CLAIM_SURGE: 'TRIAL_CLAIM_SURGE'");
+    expect(opsAlertSource).toContain('TRIAL_ALERT_WEBHOOK_URL');
+    expect(opsAlertSource).toContain('TRIAL_ALERT_TELEGRAM_BOT_TOKEN');
+    expect(opsAlertSource).toContain('TRIAL_ALERT_TELEGRAM_CHAT_ID');
+    expect(opsAlertSource).toContain('api.telegram.org');
     expect(monitorSource).toContain('agentTrialClaim.count');
   });
 });
