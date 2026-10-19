@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.NexaLayer/nexalayer",
   "title": "NexaLayer",
-  "description": "Managed proxy sessions, health, rotation, usage, and spend controls for AI agents.",
+  "description": "Managed proxy sessions with hard budget caps: products, sessions, health, usage and spend limits.",
   "websiteUrl": "https://nexalayer.net/agents",
   "repository": { "url": "https://github.com/NexaLayer/nexalayer-agent", "source": "github", "subfolder": "mcp" },
   "version": "0.2.0",
