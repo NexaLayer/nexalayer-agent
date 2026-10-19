@@ -4,7 +4,7 @@
   "name": "nexalayer",
   "display_name": "NexaLayer",
   "version": "0.2.0",
-  "description": "Managed proxy sessions, health, rotation, usage, and spend controls for AI agents.",
+  "description": "Managed proxy sessions with hard budget caps: products, sessions, health, usage and spend limits.",
   "long_description": "Connect AI agents and browser automation to NexaLayer managed network Sessions. Discover current products and prices, create and rotate Sessions, inspect health and usage, and enforce owner-controlled spend limits.",
   "author": {
     "name": "NexaLayer",
