@@ -1,11 +1,15 @@
-# NexaLayer Agent
+ok 8358 -> 8162
+---TAIL---
+d)
+- Python 中文示例说明: [examples/python-quickstart/README.zh.md](./examples/python-quickstart/README.zh.md)
+- Playwright 中文示例代码: [examples/playwright-zh](./examples/playwright-zh)
 
-NexaLayer MCP Server — a Model Context Protocol (MCP) server that lets AI agents create and manage proxy sessions with budget guardrails.
+NexaLayer is not a raw proxy IP service. The Chinese MVP documentation presents
+it as a session-based network execution layer for Playwright, Puppeteer,
+Browser-use, AI browser agents, crawlers, and automation workflows.
 
-The MCP implementation is in [`mcp/`](./mcp/), with its source entry point at [`mcp/src/index.ts`](./mcp/src/index.ts). The published package builds that file to the runtime entry path `mcp/dist/index.js`.
 
-Current public starting prices are **$0.23/GB** for dynamic proxy sessions and
-**$1.05/month** for shared static proxy sessions. Exclusive static proxy sessions
+5/month** for shared static proxy sessions. Exclusive static proxy sessions
 are **$1.43–$5.86/month** (launch pricing, live API authoritative). Query
 `GET /v1/public/products` or the authenticated product catalog for the current,
 authoritative quote and availability before creating a paid session.
@@ -173,16 +177,3 @@ NexaLayer is not a raw proxy IP service. The Chinese MVP documentation presents
 it as a session-based network execution layer for Playwright, Puppeteer,
 Browser-use, AI browser agents, crawlers, and automation workflows.
 
-## Repository Origin
-
-This code was split out from:
-
-```text
-/Users/minzhenfa/sourceCode/wan-workspace/IPProxy/Agent
-```
-
-The intended GitHub repository is:
-
-```text
-NexaLayer/nexalayer-agent
-```
