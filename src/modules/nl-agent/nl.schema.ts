@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v3';
 
 export const executeSchema = z.object({
   message: z.string().min(1).max(500),

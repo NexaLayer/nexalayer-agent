@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v3';
 
 export const submitTaskSchema = z.object({
   profile_id: z.string().min(1),

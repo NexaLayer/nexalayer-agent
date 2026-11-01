@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v3';
 import { TICKET_CATEGORIES } from './triage';
 
 const severity = z.enum(['S1', 'S2', 'S3', 'S4']);
