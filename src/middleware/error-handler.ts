@@ -2,7 +2,7 @@ import {
   FastifyInstance,
   FastifyError,
 } from 'fastify';
-import { ZodError } from 'zod';
+import { ZodError } from 'zod/v3';
 import { AppError, sendError } from '../utils/response';
 import { ERROR_CODES } from '../config/constants';
 

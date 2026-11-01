@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v3';
 
 export const tokenRequestSchema = z.object({
   api_key: z

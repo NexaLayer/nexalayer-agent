@@ -172,17 +172,3 @@ targets, alerts, and environment variables.
 NexaLayer is not a raw proxy IP service. The Chinese MVP documentation presents
 it as a session-based network execution layer for Playwright, Puppeteer,
 Browser-use, AI browser agents, crawlers, and automation workflows.
-
-## Repository Origin
-
-This code was split out from:
-
-```text
-/Users/minzhenfa/sourceCode/wan-workspace/IPProxy/Agent
-```
-
-The intended GitHub repository is:
-
-```text
-NexaLayer/nexalayer-agent
-```

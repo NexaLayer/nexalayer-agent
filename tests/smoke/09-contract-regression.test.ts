@@ -13,7 +13,7 @@ import {
   BackendResponseSchema,
   CONTRACT_VERSION,
 } from './helpers/backend-contracts';
-import { z } from 'zod';
+import { z } from 'zod/v3';
 
 async function backendGet<T>(
   path: string,
