@@ -60,10 +60,21 @@ const accountPasswordSchema = z
   .min(8, 'Password must be at least 8 characters')
   .max(72, 'Password must be at most 72 characters');
 
-export const emailPasswordLoginSchema = z.object({
-  email: z.string().email(),
-  password: accountPasswordSchema,
-});
+export const emailPasswordLoginSchema = z.union([
+  z.object({
+    identifier: z.string().trim().min(2).max(200),
+    password: accountPasswordSchema,
+  }),
+  z.object({
+    email: z.string().email(),
+    password: accountPasswordSchema,
+  }),
+]).transform((value) => ({
+  identifier: 'identifier' in value
+    ? value.identifier
+    : value.email,
+  password: value.password,
+}));
 
 export const setEmailPasswordSchema = z.object({
   password: accountPasswordSchema,

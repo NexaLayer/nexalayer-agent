@@ -82,6 +82,7 @@ async function jwtAuth(
       agentId: number;
       apiKey: string;
       permissions: string[];
+      isDemo?: boolean;
     }>(token);
 
     const agent = await prisma.agentApp.findUnique({
@@ -100,12 +101,25 @@ async function jwtAuth(
       agentId: payload.agentId,
       apiKey: payload.apiKey,
       permissions: payload.permissions,
+      isDemo: payload.isDemo === true,
     };
   } catch (err) {
     if (err instanceof AppError) throw err;
     throw new AppError(
       ERROR_CODES.AUTH_EXPIRED_TOKEN,
       'Invalid or expired token'
+    );
+  }
+}
+
+export async function rejectDemoMutation(
+  request: FastifyRequest,
+  _reply: FastifyReply
+): Promise<void> {
+  if (request.agentContext?.isDemo) {
+    throw new AppError(
+      ERROR_CODES.AUTH_INSUFFICIENT_PERMISSION,
+      'The demo account is read-only'
     );
   }
 }

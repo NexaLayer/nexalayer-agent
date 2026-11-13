@@ -43,4 +43,5 @@ export interface AgentContext {
   agentId: number;
   apiKey: string;
   permissions: string[];
+  isDemo?: boolean;
 }

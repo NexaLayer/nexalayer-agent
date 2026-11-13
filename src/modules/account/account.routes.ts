@@ -12,7 +12,7 @@ import {
   handleUpdateBudget,
   handleGetUsageAlerts,
 } from './account.controller';
-import { authGuard } from '../../middleware/auth.middleware';
+import { authGuard, rejectDemoMutation } from '../../middleware/auth.middleware';
 import { idempotencyGuard } from '../../middleware/idempotency';
 
 export async function accountRoutes(
@@ -29,9 +29,9 @@ export async function accountRoutes(
     { preHandler: [authGuard] },
     handleGetInfo
   );
-  app.post('/api-key/regenerate', { preHandler: [authGuard] }, handleRegenerateApiKey);
-  app.post('/password', { preHandler: [authGuard] }, handleSetEmailPassword);
+  app.post('/api-key/regenerate', { preHandler: [authGuard, rejectDemoMutation] }, handleRegenerateApiKey);
+  app.post('/password', { preHandler: [authGuard, rejectDemoMutation] }, handleSetEmailPassword);
   app.get('/budget', { preHandler: [authGuard] }, handleGetBudget);
-  app.put('/budget', { preHandler: [authGuard, idempotencyGuard] }, handleUpdateBudget);
+  app.put('/budget', { preHandler: [authGuard, rejectDemoMutation, idempotencyGuard] }, handleUpdateBudget);
   app.get('/usage-alerts', { preHandler: [authGuard] }, handleGetUsageAlerts);
 }

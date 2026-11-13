@@ -13,7 +13,7 @@ import {
   handleReportEvent,
   handleGetHealth,
 } from '../telemetry/telemetry.controller';
-import { authGuard } from '../../middleware/auth.middleware';
+import { authGuard, rejectDemoMutation } from '../../middleware/auth.middleware';
 import {
   idempotencyGuard,
 } from '../../middleware/idempotency';
@@ -23,7 +23,7 @@ export async function sessionRoutes(
 ): Promise<void> {
   app.addHook('preHandler', authGuard);
 
-  app.post('/', { preHandler: idempotencyGuard }, handleCreate);
+  app.post('/', { preHandler: [rejectDemoMutation, idempotencyGuard] }, handleCreate);
   app.get('/', handleList);
   app.get('/:session_id', handleGet);
   app.get('/:session_id/usage', handleUsage);
@@ -32,16 +32,24 @@ export async function sessionRoutes(
     Querystring: { include_credentials?: string };
   }>(
     '/:session_id/rotate',
-    { preHandler: idempotencyGuard },
+    { preHandler: [rejectDemoMutation, idempotencyGuard] },
     handleRotate
   );
-  app.delete('/:session_id', handleTerminate);
+  app.delete<{ Params: { session_id: string } }>(
+    '/:session_id',
+    { preHandler: [rejectDemoMutation] },
+    handleTerminate
+  );
   app.post<{ Params: { session_id: string } }>(
     '/:session_id/renew',
-    { preHandler: idempotencyGuard },
+    { preHandler: [rejectDemoMutation, idempotencyGuard] },
     handleRenew
   );
-  app.post('/:session_id/whitelist', handleWhitelist);
+  app.post<{ Params: { session_id: string } }>(
+    '/:session_id/whitelist',
+    { preHandler: [rejectDemoMutation] },
+    handleWhitelist
+  );
 
   app.post(
     '/:session_id/report-event',

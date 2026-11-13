@@ -34,7 +34,7 @@ export async function handleRegister(
 
 export async function handleEmailPasswordLogin(request: FastifyRequest, reply: FastifyReply) {
   const body = emailPasswordLoginSchema.parse(request.body);
-  const result = await loginWithEmailPassword(request.server, body.email, body.password);
+  const result = await loginWithEmailPassword(request.server, body.identifier, body.password);
   sendSuccess(reply, result, 200, request.startTime);
 }
 

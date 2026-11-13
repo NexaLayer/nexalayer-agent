@@ -6,7 +6,7 @@ import {
   handleRechargeStatus,
   handleGetTransactions,
 } from './billing.controller';
-import { authGuard } from '../../middleware/auth.middleware';
+import { authGuard, rejectDemoMutation } from '../../middleware/auth.middleware';
 import {
   idempotencyGuard,
 } from '../../middleware/idempotency';
@@ -20,7 +20,7 @@ export async function billingRoutes(
   app.get('/pricing', handleGetPricing);
   app.post(
     '/recharge',
-    { preHandler: idempotencyGuard },
+    { preHandler: [rejectDemoMutation, idempotencyGuard] },
     handleRecharge
   );
   app.get(

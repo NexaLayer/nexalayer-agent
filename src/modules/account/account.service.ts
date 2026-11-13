@@ -757,10 +757,48 @@ function issueEmailAccessToken(app: FastifyInstance, agent: {
 
 export async function loginWithEmailPassword(
   app: FastifyInstance,
-  email: string,
+  identifier: string,
   password: string
 ) {
-  const normalizedEmail = normalizeEmail(email);
+  const normalizedIdentifier = identifier.trim().toLowerCase();
+  if (
+    env.DEMO_ACCOUNT_USERNAME &&
+    env.DEMO_ACCOUNT_PASSWORD_HASH &&
+    env.DEMO_ACCOUNT_AGENT_ID &&
+    normalizedIdentifier === env.DEMO_ACCOUNT_USERNAME.toLowerCase() &&
+    await compare(password, env.DEMO_ACCOUNT_PASSWORD_HASH)
+  ) {
+    const agent = await prisma.agentApp.findUnique({
+      where: { id: env.DEMO_ACCOUNT_AGENT_ID },
+    });
+    if (!agent || agent.status !== 'active') {
+      throw new AppError(ERROR_CODES.AUTH_INVALID_KEY, 'Demo account unavailable');
+    }
+    return {
+      access_token: app.jwt.sign(
+        {
+          agentId: agent.id,
+          apiKey: agent.apiKey,
+          permissions: ['proxy:read', 'billing:read'],
+          isDemo: true,
+        },
+        { expiresIn: env.JWT_EXPIRES_IN }
+      ),
+      token_type: 'Bearer',
+      expires_in: env.JWT_EXPIRES_IN,
+      account: {
+        agent_id: agent.id,
+        name: agent.name,
+        username: env.DEMO_ACCOUNT_USERNAME,
+        is_demo: true,
+      },
+    };
+  }
+
+  if (!normalizedIdentifier.includes('@')) {
+    throw new AppError(ERROR_CODES.AUTH_INVALID_KEY, 'Invalid username/email or password');
+  }
+  const normalizedEmail = normalizeEmail(normalizedIdentifier);
   const identity = await prisma.agentEmailIdentity.findUnique({
     where: { emailHash: hashEmail(normalizedEmail) },
     include: { agent: true },

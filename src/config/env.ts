@@ -136,6 +136,13 @@ const envSchema = z.object({
   DEEPSEEK_BASE_URL: z
     .string()
     .default('https://api.deepseek.com/v1'),
+
+  DEMO_ACCOUNT_USERNAME: optionalTrimmed(z.string().min(2).max(50)),
+  DEMO_ACCOUNT_PASSWORD_HASH: optionalTrimmed(z.string().min(20)),
+  DEMO_ACCOUNT_AGENT_ID: z.preprocess(
+    (v) => typeof v === 'string' && v.trim() ? v : undefined,
+    z.coerce.number().int().positive().optional()
+  ),
 });
 
 const parsed = envSchema.safeParse(process.env);
