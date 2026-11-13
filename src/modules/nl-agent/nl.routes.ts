@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import {
   handleExecute,
+  handlePublicExecute,
   handleConfirm,
   handleSuggestions,
   handleHistory,
@@ -10,6 +11,19 @@ import { nlAuthGuard } from './nl-auth.middleware';
 export async function nlRoutes(
   app: FastifyInstance
 ): Promise<void> {
+  app.post(
+    '/public/execute',
+    {
+      config: {
+        rateLimit: {
+          max: 10,
+          timeWindow: '1 minute',
+        },
+      },
+    },
+    handlePublicExecute
+  );
+
   app.post(
     '/execute',
     { preHandler: [nlAuthGuard] },

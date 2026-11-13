@@ -11,8 +11,43 @@ import {
   DEFAULT_SUGGESTIONS,
   getSuggestionsByRole,
 } from './suggestions';
+import { llmChat } from './llm-parser';
+import { randomUUID } from 'node:crypto';
 
 const nlService = new NLService();
+
+export async function handlePublicExecute(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<void> {
+  const parsed = executeSchema.safeParse(request.body);
+  if (!parsed.success) {
+    throw new AppError(
+      ERROR_CODES.INVALID_REQUEST,
+      'Invalid request body'
+    );
+  }
+
+  const message = await llmChat(parsed.data.message);
+  const isZh = /[\u3400-\u9fff]/.test(parsed.data.message);
+  const fallback = isZh
+    ? '我可以介绍 NexaLayer、代理 Session、价格和使用方式。涉及购买、余额或账户操作时，请先登录。'
+    : 'I can explain NexaLayer, proxy sessions, pricing, and usage. Sign in before purchases, billing, or account actions.';
+
+  reply.status(200).send({
+    success: true,
+    data: {
+      conversation_id:
+        parsed.data.conversation_id || `public_${randomUUID()}`,
+      intent: 'public_chat',
+      message: message || fallback,
+      suggestions: isZh
+        ? ['NexaLayer 能做什么？', '代理 Session 是什么？', '价格是多少？']
+        : ['What can NexaLayer do?', 'What is a proxy Session?', 'How much does it cost?'],
+      requires_confirmation: false,
+    },
+  });
+}
 
 export async function handleExecute(
   request: FastifyRequest,
